@@ -39,3 +39,6 @@ crash.log
 
 # Operator-collected EC2 lab evidence; never publish raw artifacts
 evidence/
+
+# Local MySQL backups can contain sensitive database records
+backup/
