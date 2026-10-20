@@ -2,7 +2,7 @@
 
 ## 상태와 범위
 
-코드는 기존 브랜치 `feat/controlled-lab-verification-20261020`에만 반영합니다. Draft PR #1을 유지하며 main 병합, Day 18~20, EC2 설정 변경은 범위 밖입니다.
+개발 기능은 main `51aae3a65406410ebe7ebb5ba2c107d8928722a7`에 통합되었습니다. 이 문서는 당시 실측 연결 절차와 확인 상태를 보존합니다. 현재 촬영 순서는 [포트폴리오 촬영 가이드](portfolio_capture_guide.md)를 사용합니다.
 
 - Day 15: Python 루프백 정상 서버, 실제 HTTP checker의 `NOT_DETECTED` 판정 및 파라미터 SQL 조회를 자동 검증. 사용자 Windows의 신규 스캔/V7 저장은 아래 실행 결과로 확인해야 합니다.
 - Day 16: 사용자 실행 전용 EC2 읽기 전용 수집기와 Windows 가져오기 구현. FTP/HTTP/SSH 실제 원본은 이 Work에서 확보하지 않았습니다. 사용자 보고 기준 기존 DVWA는 scan 7 / HTTP port 4에 저장돼 있습니다.
@@ -15,8 +15,8 @@
 프로젝트 루트에서 실행합니다. 작업 중인 변경사항 때문에 pull이 실패하면 덮어쓰거나 reset하지 말고 출력을 확인합니다.
 
 ```powershell
-git switch feat/controlled-lab-verification-20261020
-git pull --ff-only origin feat/controlled-lab-verification-20261020
+git switch main
+git pull --ff-only origin main
 py -m scripts.windows_v7_preflight
 ```
 

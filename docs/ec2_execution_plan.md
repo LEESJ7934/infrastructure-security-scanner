@@ -1,8 +1,10 @@
 # EC2 실측 실행 지침 — 기존 인스턴스만 사용
 
+> 과거 EC2 확장 실행 계획입니다. 현재 사용자 실측·촬영 절차는 [촬영 가이드](portfolio_capture_guide.md)를 따릅니다. 이 문서의 배포·변경 절차를 기존 EC2에 촬영 목적으로 적용하지 않습니다. INSTANCE_ID_FROM_OWNED_ACCOUNT는 실제 승인된 인스턴스 ID로 사용자 환경에서만 대체합니다.
+
 현재 ChatGPT에는 사용자 AWS SSM 실행 권한이 없습니다. 스크린샷에서 실행 중인 인스턴스와 다음 실제 실습 증명은 서로 다릅니다. 이 문서의 원격 명령은 **아직 실행되지 않았습니다**.
 
-대상: test_server, i-036b5556c800856e0, 서울(ap-northeast-2), t3.micro. **퍼블릭 IPv4를 스캔하지 않습니다.**
+대상: test_server, INSTANCE_ID_FROM_OWNED_ACCOUNT, 서울(ap-northeast-2), t3.micro. **퍼블릭 IPv4를 스캔하지 않습니다.**
 
 ## 1. PC에서 기존 EC2 안전성 확인
 
@@ -10,7 +12,7 @@ AWS CLI v2, Session Manager 플러그인, Python 3.12가 필요합니다. IAM �
 
 PowerShell:
 
-    $env:AWS_LAB_INSTANCE_ID = "i-036b5556c800856e0"
+    $env:AWS_LAB_INSTANCE_ID = "INSTANCE_ID_FROM_OWNED_ACCOUNT"
     $env:AWS_DEFAULT_REGION = "ap-northeast-2"
     aws sts get-caller-identity
     python -m scripts.ec2_lab_preflight --instance-id $env:AWS_LAB_INSTANCE_ID --region $env:AWS_DEFAULT_REGION
@@ -25,7 +27,7 @@ AWS 콘솔 EC2 → 대상 인스턴스 → 연결 → Session Manager에서 실�
 
 EC2에서 사용자의 승인 후 GitHub 작업 브랜치를 내려받습니다.
 
-    git clone --branch feat/controlled-lab-verification-20261020 https://github.com/LEESJ7934/infrastructure-security-scanner.git
+    git clone --branch main https://github.com/LEESJ7934/infrastructure-security-scanner.git
     cd infrastructure-security-scanner
     bash lab/ec2_resource_gate.sh
 
@@ -33,7 +35,7 @@ EC2에서 사용자의 승인 후 GitHub 작업 브랜치를 내려받습니다.
 
 **RAM/디스크 검사 통과 후**, 인스턴스 소유자가 명시적으로 승인한 경우에만 아래 명령을 실행합니다. 일회용 실습 자격정보는 셸 환경변수에만 두며 Git이나 채팅에 저장하지 않습니다.
 
-    export AWS_LAB_INSTANCE_ID="i-036b5556c800856e0"
+    export AWS_LAB_INSTANCE_ID="INSTANCE_ID_FROM_OWNED_ACCOUNT"
     export EC2_LAB_APPROVED="YES"
     export LAB_SSH_PASSWORD="$(openssl rand -hex 24)"
     export DVWA_DB_ROOT_PASSWORD="$(openssl rand -hex 24)"
@@ -59,7 +61,7 @@ SSM 셸에서 실습 SSH 프로세스의 실제 인수를 확인합니다.
 
 PC의 검증된 Nuclei 바이너리 및 별도 DVWA 실습 계정 환경변수를 준비한 후 PowerShell에서 실행합니다. 비밀번호를 명령줄에 적거나 Git에 저장하지 않습니다.
 
-    python -m scripts.ec2_lab_tunnel_run --instance-id i-036b5556c800856e0 --region ap-northeast-2 --phase before --baseline-scan-id LOCAL_SCAN_ID --scope-file config/scope.example.json --nuclei-binary APPROVED_NUCLEI_PATH --binary-sha256 VERIFIED_EXECUTABLE_SHA256 --ssh-policy-file ssh_policy.local.json --execute
+    python -m scripts.ec2_lab_tunnel_run --instance-id INSTANCE_ID_FROM_OWNED_ACCOUNT --region ap-northeast-2 --phase before --baseline-scan-id LOCAL_SCAN_ID --scope-file config/scope.example.json --nuclei-binary APPROVED_NUCLEI_PATH --binary-sha256 VERIFIED_EXECUTABLE_SHA256 --ssh-policy-file ssh_policy.local.json --execute
 
 실행기는 EC2와 SSM Online, 위험한 SG 공개 설정, 포트 충돌을 먼저 검사하고, 원격 서비스 스캔 → FTP·SSH·HTTP → DVWA·Nuclei → MySQL 증적 → JSON/PDF와 SSM 실행 manifest 저장을 처리합니다. 실제 실행이 실패한 항목은 CONFIRMED 처리하지 않습니다.
 
@@ -73,7 +75,7 @@ PC의 검증된 Nuclei 바이너리 및 별도 DVWA 실습 계정 환경변수�
 
 PC에서는 위 실측에서 발급된 원래 EC2 scan ID를 지정합니다.
 
-    python -m scripts.ec2_lab_tunnel_run --instance-id i-036b5556c800856e0 --region ap-northeast-2 --phase after --baseline-scan-id LOCAL_SCAN_ID --ec2-scan-id EC2_SCAN_ID --scope-file config/scope.example.json --execute
+    python -m scripts.ec2_lab_tunnel_run --instance-id INSTANCE_ID_FROM_OWNED_ACCOUNT --region ap-northeast-2 --phase after --baseline-scan-id LOCAL_SCAN_ID --ec2-scan-id EC2_SCAN_ID --scope-file config/scope.example.json --execute
 
 같은 포트의 헤더 상태가 실제 POTENTIAL → NOT_DETECTED가 된 경우에만 MySQL V7과 비교 보고서에 새 증적을 기록합니다. 운영 환경이나 다른 취약점의 개선을 뜻하지 않습니다.
 

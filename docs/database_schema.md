@@ -1,5 +1,8 @@
 # Port Scanner Database Schema V5
 
+> 현재 통합 기준은 **MySQL 8.0 / 프로젝트 스키마 V7**입니다. 아래 V5/V6 구조 설명은 기존 기반을 보존한 것입니다. `sql/init.sql`은 V6를 만들며 V7은 `sql/migration_v7.sql`을 별도로 적용합니다. V7의 `lab_verification_results`는 scan/port/asset 외래키, 실행 상태·판정·Scope·시각·증적 SHA-256을 보존합니다. `NOT_TESTED`는 DB enum이 아닌 보고서 커버리지입니다. [백업·적용 절차](windows_mysql_ec2_evidence.md)와 [현재 README](../README.md)를 함께 확인합니다.
+
+
 ## 1. 개선 목적
 
 기존 스키마는 취약점 상태가 `POTENTIAL`, `CONFIRMED`,

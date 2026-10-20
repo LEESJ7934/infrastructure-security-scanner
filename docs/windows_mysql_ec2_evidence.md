@@ -6,7 +6,7 @@
 
 ```powershell
 cd <PROJECT_DIRECTORY>
-git switch feat/controlled-lab-verification-20261020
+git switch main
 git pull --ff-only
 py -m pip install -r requirements.txt
 py -m scripts.windows_v7_preflight
