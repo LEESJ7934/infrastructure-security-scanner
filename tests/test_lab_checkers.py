@@ -16,7 +16,7 @@ class FTPTests(unittest.TestCase):
         conn.connect.return_value = "220 ready"
         conn.login.return_value = "230 logged in"
         self.assertEqual(FTPChecker().run_check(PORT, {})["details"]["anonymous_login_attempted"], False)
-        result = FTPChecker(allow_anonymous_login=True).run_check(PORT, {})
+        result = FTPChecker(allow_anonymous_login=True, approved_endpoints=[('127.0.0.1', 2121)]).run_check(PORT, {})
         self.assertTrue(result["details"]["anonymous_login_allowed"])
         self.assertEqual(result["details"]["finding_status"], "CONFIRMED")
         self.assertEqual(result["status"], "POTENTIAL")
@@ -24,17 +24,23 @@ class FTPTests(unittest.TestCase):
         self.assertFalse(conn.storbinary.called or conn.delete.called)
 
     @patch("verification.checker_ftp.FTP")
+    def test_out_of_scope_auth_never_connects(self, ftp_cls):
+        result = FTPChecker(allow_anonymous_login=True).run_check(PORT, {})
+        self.assertEqual(result["error_code"], "SCOPE_DENIED")
+        ftp_cls.assert_not_called()
+
+    @patch("verification.checker_ftp.FTP")
     def test_denied_anonymous_is_not_detected(self, ftp_cls):
         from ftplib import error_perm
         ftp_cls.return_value.connect.return_value = "220 ready"
         ftp_cls.return_value.login.side_effect = error_perm("530 Login incorrect")
-        result = FTPChecker(allow_anonymous_login=True).run_check(PORT, {})
+        result = FTPChecker(allow_anonymous_login=True, approved_endpoints=[('127.0.0.1', 2121)]).run_check(PORT, {})
         self.assertEqual(result["details"]["finding_status"], "NOT_DETECTED")
 
     @patch("verification.checker_ftp.FTP")
     def test_error_is_not_safe(self, ftp_cls):
         ftp_cls.return_value.connect.side_effect = TimeoutError("timeout")
-        result = FTPChecker(allow_anonymous_login=True).run_check(PORT, {})
+        result = FTPChecker(allow_anonymous_login=True, approved_endpoints=[('127.0.0.1', 2121)]).run_check(PORT, {})
         self.assertEqual(result["status"], "ERROR")
         self.assertNotIn("finding_status", result["details"])
 
