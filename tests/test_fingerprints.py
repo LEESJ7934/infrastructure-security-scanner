@@ -13,7 +13,7 @@ from scripts.demo_banner_server import DemoHandler
 
 class FingerprintTests(unittest.TestCase):
     def test_explicit_ftp_greeting_on_nonstandard_port(self):
-        banner = "220 220 controlled-lab FTP ready\\r\\n"
+        banner = "220 220 controlled-lab FTP ready\r\n"
         result = identify_service(banner, "unknown")
         self.assertEqual(result["service"], "ftp")
         self.assertIsNone(result["product"])
