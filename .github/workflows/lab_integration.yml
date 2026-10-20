@@ -46,8 +46,8 @@ jobs:
             sleep 2
           done
           docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot' < sql/init.sql
-          docker exec scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot port_scan' \
-            -e "INSERT INTO scans (scan_uid,target,scan_type,port_range,started_at,status) VALUES ('pre-v7-fixture','127.0.0.1','tcp','2121',UTC_TIMESTAMP(),'COMPLETED')"
+          printf "%s\\n" "INSERT INTO scans (scan_uid,target,scan_type,port_range,started_at,status) VALUES ('pre-v7-fixture','127.0.0.1','tcp','2121',UTC_TIMESTAMP(),'COMPLETED');" | \
+            docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot port_scan'
           docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot' < sql/migration_v7.sql
           echo "DB_PASSWORD=$CI_MYSQL_PASSWORD" >> "$GITHUB_ENV"
       - name: 테스트용 Docker 서비스 빌드 및 실행
