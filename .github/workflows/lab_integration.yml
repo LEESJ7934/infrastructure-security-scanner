@@ -62,10 +62,25 @@ jobs:
             done
             if [ "$ok" != "1" ]; then echo "Missing live port $port"; exit 1; fi
           done
-      - name: 일회용 DVWA 데이터베이스 준비
+      - name: 일회용 DVWA 데이터베이스 준비 및 초기 데이터 확인
         env:
           CI_DISPOSABLE_DVWA: "YES"
-        run: python -m scripts.ci_dvwa_setup
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready=0
+          for i in $(seq 1 60); do
+            if docker compose -f lab/compose.yml exec -T dvwa-db sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mariadb -h127.0.0.1 -udvwa -N -e "SELECT 1" 2>/dev/null' | grep -qx '1'; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != 1 ]; then echo "Disposable DVWA MariaDB not ready"; exit 1; fi
+          python -m scripts.ci_dvwa_setup
+          users="$(docker compose -f lab/compose.yml exec -T dvwa-db sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mariadb -h127.0.0.1 -udvwa -N -e "SELECT COUNT(*) FROM dvwa.users"' 2>/dev/null | tr -d '\r' || true)"
+          if [ "$users" != 5 ]; then echo "DVWA seeded users missing after setup"; exit 1; fi
+          echo "Disposable DVWA seeded users verified: count=$users"
       - name: 고정 해시로 Nuclei 실제 바이너리 설치
         shell: bash
         run: |
