@@ -146,7 +146,7 @@ def _write_manifest(*, output_dir: Path, instance_id: str, region: str,
 
 
 def run(*, instance_id: str, region: str, baseline_scan_id: int, scope_file: str,
-        phase: str, ec2_scan_id=None, ssh_policy_file=None, nuclei_binary=None,
+        phase: str, ec2_scan_id=None, ssh_policy_file=None, nuclei_binary=None, nuclei_binary_sha256=None,
         output_dir="reports/ec2", aws_cli="aws") -> dict:
     if baseline_scan_id < 1 or phase not in ("before", "after"):
         raise ValueError("Valid baseline scan and phase required")
@@ -184,7 +184,7 @@ def run(*, instance_id: str, region: str, baseline_scan_id: int, scope_file: str
                           environment="EC2_LAB", check=kind)
                 if kind == "NUCLEI":
                     template = Path("lab/nuclei/missing-nosniff.yaml")
-                    kw.update(nuclei_binary=nuclei_binary, template_root=str(template.parent),
+                    kw.update(nuclei_binary=nuclei_binary, expected_binary_sha256=nuclei_binary_sha256, template_root=str(template.parent),
                               template_name=template.name,
                               reviewed_sha256=hashlib.sha256(template.read_bytes()).hexdigest(),
                               timeout=35)
@@ -232,6 +232,7 @@ def main(argv=None):
     p.add_argument("--scope-file", required=True)
     p.add_argument("--phase", choices=("before", "after"), required=True)
     p.add_argument("--nuclei-binary")
+    p.add_argument("--binary-sha256")
     p.add_argument("--ssh-policy-file")
     p.add_argument("--output-dir", default="reports/ec2")
     p.add_argument("--execute", action="store_true", help="Owner explicitly approves live scoped checks")
@@ -244,6 +245,7 @@ def main(argv=None):
                       baseline_scan_id=args.baseline_scan_id,
                       scope_file=args.scope_file, phase=args.phase,
                       ec2_scan_id=args.ec2_scan_id, nuclei_binary=args.nuclei_binary,
+                      nuclei_binary_sha256=args.binary_sha256,
                       ssh_policy_file=args.ssh_policy_file, output_dir=args.output_dir)
         print(json.dumps(outcome, ensure_ascii=False, default=str))
         return 0

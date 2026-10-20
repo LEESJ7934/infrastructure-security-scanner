@@ -37,7 +37,9 @@ def make_observation(*, port, environment, check_name, result, scope, observed_a
         finding = result.get("details", {}).get("finding_status", "INCONCLUSIVE")
         if finding not in FINDING:
             raise ValueError("Invalid configuration finding status")
+    observation_time = observed_at or datetime.now(timezone.utc).replace(tzinfo=None)
     evidence = redact({
+        "observed_at": observation_time.isoformat(),
         "checker": result.get("checker"), "reason": result.get("reason"),
         "error_code": result.get("error_code"), "details": result.get("details", {}),
         "additional_checks": result.get("additional_checks", []),
@@ -57,7 +59,7 @@ def make_observation(*, port, environment, check_name, result, scope, observed_a
         "evidence_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
         "evidence_json": canonical,
         "duration_ms": result.get("details", {}).get("duration_ms"),
-        "observed_at": observed_at or datetime.now(timezone.utc).replace(tzinfo=None),
+        "observed_at": observation_time,
     }
 
 

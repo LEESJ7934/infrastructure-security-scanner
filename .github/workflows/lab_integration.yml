@@ -92,6 +92,7 @@ jobs:
           chmod 0755 "$RUNNER_TEMP/nuclei"
           "$RUNNER_TEMP/nuclei" -version
           echo "CI_NUCLEI_BINARY=$RUNNER_TEMP/nuclei" >> "$GITHUB_ENV"
+          echo "CI_NUCLEI_SHA256=$(sha256sum "$RUNNER_TEMP/nuclei" | cut -d' ' -f1)" >> "$GITHUB_ENV"
       - name: 실제 FTP SSH HTTP DVWA Nuclei 스캔 및 MySQL 보고서 통합 검증
         env:
           CI_DVWA_USERNAME: admin

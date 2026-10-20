@@ -10,6 +10,7 @@ import json
 import os
 import re
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import subprocess
 from urllib.parse import urlsplit
 
@@ -47,6 +48,7 @@ def _validate_target(url: str, allow_targets: set[str]) -> str:
 
 def execute_reviewed(*, nuclei_binary: str, template_root: str, template_allowlist: dict,
                      template_name: str, origin: str, approved_ips: set[str],
+                     expected_binary_sha256: str, expected_version: str = "v3.11.1",
                      timeout=30, max_results=100):
     """Use only a pinned reviewed template and numeric, explicitly approved target."""
     if not 1 <= timeout <= 120 or not 1 <= max_results <= 1000:
@@ -58,25 +60,47 @@ def execute_reviewed(*, nuclei_binary: str, template_root: str, template_allowli
     binary = Path(nuclei_binary).resolve(strict=True)
     if not binary.is_file():
         raise ValueError("Nuclei executable missing")
+    binary_sha256 = hashlib.sha256(binary.read_bytes()).hexdigest()
+    if not re.fullmatch(r"[0-9a-f]{64}", expected_binary_sha256 or "") or binary_sha256 != expected_binary_sha256:
+        raise ValueError("Executable differs from verified official archive identity")
     version = subprocess.run([str(binary), "-version"], capture_output=True, text=True, timeout=10,
                              check=False)
     if version.returncode != 0:
         raise NucleiExecutionError("Nuclei version invocation failed")
+    found = re.search(r"v[0-9]+\.[0-9]+\.[0-9]+", version.stdout + getattr(version, "stderr", ""))
+    if not found or found[0] != expected_version:
+        raise NucleiExecutionError("Unexpected Nuclei version")
     # Avoid a process-wide shell and prevent passive upload/update mechanisms.
     args = [str(binary), "-u", target, "-t", str(template), "-jsonl",
             "-silent", "-disable-update-check", "-no-interactsh", "-rate-limit", "1",
-            "-concurrency", "1", "-timeout", "5", "-retries", "0"]
+            "-concurrency", "1", "-timeout", "5", "-retries", "0",
+            "-disable-redirects", "-omit-raw", "-no-stdin"]
     try:
-        finished = subprocess.run(args, capture_output=True, text=True, timeout=timeout,
-                                  check=False, env={k: v for k,v in os.environ.items()
-                                                   if k in {"PATH","HOME","TMPDIR","SYSTEMROOT","WINDIR"}})
+        # Explicit empty config prevents loading personal templates/headers/proxies.
+        with TemporaryDirectory(prefix="reviewed-nuclei-") as directory:
+            config = Path(directory) / "config.yaml"
+            config.write_text("{}\n", encoding="utf-8")
+            finished = subprocess.run(args + ["-config", str(config)], capture_output=True, timeout=timeout,
+                                      check=False, env={k: v for k,v in os.environ.items()
+                                                       if k in {"PATH","HOME","TMPDIR","SYSTEMROOT","WINDIR",
+                                                                "USERPROFILE","TEMP","TMP"}})
     except subprocess.TimeoutExpired:
         return {"execution_status": "ERROR", "finding_status": "INCONCLUSIVE",
                 "reason": "Nuclei execution timeout", "results": []}
     if finished.returncode != 0:
         return {"execution_status": "ERROR", "finding_status": "INCONCLUSIVE",
                 "reason": "Nuclei returned nonzero exit", "results": []}
-    rows = finished.stdout.splitlines()
+    raw_stdout = finished.stdout if isinstance(finished.stdout, bytes) else finished.stdout.encode()
+    try:
+        stdout = raw_stdout.decode("utf-8")
+    except UnicodeError as exc:
+        raise NucleiExecutionError("JSONL output must be UTF-8") from exc
+    if len(raw_stdout) > 262144:
+        raise NucleiExecutionError("JSONL output exceeds size bound")
+    rows = stdout.splitlines()
+    expected_id = re.search(r"(?m)^id:\s*([a-zA-Z0-9_-]+)\s*$", template.read_text(encoding="utf-8"))
+    if not expected_id:
+        raise NucleiExecutionError("Reviewed template ID missing")
     if len(rows) > max_results:
         raise NucleiExecutionError("Result count exceeds allowed maximum")
     observed = []
@@ -87,6 +111,16 @@ def execute_reviewed(*, nuclei_binary: str, template_root: str, template_allowli
             raise NucleiExecutionError("Malformed JSONL result") from exc
         if not isinstance(value, dict):
             raise NucleiExecutionError("Non-object JSONL result")
+        if (value.get("template-id") != expected_id[1]
+                or not isinstance(value.get("info"), dict)
+                or value.get("info", {}).get("severity") not in {"info", "low", "medium", "high", "critical", "unknown"}):
+            raise NucleiExecutionError("Unexpected template/result metadata")
+        try:
+            matched = _validate_target(value.get("matched-at", ""), approved_ips)
+        except (ValueError, TypeError) as exc:
+            raise NucleiExecutionError("Result endpoint is outside approved origin") from exc
+        if matched != target:
+            raise NucleiExecutionError("Result endpoint differs from selected scan port")
         # Store only reviewed non-secret keys, never request, response or cookies.
         observed.append({"template_id": str(value.get("template-id",""))[:160],
                          "severity": str(value.get("info",{}).get("severity",""))[:32],
@@ -95,7 +129,9 @@ def execute_reviewed(*, nuclei_binary: str, template_root: str, template_allowli
     return {"execution_status": "SUCCESS",
             "finding_status": "POTENTIAL" if observed else "NOT_DETECTED",
             "reason": "Template match needs separate CVE-specific verification",
-            "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+            "binary_sha256": binary_sha256,
+            "raw_jsonl_sha256": hashlib.sha256(raw_stdout).hexdigest(),
+            "raw_jsonl_retained": False,
             "template_sha256": template_allowlist[template_name],
-            "version_output": (re.search(r"v[0-9]+\\.[0-9]+\\.[0-9]+", getattr(version, "stdout", "") + getattr(version, "stderr", "")) or ["UNAVAILABLE"])[0],
+            "version_output": found[0],
             "process_returncode": finished.returncode, "results": observed}

@@ -260,7 +260,8 @@ def render_report_pdf(snapshot, output_path):
         section(12, "Controlled Laboratory Comparison")
         fields([("baseline_scan_id", comparison.get("scan_ids", {}).get("LOCAL_BASELINE")),
                 ("ec2_scan_id", comparison.get("scan_ids", {}).get("EC2_LAB")),
-                ("scope", "Stored lab configuration observations only; missing means NOT_TESTED.")])
+                ("runtime_context", snapshot.get("runtime_context", "OPERATOR_STORED_OBSERVATIONS")),
+                ("scope", "EC2_LAB is a storage label; Docker CI does not prove EC2 execution. Missing means NOT_TESTED.")])
         story.append(p(comparison.get("disclaimer", "Independent environments; not remediation before/after.")))
         for env_name, group in comparison.get("environments", {}).items():
             story.append(p(env_name, subheading))
@@ -276,6 +277,14 @@ def render_report_pdf(snapshot, output_path):
                             ("evidence_integrity", row.get("evidence_integrity")),
                             ("risk", row.get("risk")), ("recommendation", row.get("recommendation"))])
                     fields([("evidence", row.get("evidence"))])
+        story.append(p("Independent parameterized SQL application", subheading))
+        fields((snapshot.get("independent_sql_baseline") or {"status": "NOT_TESTED"}).items())
+        story.append(p("This separate application does not demonstrate remediation of DVWA."))
+        story.append(p("Same-service retest history", subheading))
+        for retest in comparison.get("retests", []):
+            fields(retest.items())
+        if not comparison.get("retests"):
+            story.append(p("NOT_TESTED: no qualifying same-service before/after evidence."))
         section(13, "Peer Environment CVE Findings")
         peer = snapshot.get("peer_report") or {}
         for scan in peer.get("scans", []):

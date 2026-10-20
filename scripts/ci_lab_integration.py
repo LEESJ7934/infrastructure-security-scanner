@@ -90,12 +90,33 @@ def verify_header_remediation(port, scan_id):
         sleep(1)
     if result.get("details", {}).get("finding_status") != "NOT_DETECTED":
         raise AssertionError("HTTP remediation did not remove missing header finding")
+    result["details"]["remediation_context"] = {
+        "runtime": "GITHUB_ACTIONS_DISPOSABLE_DOCKER", "service": "http-weak", "change": "security_headers_enabled"}
     observation = make_observation(
         port=port, environment="EC2_LAB", check_name="HTTP_SECURITY_HEADERS",
         result=result, scope=SCOPE,
     )
     insert_observation(observation)
     return {"port":port["port"], "before":"POTENTIAL", "after":"NOT_DETECTED"}
+
+
+def verify_ftp_remediation(port):
+    from verification.checker_ftp import FTPChecker
+    subprocess.run(["docker", "compose", "-f", "lab/compose.yml", "-f", "lab/compose.retest.yml",
+                    "--profile", "vulnerable", "up", "-d", "--no-deps", "--force-recreate", "ftp-weak"],
+                   check=True, capture_output=True, text=True, timeout=90)
+    result = None
+    for _ in range(30):
+        result = FTPChecker(timeout=2, allow_anonymous_login=True,
+            approved_endpoints=((port["host_ip"], int(port["port"])),)).run_check(port, {})
+        if result.get("details", {}).get("finding_status") == "NOT_DETECTED":
+            break
+        sleep(1)
+    assert result.get("details", {}).get("finding_status") == "NOT_DETECTED", "FTP denial not established"
+    result["details"]["remediation_context"] = {
+        "runtime": "GITHUB_ACTIONS_DISPOSABLE_DOCKER", "service": "ftp-weak", "change": "anonymous_auth_disabled"}
+    insert_observation(make_observation(port=port, environment="EC2_LAB", check_name="FTP_ANONYMOUS",
+                                        result=result, scope=SCOPE))
 
 
 def check_historical_preservation(conn):
@@ -142,6 +163,8 @@ def main():
         outcome = run_special(
             scope=SCOPE, scan_id=ec2_id, port_id=weak[8082]["port_id"],
             environment="EC2_LAB", check="NUCLEI", nuclei_binary=os.environ["CI_NUCLEI_BINARY"],
+            expected_binary_sha256=os.environ["CI_NUCLEI_SHA256"],
+            jsonl_output="reports/ci/nuclei_reviewed.jsonl",
             template_root="lab/nuclei", template_name=path.name,
             reviewed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(), timeout=35)
         if outcome["execution_status"] != "SUCCESS":
@@ -199,8 +222,24 @@ def main():
             finally:
                 conn.close()
 
+    from scripts.verify_safe_sql_baseline import verify_safe_lookup
+    safe_sql = verify_safe_lookup("http://127.0.0.1:8081")
+    safe_sql.update(scan_id=local_id, port_id=normal[8081]["port_id"], environment="LOCAL_BASELINE")
+    safe_sql_path = Path("reports/ci/separate_safe_sql_baseline.json")
+    safe_sql_path.parent.mkdir(parents=True, exist_ok=True)
+    safe_sql_path.write_text(json.dumps(safe_sql, indent=2), encoding="utf-8")
+    verify_ftp_remediation(weak[2122])
     remediation = verify_header_remediation(weak[8082], ec2_id)
     assert remediation == {"port": 8082, "before": "POTENTIAL", "after": "NOT_DETECTED"}
+
+    if os.environ.get("CI_NUCLEI_BINARY"):
+        path = Path("lab/nuclei/missing-nosniff.yaml")
+        retest = run_special(scope=SCOPE, scan_id=ec2_id, port_id=weak[8082]["port_id"],
+            environment="EC2_LAB", check="NUCLEI", nuclei_binary=os.environ["CI_NUCLEI_BINARY"],
+            expected_binary_sha256=os.environ["CI_NUCLEI_SHA256"], template_root="lab/nuclei",
+            template_name=path.name, reviewed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+            jsonl_output="reports/ci/nuclei_after_headers.jsonl", timeout=35)
+        assert (retest["execution_status"], retest["finding_status"]) == ("SUCCESS", "NOT_DETECTED"), retest
 
     # Exercise deduplicated append-only import SQL on real disposable MySQL V7.
     # This is a CI fixture, never evidence of Windows or AWS execution.
@@ -215,7 +254,9 @@ def main():
     assert first == second, "Repeated source must return existing V7 ID"
 
     output = generate_integrated_report(local_scan_id=local_id, ec2_scan_id=ec2_id,
-                                        output_dir="reports/ci", format="both")
+                                        output_dir="reports/ci", format="both",
+                                        runtime_context="GITHUB_ACTIONS_DISPOSABLE_DOCKER",
+                                        safe_sql_evidence=str(safe_sql_path))
     summary = json.loads(Path(output["json_path"]).read_text(encoding="utf-8"))
     assert summary["selection"]["local_scan_id"] == local_id
     assert summary["lab_comparison"]["scan_ids"]["EC2_LAB"] == ec2_id
@@ -223,6 +264,9 @@ def main():
     statuses = [row["finding_status"] for row in changed if row["evidence"]["port"] == 8082
                 and row["evidence"].get("checker") != "CIDeduplicationFixture"]
     assert statuses == ["POTENTIAL", "NOT_DETECTED"], statuses
+    assert {r["check"] for r in summary["lab_comparison"]["retests"]} >= {"FTP_ANONYMOUS", "HTTP_SECURITY_HEADERS"}
+    from api.analysis_report import snapshot_sha256
+    assert snapshot_sha256(summary) == summary["integrity"]["snapshot_sha256"]
     assert Path(output["pdf_path"]).read_bytes()[:5] == b"%PDF-"
     for key, group in summary["lab_comparison"]["environments"].items():
         assert group["coverage"]["FTP_ANONYMOUS"] == "OBSERVED"

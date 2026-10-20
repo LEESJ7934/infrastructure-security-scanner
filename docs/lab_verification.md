@@ -1,88 +1,41 @@
-# 승인된 격리 실습 검증 — V7 개발 및 실제 테스트
+# 포트스캐너 검증 기록과 판단 기준
 
-**증적 범위:** 2026-10-20 GitHub Actions의 일회용 Ubuntu Docker 컨테이너에서 실행한 결과입니다. 실제 사용자 소유 AWS EC2에서는 접속·배포·진단을 하지 않았습니다. EC2 Security Group, 운영 SSH, IAM 또는 과금 리소스를 변경하지 않았습니다.
+## 코드·자동 검증
 
-## 실제 Docker 통합 테스트
+Work에서 전체 Python 테스트 330개, 구문 검사, diff 공백 검사, 민감정보 검사를 수행합니다. 정확한 GitHub 실행 결과는 [기본 CI와 Docker 통합 Actions](https://github.com/LEESJ7934/infrastructure-security-scanner/actions)의 해당 커밋을 확인합니다.
 
-- [실제 Docker 통합 검증 성공](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402659)
-- [자동 회귀 테스트 성공](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402660)
-- 격리된 MySQL 8.0.40에 기존 V6 구조를 적용하고 데이터 1건을 저장한 뒤 V7 마이그레이션을 적용했습니다. 이전 스캔이 남아 있음을 확인했습니다.
-- `lab/compose.yml`의 FTP, SSH, HTTP, DVWA, MariaDB 실습 서비스를 loopback에 바인딩했습니다.
-- DVWA 초기 사용자 데이터 5건을 실습용 MariaDB 쿼리로 확인한 후 로그인과 비파괴 SQL Injection 결과 행 증가를 재현했습니다.
-- Nuclei 공식 v3.11.1 배포 파일 SHA-256을 확인한 뒤 `lab/nuclei/missing-nosniff.yaml`을 실행하고 JSONL 결과를 `POTENTIAL`로 저장했습니다.
-- V7에 실행 상태, 설정 판정, 증적 SHA-256을 분리 저장했습니다. 다른 ID인 정상 스캔 `2`와 취약 실습 스캔 `3`을 하나의 `REPEATABLE READ` DB 스냅샷에서 보고서 JSON/PDF로 생성했습니다.
-- 보고서의 `NOT_TESTED`는 서비스가 없거나 검증되지 않았다는 뜻이며 안전 판정이 아닙니다.
+일회용 Ubuntu Docker/MySQL CI는 V6 기존 스캔 보존 후 V7 적용, FK 무결성, 실제 FTP/SSH/HTTP, 초기 데이터만 사용하는 DVWA 읽기 전용 SQLi, 공식 Nuclei v3.11.1의 실제 프로세스, V7 저장·증적 해시, JSON/PDF 생성 경로를 검사합니다. 이전 성공 기록: [Day 15~17 통합 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39450382155).
 
-| 점검 | 정상 컨테이너 | 취약 컨테이너 | 의미 |
-|---|---|---|---|
-| FTP 익명 인증 | `NOT_DETECTED` | `CONFIRMED` | 익명 로그인 설정 확인, CVE 확정 아님 |
-| SSH 비밀번호 인증 | `NOT_DETECTED` | `POTENTIAL` | 격리 실습의 인증 정책 비교; 공격/대입 없음 |
-| HTTP 헤더 | `NOT_DETECTED` | `POTENTIAL` | 검사 대상 헤더 누락, 개별 적용 타당성 검토 필요 |
-| DVWA SQL Injection | 정상 서비스와 별도 구성 | 실제 재현 | 격리된 초기 데이터에 대한 읽기 전용 조회 결과 확대 |
-| Nuclei 템플릿 | 별도 스캔 미실행 | 매칭 `POTENTIAL` | 매칭만으로 CVE 확정 금지 |
+최종 통합 검사에는 같은 HTTP·FTP 서비스의 개선 후 재점검, Nuclei 헤더 재점검, 별도 안전 SQL 앱을 연결했습니다. 새로운 CI의 성공을 확인한 뒤 그 실행을 실증 근거로 사용합니다. 기존 EC2에 CI Compose를 배포하거나 설정을 바꾸지 않습니다.
 
-정상 SQL 조회 서비스는 `lab/server.py`의 파라미터 바인딩 코드를 사용합니다. 정상 서비스에 DVWA가 없다는 사실을 SQL Injection 안전 증명으로 사용하지 않습니다. 각 검사별 증적은 다운로드 가능한 GitHub Actions 아티팩트와 V7 이력에 남습니다.
+## 사용자 소유 EC2의 실제 관찰
 
-## 사용자 로컬/EC2 재현
+2026-10-20 사용자가 EC2 SSM에서 실행해 공유한 결과이며 Work/CI가 독립적으로 AWS에 접속한 결과가 아닙니다.
 
-프로젝트 루트에서 다음 명령을 사용합니다. 각 `<SCAN_ID>`, `<PORT_ID>`는 실제 DB에서 생성된 값으로 대체하고, `scope.local.json`과 인증정보는 **Git에 커밋하지 않습니다.**
-
-```bash
-# (1) 설정된 승인 범위만 dry-run
-python -m scripts.run_lab_verification --scan-id <SCAN_ID> --environment LOCAL_BASELINE --scope-file config/scope.local.json --dry-run
-
-# (2) FTP 인증을 명시적으로 승인한 실습 환경 점검
-python -m scripts.run_lab_verification --scan-id <SCAN_ID> --environment LOCAL_BASELINE --scope-file config/scope.local.json --allow-ftp-anonymous
-
-# (3) 이력과 설정 결과를 별도의 두 스캔 ID로 통합
-python -m scripts.generate_integrated_lab_report --local-scan-id <LOCAL_SCAN_ID> --ec2-scan-id <EC2_SCAN_ID> --output-dir reports --format both
-```
-
-Nuclei/DVWA 검증 경로는 `scripts.run_lab_special`; Docker 실습 구성, 초기 DB 백업 및 SSM 포트 전달은 [lab/README.md](../lab/README.md)를 확인하세요. Nuclei는 템플릿 SHA-256 allowlist가 일치해야 하며 실제 프로세스 실패는 `ERROR/INCONCLUSIVE`입니다. DVWA는 초기화된 격리 데이터만 사용하고 사용자/운영 DB를 수정하지 않습니다.
-
-**판단 규칙:** `execution_status=SUCCESS`는 검사 실행 성공을 뜻하고 `finding_status=CONFIRMED`는 해당 설정 또는 실습 동작이 실제 재현됐다는 뜻입니다. CVE 결과/우선순위는 기존 V6 파이프라인과 별도로 유지합니다. SHA-256은 동일한 증적 내용 확인 수단이지 전자서명이나 출처 진정성 증명은 아닙니다.
-
-## 남은 과제
-
-- 사용자 소유 EC2 SSM/VPN 등 안전한 접근이 확보된 후 취약 컨테이너 실제 배포, 재점검 및 장비별 증적 비교. 실제 EC2는 **미검증**입니다.
-- EC2 운영 SSH 설정을 바꾸지 않고, **컨테이너 실습 SSH만** 관리자 정책·실행 옵션을 확인해야 합니다.
-- 이미지 중 일부는 버전 태그로 고정돼 있고 모든 이미지가 digest 고정된 것은 아닙니다. 실제 이미지 digest를 기록해야 합니다.
-- **조치 후 재점검 성공:** Docker CI에서 `http-weak` 서비스의 누락 보안 헤더를 적용한 컨테이너로만 재생성하고, 동일 자산/포트의 V7 이력에 `POTENTIAL → NOT_DETECTED`를 각각 저장한 뒤 JSON 보고서에서 두 상태가 모두 유지되는지 확인했습니다. 이 조치는 **GitHub Actions 일회용 컨테이너**에만 적용했습니다. [검증 완료 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844206).
-- 실제 실행 중인 두 SSH 실습 컨테이너의 sshd 프로세스 인수에서 `PasswordAuthentication=no/yes`를 각각 읽어 비교했습니다. 사용자 EC2의 SSH 인증 정책을 확인한 결과는 아닙니다.
-- 별도 자동 회귀 테스트 **269개**가 통과했습니다. [CI 실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844259).
-
-
-## 기존 EC2 실측 준비 코드 (실제 AWS 미실행)
-
-2026-10-20 기존 사용자 EC2가 실행 중임을 스크린샷으로만 확인했습니다. AWS 계정/SSM 명령 권한이 현재 대화에 연결돼 있지 않아 **실제 EC2 배포·검증은 미실행**입니다. 대신 읽기 전용 AWS 사전 검사, IMDSv2 인스턴스/메모리/디스크/포트 게이트, 사용자 PC SSM 터널, MySQL V7 증적 저장, 이전·이후 보고서 검증을 위한 실행기를 구현하고 자동 테스트를 추가했습니다.
-
-관련 파일: scripts/ec2_lab_preflight.py, scripts/ec2_lab_tunnel_run.py, scripts/ec2_report_verify.py, lab/ec2_resource_gate.sh. 실제 실행 절차: [docs/ec2_execution_plan.md](ec2_execution_plan.md). AWS 비밀정보, 운영 SSH, 기존 EC2 자원 및 보안 그룹은 변경하지 않았습니다.
-
-
-## 사용자 소유 EC2에서 수집한 수동 검증 기록 (2026-10-20)
-
-이 절의 관찰값은 **사용자가 EC2 SSM 터미널에서 직접 실행하여 공유한 화면**을 근거로 기록했습니다. GitHub Actions의 독립 EC2 테스트가 아니며 이 저장소에서 증적 원본을 가져온 것은 아닙니다.
-
-| 점검 | 사용자 터미널 관찰 결과 | 근거와 한계 |
+| 항목 | 사용자 확인 결과 | 저장 검증 상태 |
 |---|---|---|
-| FTP 익명 로그인 | 230 Login successful, vsftpd 3.0.5 | 127.0.0.1:21의 실제 익명 인증 성공. FTP 설정 확인이지 CVE 확정 아님 |
-| 운영 SSH 정책 | pubkeyauthentication yes, passwordauthentication no | sshd -T 관찰. 운영 SSH를 취약 실습 SSH로 취급하지 않음 |
-| HTTP 보안 헤더 | HTTP 200, CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy 누락 | 127.0.0.1:80 DVWA에서 네 개의 헤더 누락 |
-| DVWA 인증 | Login verified: True | 로그인 후 세션 유지 확인 |
-| DVWA SQL Injection | 정상 조회 1개 행 → SQLi 조회 5개 행, CONFIRMED | 비파괴 읽기 동작. CVE 확정과 분리 |
-| MySQL V7 실제 EC2 증적 저장 | 미실행 | 사용자 EC2 /tmp/dvwa_sqli_evidence.json 생성 보고만 있음 |
-| AWS 실습 조치 후 재점검 | 미실행 | Docker CI 개선 테스트와 구별 |
+| FTP 21 | 익명 인증 230 Login successful | 사용자 실측 확인, V7 추가 저장 대기 |
+| SSH 22 | pubkeyauthentication yes / passwordauthentication no | 기본 sshd 설정 관찰, V7 추가 저장 대기 |
+| HTTP 80 | HTTP 200, CSP/X-Frame-Options/X-Content-Type-Options/Referrer-Policy 누락 | 사용자 실측 확인, V7 추가 저장 대기 |
+| DVWA SQLi | 정상 1행→우회 5행, CONFIRMED | 사용자 확인 기준 Windows V7 scan 7/port 4 저장 및 MATCH |
+| Nuclei | 사용자 EC2 실측 미확인 | 실행·V7 저장 대기 |
+| EC2 설정 개선 | 미실행 | Docker CI의 개선과 구분 |
+| 신규 Windows 정상 스캔·통합 보고서 | 미확인 | 실제 ID·생성 결과 확인 대기 |
 
-### 증적 해시 및 V7 연결
+## 상태와 무결성 해석
 
-EC2에서 원본 파일의 SHA-256을 조회만 하여 기록합니다.
+- `CANDIDATE`: 기존 V6의 CVE 후보. 버전 일치만으로 확정하지 않음.
+- `POTENTIAL`: 설정상 위험 가능성 또는 Nuclei 템플릿 매칭. 개별 맥락·CVE 검증 필요.
+- `CONFIRMED`: FTP 익명 인증 허용이나 DVWA의 읽기 전용 행 확대를 해당 증적으로 확인. CVE 확정과 별개.
+- `NOT_DETECTED`: 실행한 특정 검사에서 발견하지 못함. 시스템 전체가 안전하다는 뜻이 아님.
+- `NOT_TESTED`: 증적 없음, 오류 또는 판정 불가인 검사 커버리지. 실행 오류 행은 `ERROR/INCONCLUSIVE`로 보존.
 
-    sha256sum /tmp/dvwa_sqli_evidence.json
-    python3 -m json.tool /tmp/dvwa_sqli_evidence.json > /dev/null
+신규 관찰은 검사 시각도 증적 SHA-256에 포함합니다. 기존 V7 이력은 삭제·재해시하지 않습니다. 기존 스키마를 유지하며 원본 해시·정제 JSONL 해시·DB 증적 해시·통합 스냅샷 해시의 대상을 구분합니다. 해시는 내용 일치 검사이며 전자서명/원격 출처 인증은 아닙니다.
 
-파일은 인증된 안전한 경로로 스캐너 실행 PC로 옮겨 사용합니다. 채팅/GitHub/노션에 쿠키, 암호, 세션 토큰, 본문을 기록하지 않습니다. 추가된 scripts/import_ec2_dvwa_evidence.py는 승인된 기존 MySQL V7 스캔/포트 행이 존재할 때만 구조·행 수·SHA-256 형식을 검사하고, 실행 성공/설정 확인을 분리하여 append-only 기록합니다. 기본은 dry-run이며 --commit을 명시해야 저장합니다. 원본 증적의 SHA-256은 전자서명이나 독립적인 AWS EC2 원격 증명이 아닙니다.
+동일 스캔·자산·포트·환경·검사 항목의 검증 성공 이력만 전후 비교합니다. 오류·해시 불일치·다른 앱·같은 시각은 조치 성공으로 묶지 않습니다. EC2 DVWA와 정상 SQLite 앱은 독립 비교이며 DVWA가 개선됐다고 표시하지 않습니다.
 
-    python -m scripts.import_ec2_dvwa_evidence --evidence-file evidence/dvwa_sqli_evidence.json --scope-file config/scope.example.json --scan-id <EC2_SCAN_ID> --port-id <EC2_HTTP_PORT_ID>
-    python -m scripts.import_ec2_dvwa_evidence --evidence-file evidence/dvwa_sqli_evidence.json --scope-file config/scope.example.json --scan-id <EC2_SCAN_ID> --port-id <EC2_HTTP_PORT_ID> --commit
+## 재현과 병합 조건
 
-**중요:** 기존 EC2의 21/22/23/80 포트는 CI의 2122/2223/8082/4280 포트와 다릅니다. 사용자 운영 SSH 22번을 취약 실습 SSH로 판정하거나, CI 전용 실행기를 포트 매핑 수정 없이 EC2에 바로 적용하지 마세요. 현재 실제 EC2 증적은 V7 DB나 최종 보고서에 저장되지 않았습니다.
+[Day 15~17](day15_17_work1.md)에서 사용자 기존 V7과 실제 원본을 연결하고, [Day 18~20 실행 지침](day18_20_final.md)에서 Windows Nuclei·SSM 전달·최종 보고서 명령을 실행합니다. 운영 SSH·기존 FTP/DVWA 데이터·AWS 네트워크·기존 다크웹 컨테이너를 변경하지 않습니다.
+
+실제 Windows MySQL 결과와 최종 보고서를 일반 Chat에서 확인하기 전에는 전체 실환경 검증 완료로 표기하지 않습니다. Draft PR #1 유지, main 직접 수정·Squash 병합·브랜치 삭제 없음.

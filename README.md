@@ -367,71 +367,24 @@ V6 보고서는 CVE findings와 AWS configuration findings를 별도 항목으�
 현재 SG 설정 진단은 SSH(22), RDP(3389), MySQL(3306), PostgreSQL(5432), MongoDB(27017), FTP(21), Telnet(23), 전체 포트/프로토콜의 Internet-wide ingress를 별도 configuration finding으로 분류합니다.
 
 
-## 후속: 격리된 정상·취약 환경 검증 (V7, Draft PR #1)
+## 보안 검증·증적·재점검 (MySQL V7)
 
-기존 V6의 CVE 후보, 증적 및 우선순위 평가 기능은 그대로 유지합니다. 추가된 V7은 **설정/실습 검증용 별도 이력**으로, CVE 발견만으로 실증 결과가 확정되지 않도록 설계했습니다.
+기존 V6의 자산·CVE 후보·위험 평가와 함께 V7 검증 이력을 관리합니다. 실행 상태와 판정 상태를 분리하고 승인 Scope, 검사 시각, 대상, SHA-256을 보존합니다. FTP 익명 인증 허용과 DVWA SQLi는 각 설정/실습 검증이며 특정 CVE 확정을 뜻하지 않습니다. Nuclei 매칭은 `POTENTIAL`입니다. 증적이 없거나 실행에 실패한 항목을 안전하다고 판단하지 않습니다.
 
-- 기존의 열린 TCP 포트 관찰값을 승인 Scope로 재검증한 뒤 FTP 익명 로그인, HTTP 헤더, SSH 배너·관리자 제공 인증 정책을 확인합니다.
-- DVWA 실습용 비파괴 SQL Injection 검사와 SHA-256 증적 기록을 위한 별도 실행 명령을 제공합니다. 인증정보·쿠키·사용자 레코드는 증적에 기록하지 않습니다.
-- 공식 바이너리·버전·템플릿 SHA-256을 확인한 제한적 Nuclei 실행 기능이 있습니다. **Nuclei 매칭은 CVE CONFIRMED가 아닙니다.**
-- 정상·취약 환경별 서로 다른 스캔 ID를 입력받아 기존 V6 CVE 결과와 V7 이력을 하나의 읽기 전용 DB 스냅샷에서 집계하는 JSON/PDF 생성기를 추가했습니다.
-- 스코프 밖·미실행·실패한 서비스는 안전하다고 판단하지 않습니다.
-- CI의 Docker 실습은 GitHub Actions의 루프백 컨테이너에서 실행하며 **사용자 소유 AWS EC2의 검증을 대신하지 않습니다.**
+- FTP·HTTP·SSH 읽기 전용 검사, 비파괴 DVWA SQLi, 공식 배포본/실행 파일/버전/템플릿 무결성을 확인하는 Nuclei 실행
+- 사용자 수집 EC2 증적의 원본 해시·대상·기존 스캔/포트·Scope 대조 후 V7 추가 저장 및 중복 방지
+- 서로 다른 정상/EC2 스캔을 하나의 읽기 전용 DB 스냅샷에서 JSON/PDF로 출력
+- 동일 서비스의 조치 전후 증적은 별도 이력으로 보존하며 시각·해시·변경 맥락을 함께 비교
+- 별도 파라미터 SQL 앱은 DVWA와 독립 비교이며 DVWA 개선 완료로 표시하지 않음
 
-상세 환경 구축 및 재현 명령은 [격리 실습 문서](lab/README.md)와 [검증 내역](docs/lab_verification.md)을 참고합니다. CI 실행 결과는 [격리 실습 통합 검증](.github/workflows/lab_integration.yml)에서 확인합니다. 실제 실패한 단계는 완료로 분류하지 않습니다.
+### 검증 현황
 
-```bash
-# V7 스키마를 이전하기 전 외부 백업 필수
-# 기존 스캔 ID를 선택해 DB 쓰기 없는 승인 범위 확인
-python -m scripts.run_lab_verification --scan-id 1 --environment LOCAL_BASELINE --scope-file config/scope.local.json --dry-run
+Work의 전체 Python 회귀 테스트 **330개 통과**. GitHub Actions의 [기본 CI](.github/workflows/ci.yml)와 [격리 통합 검증](.github/workflows/lab_integration.yml)은 일회용 Docker/MySQL에서 V6→V7 기록 보존, 실제 FTP·SSH·HTTP·DVWA·Nuclei, HTTP/FTP 개선 후 재점검, JSON/PDF·무결성을 검사합니다. 최신 실행 결과와 보고서 아티팩트는 [Actions](https://github.com/LEESJ7934/infrastructure-security-scanner/actions)에서 확인합니다. CI의 `EC2_LAB`은 모의 환경 저장 라벨이며 실제 AWS 결과가 아닙니다.
 
-# 서로 다른 스캔 ID의 CVE 및 구성 점검을 합쳐 보고서로 내보내기
-python -m scripts.generate_integrated_lab_report --local-scan-id 1 --ec2-scan-id 2 --format both --output-dir reports
-```
+사용자 EC2 실측(사용자가 2026-10-20 공유한 결과): FTP `230 Login successful`, SSH 비밀번호 인증 비활성, HTTP 보안 헤더 4종 누락, DVWA 정상 1행→우회 5행. 사용자 확인 기준 DVWA는 Windows MySQL V7의 scan 7/port 4에 `CONFIRMED` 저장됐고 증적 무결성 `MATCH`를 확인했습니다. Work가 사용자 DB를 직접 열어 확인한 것은 아닙니다.
 
-### 2026-10-20 Docker·MySQL 실습 검증 결과
+**남은 사용자 확인:** FTP/HTTP/SSH의 실제 V7 추가 저장, 신규 로컬 정상 스캔, 기존 EC2 대상 Nuclei 실행, 실제 Windows 통합 JSON/PDF 생성. 기존 AWS 서비스의 개선은 수행하지 않았습니다. 운영 SSH·Security Group·기존 데이터·다크웹 컨테이너를 변경하지 않습니다. Draft PR #1을 유지하고 최종 Squash 병합은 별도 승인 후 진행합니다.
 
-[GitHub Actions 실측 검증 실행 #39415402659](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402659)에서 일회용 루프백 Docker 환경의 전체 통합 검증이 성공했습니다. Python 3.12 단위 테스트 **269개**도 통과했습니다.
-
-| 점검 항목 | 정상 실습(scan ID 2) | 의도적 취약 실습(scan ID 3) |
-|---|---|---|
-| FTP 익명 로그인 | SUCCESS / NOT_DETECTED | SUCCESS / CONFIRMED(익명 인증 설정) |
-| SSH 인증 정책 | SUCCESS / NOT_DETECTED | SUCCESS / POTENTIAL |
-| HTTP 보안 헤더 | SUCCESS / NOT_DETECTED | SUCCESS / POTENTIAL |
-| DVWA SQLi | 해당 테스트 미실행 | 통합 워크플로에서 실제 비파괴 검증 단계 통과 |
-| Nuclei | 해당 테스트 미실행 | 실제 Nuclei 3.11.1 템플릿 실행 단계 통과 |
-
-- MySQL 8.0.40 V7 적용, 기존 V6 테스트 기록 보존, 저장 이력의 FK 제약 및 증적 무결성, 두 개의 서로 다른 스캔 ID에 대한 JSON/PDF 생성 과정을 통합 테스트로 확인했습니다.
-- [CI에서 생성된 JSON/PDF 아티팩트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402659#artifacts)의 보관 기간은 7일입니다.
-- Docker의 의도적 취약 실습은 AWS EC2가 아닙니다. **사용자 소유 EC2에서의 실측 및 실제 로컬 운영환경에 대한 검증은 아직 하지 않았습니다.**
-- CVE 여부와 취약 설정 검증은 별개입니다. 익명 FTP 인증 허용이 확인되었다고 CVE가 CONFIRMED가 되는 것은 아닙니다.
-
-미완료/별도 승인 필요: 기존 EC2의 접근 통제 확인 및 실측, EC2 측 SSH 인증정책의 독립 증적, 조치 후 재점검 및 실제 EC2·로컬 간 비교. `main` 병합 전 Draft PR에서 검토합니다.
-
-### 격리 Docker CI 검증 결과 (2026-10-20)
-
-GitHub Actions 일회용 환경에서 Python 회귀 테스트 **269개**, MySQL 8.0.40 V6→V7 데이터 보존·증적/FK 검사, 실제 FTP·SSH·HTTP와 DVWA/Nuclei 실행, JSON/PDF 생성 및 HTTP 보안 헤더 개선 전후 재점검이 통과했습니다.
-
-| 점검 항목 | 정상 서비스 | 취약 실습 서비스 |
-|---|---|---|
-| FTP 익명 로그인 | 거부(`NOT_DETECTED`) | 허용(`CONFIRMED`, 설정에 한함) |
-| SSH 비밀번호 정책 | 비활성(`NOT_DETECTED`) | 활성(`POTENTIAL`) |
-| HTTP 보안 헤더 | 적용(`NOT_DETECTED`) | 누락(`POTENTIAL`) |
-| HTTP 누락 헤더 조치 후 재점검 | — | `POTENTIAL → NOT_DETECTED` |
-| DVWA SQL Injection | 대응하는 별도 DVWA 서비스 미구축(안전 판정 아님) | 비파괴 실습 재현 |
-| Nuclei | 별도 미실행 | 매칭 `POTENTIAL` (CVE 확정 아님) |
-
-실제 실행 기록: [일회용 Docker 통합 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844206) · [자동 회귀 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844259). 실제 보고서 파일은 통합 테스트 실행의 아티팩트로 제공합니다. **AWS EC2는 미검증 상태이며 사용자 소유 서버의 SSH/네트워크 설정은 변경하지 않았습니다.** 실습 포트는 모두 루프백으로만 바인딩됩니다.
-
-
-### 사용자 소유 EC2 실측 실행 준비 (SSM 전용)
-
-스크린샷에서 기존 test_server(t3.micro, 서울 리전)가 실행 중인 것을 확인했으나, 실제 SSM 연결/배포/EC2 진단은 아직 실행되지 않았습니다. 기존 인스턴스의 공개 IPv4를 스캔하지 않고 SSM의 127.0.0.1 포트 전달만 이용하도록 준비했습니다.
-
-- 실제 EC2 사전 검사: scripts/ec2_lab_preflight.py (running, SSM Online, 보안 그룹 실습 포트 전체 공개 여부, AWS 변경 없음)
-- 원격 Docker 배포 게이트: lab/ec2_resource_gate.sh (IMDSv2 인스턴스 ID, 메모리/디스크, 포트 격리, 명시적 사용자 승인)
-- EC2 원격 검증/재점검: scripts/ec2_lab_tunnel_run.py (기존 MySQL V7, DVWA/Nuclei, JSON/PDF, SSM manifest)
-- 증적 일관성 검사: scripts/ec2_report_verify.py (이전/이후 스캔 ID·SHA-256·NOT_TESTED/오류 구분)
-- 사용 명령과 주의사항: [EC2 실행 지침](docs/ec2_execution_plan.md)
-
-**t3.micro의 1GiB RAM은 다중 컨테이너 실습에 부족할 수 있어 자동 배포가 차단됩니다.** 인스턴스 유형/EBS/IAM/보안 그룹을 자동 변경하지 않습니다. GitHub CI는 기존 Docker 실습과 신규 EC2 실행기 오프라인 테스트이며 **AWS 실제 테스트 성공이 아닙니다.**
+- [Day 15~17 Windows·EC2 증적 연결](docs/day15_17_work1.md)
+- [Day 18~20 Nuclei·재점검·최종 보고서 실행](docs/day18_20_final.md)
+- [검증 결과와 한계](docs/lab_verification.md) / [Docker 실습 구성](lab/README.md)

@@ -18,7 +18,8 @@ from verification.reviewed_nuclei import execute_reviewed
 def run_special(*, scope: ScopePolicy, scan_id: int, port_id: int, environment: str,
                 check: str, dry_run=False, username=None, password=None,
                 nuclei_binary=None, template_root=None, template_name=None,
-                reviewed_sha256=None, timeout=10):
+                reviewed_sha256=None, expected_binary_sha256=None, expected_version="v3.11.1",
+                jsonl_output=None, timeout=10):
     if scan_id < 1 or port_id < 1 or environment not in {"LOCAL_BASELINE", "EC2_LAB"}:
         raise ValueError("Invalid selection")
     if check not in {"DVWA_SQLI", "NUCLEI"}:
@@ -51,11 +52,19 @@ def run_special(*, scope: ScopePolicy, scan_id: int, port_id: int, environment: 
             nuclei = execute_reviewed(
                 nuclei_binary=nuclei_binary, template_root=template_root,
                 template_allowlist={template_name: reviewed_sha256},
-                template_name=template_name, origin=origin, approved_ips={host},
-                timeout=timeout)
+                template_name=template_name, origin=origin, approved_ips={host}, expected_binary_sha256=expected_binary_sha256,
+                expected_version=expected_version, timeout=timeout)
         except (OSError, ValueError, RuntimeError) as exc:
             nuclei = {"execution_status": "ERROR", "finding_status": "INCONCLUSIVE",
                       "reason": type(exc).__name__, "results": []}
+        if jsonl_output and nuclei["execution_status"] == "SUCCESS":
+            import hashlib
+            safe_jsonl = "".join(json.dumps(r, sort_keys=True, separators=(",", ":")) + "\n" for r in nuclei["results"])
+            destination = Path(jsonl_output)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("x", encoding="utf-8", newline="\n") as output:
+                output.write(safe_jsonl)
+            nuclei["sanitized_jsonl_sha256"] = hashlib.sha256(safe_jsonl.encode()).hexdigest()
         result = {
             "status": "ERROR" if nuclei["execution_status"] == "ERROR" else "POTENTIAL",
             "checker": "ReviewedNucleiRunner", "reason": nuclei["reason"],
@@ -81,6 +90,9 @@ def main(argv=None):
     parser.add_argument("--template-root")
     parser.add_argument("--template-name")
     parser.add_argument("--template-sha256")
+    parser.add_argument("--binary-sha256")
+    parser.add_argument("--nuclei-version", default="v3.11.1")
+    parser.add_argument("--jsonl-output", type=Path)
     parser.add_argument("--timeout", type=float, default=10)
     args = parser.parse_args(argv)
     try:
@@ -90,7 +102,8 @@ def main(argv=None):
             dry_run=args.dry_run, username=os.getenv("DVWA_USERNAME"),
             password=os.getenv("DVWA_PASSWORD"), nuclei_binary=args.nuclei_binary,
             template_root=args.template_root, template_name=args.template_name,
-            reviewed_sha256=args.template_sha256, timeout=args.timeout)
+            reviewed_sha256=args.template_sha256, expected_binary_sha256=args.binary_sha256,
+            expected_version=args.nuclei_version, jsonl_output=args.jsonl_output, timeout=args.timeout)
         print(json.dumps(outcome, ensure_ascii=False))
         return 1 if outcome.get("execution_status") == "ERROR" else 0
     except Exception as exc:

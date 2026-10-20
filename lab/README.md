@@ -79,7 +79,7 @@ Nuclei 공식 실행 파일은 사용자 로컬에 설치하고 SHA-256을 확�
 
 ```bash
 sha256sum lab/nuclei/missing-nosniff.yaml
-python -m scripts.run_lab_special --check NUCLEI --scan-id 2 --port-id 124 --environment EC2_LAB --scope-file config/scope.aws.local.json --nuclei-binary /absolute/path/to/nuclei --template-root lab/nuclei --template-name missing-nosniff.yaml --template-sha256 <해시>
+python -m scripts.run_lab_special --check NUCLEI --scan-id 2 --port-id 124 --environment EC2_LAB --scope-file config/scope.aws.local.json --nuclei-binary /absolute/path/to/nuclei --binary-sha256 <검증된_실행파일_SHA256> --nuclei-version v3.11.1 --template-root lab/nuclei --template-name missing-nosniff.yaml --template-sha256 <해시>
 ```
 
 ## 5. 비교 보고서
@@ -113,4 +113,11 @@ SSH 운영 데몬, Security Group, IAM 권한을 변경하는 명령은 제공�
 
 ## 기존 EC2에서의 실제 검증 — 사용자 실행 단계
 
-[EC2 실측 실행 지침](../docs/ec2_execution_plan.md)의 사전 검사, IMDSv2 기반 배포 게이트, 사용자 PC SSM 포트 전달 검사, 개선 후 재점검, JSON/PDF+SSM manifest 비교 순서대로 진행하세요. EC2(t3.micro)는 1GiB RAM이므로 기본 자원 기준에 미달할 수 있습니다. 승인 없는 비용 변경·운영 SSH 변경·인터넷 공개는 하지 않습니다. 실제 EC2 SSM 실측은 아직 수행되지 않았습니다.
+[EC2 실측 실행 지침](../docs/ec2_execution_plan.md)의 사전 검사, IMDSv2 기반 배포 게이트, 사용자 PC SSM 포트 전달 검사, 개선 후 재점검, JSON/PDF+SSM manifest 비교 순서대로 진행하세요. EC2(t3.micro)는 1GiB RAM이므로 기본 자원 기준에 미달할 수 있습니다. 승인 없는 비용 변경·운영 SSH 변경·인터넷 공개는 하지 않습니다. 기존 EC2의 FTP·SSH·HTTP·DVWA 수동 실측은 사용자 확인 완료이며, 이 다중 컨테이너 배포 절차를 실제 EC2에서 수행한 것은 아닙니다.
+
+
+## HTTP·FTP 개선 후 재점검과 Nuclei 준비
+
+`compose.retest.yml`은 기존 일회용 실습 `http-weak`의 보안 헤더 적용과 `ftp-weak`의 익명 인증 차단만 정의합니다. CI는 이 두 컨테이너만 `--no-deps --force-recreate`로 재생성하고 같은 스캔/포트의 새 V7 이력을 추가합니다. 사용자 EC2 FTP 21, 운영 SSH, 기존 DVWA 또는 다크웹 컨테이너에 이 명령을 적용하지 않습니다.
+
+Nuclei는 [공식 배포본 준비 및 Windows 실행 절차](../docs/day18_20_final.md)의 `prepare_nuclei`로 ZIP 해시를 확인한 뒤 실행 파일 해시와 버전을 전달합니다. 템플릿은 기존 missing-nosniff 한 개이며 공격/파괴 동작이 없습니다. 조치 전후 JSONL은 정제해 아티팩트에 보존하고 원본 stdout SHA-256을 별도로 저장합니다. SQL 방어 검증은 기존 안전 앱의 파라미터 조회를 재사용하며 DVWA 수정으로 표시하지 않습니다.

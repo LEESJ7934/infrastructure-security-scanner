@@ -16,11 +16,12 @@ class ReviewedNucleiTests(unittest.TestCase):
         self.params = dict(nuclei_binary=str(base/"nuclei"), template_root=str(base),
                            template_allowlist={"safe.yaml": hashlib.sha256(b"id: safe").hexdigest()},
                            template_name="safe.yaml",origin="http://127.0.0.1:8080",
-                           approved_ips={"127.0.0.1"})
+                           approved_ips={"127.0.0.1"},
+                           expected_binary_sha256=hashlib.sha256(b"mock binary").hexdigest())
 
     @patch("verification.reviewed_nuclei.subprocess.run")
     def test_no_detection_is_not_confirmed(self, run):
-        run.side_effect = [type("R", (), {"returncode":0,"stdout":"v3","stderr":""})(),
+        run.side_effect = [type("R", (), {"returncode":0,"stdout":"v3.11.1","stderr":""})(),
                            type("R", (), {"returncode":0,"stdout":"","stderr":""})()]
         out = execute_reviewed(**self.params)
         self.assertEqual(out["finding_status"], "NOT_DETECTED")
@@ -29,7 +30,7 @@ class ReviewedNucleiTests(unittest.TestCase):
 
     @patch("verification.reviewed_nuclei.subprocess.run")
     def test_detected_stays_potential(self, run):
-        run.side_effect = [type("R", (), {"returncode":0,"stdout":"v3"})(),
+        run.side_effect = [type("R", (), {"returncode":0,"stdout":"v3.11.1"})(),
                            type("R", (), {"returncode":0,"stdout":'{"template-id":"safe","info":{"severity":"low"},"matched-at":"http://127.0.0.1:8080"}'})()]
         out = execute_reviewed(**self.params)
         self.assertEqual(out["finding_status"], "POTENTIAL")

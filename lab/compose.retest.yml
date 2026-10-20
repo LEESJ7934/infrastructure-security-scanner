@@ -4,3 +4,7 @@ services:
     environment:
       LAB_MODE: http
       LAB_VULNERABLE: "0"
+  ftp-weak:
+    environment:
+      LAB_MODE: ftp
+      LAB_VULNERABLE: "0"

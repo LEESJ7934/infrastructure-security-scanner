@@ -33,6 +33,9 @@ def _render_row(row):
         ("execution_status", "execution_status"), ("finding_status", "finding_status"),
         ("scan_id", "scan_id"), ("port_id", "port_id"), ("asset_uid", "asset_uid"),
         ("scope_uid", "scope_uid"), ("scope_sha256", "scope_sha256")) if key in details)
+    if "observed_at" in details:
+        binding_matches = binding_matches and (
+            datetime.fromisoformat(details["observed_at"]) == datetime.fromisoformat(str(row["observed_at"])))
     integrity_matches = actual == row["evidence_sha256"] and binding_matches
     risk, recommendation = GUIDANCE.get(row["check_name"], ("REVIEW_REQUIRED", "Review evidence."))
     trusted = integrity_matches and row["execution_status"] == "SUCCESS"
@@ -54,6 +57,39 @@ def _render_row(row):
     }
 
 
+def _retests(rendered):
+    groups = {}
+    for row in rendered:
+        evidence = row["evidence"]
+        if (row["evidence_integrity"] != "MATCH" or row["execution_status"] != "SUCCESS"
+                or row["finding_status"] not in {"POTENTIAL", "CONFIRMED", "NOT_DETECTED"}
+                or evidence.get("details", {}).get("fixture_only")):
+            continue
+        # A different scan, port, asset, environment or check cannot be called
+        # remediation of the same service. Independent SQL apps never pair.
+        identity = (evidence.get("scan_id"), evidence.get("port_id"), row["asset_uid"],
+                    row["environment"], row["check"])
+        if None in identity:
+            continue
+        groups.setdefault(identity, []).append(row)
+    output = []
+    for identity, items in groups.items():
+        items = sorted(items, key=lambda r: r["observed_at"])
+        before, after = items[0], items[-1]
+        if (before["finding_status"] not in {"POTENTIAL", "CONFIRMED"}
+                or after["finding_status"] != "NOT_DETECTED"
+                or before["observed_at"] >= after["observed_at"]):
+            continue
+        context = after["evidence"].get("details", {}).get("remediation_context")
+        output.append({"scan_id": identity[0], "port_id": identity[1], "asset_uid": identity[2],
+                       "environment": identity[3], "check": identity[4],
+                       "before": {k: before[k] for k in ("finding_status", "observed_at", "evidence_sha256")},
+                       "after": {k: after[k] for k in ("finding_status", "observed_at", "evidence_sha256")},
+                       "change_record": context, "assessment": "OBSERVED_CHANGE_IN_SAME_CHECK_SCOPE",
+                       "limitation": "Observation change alone is not proof of the applied change or overall security."})
+    return output
+
+
 def build_comparison(rows):
     """No observed service / no row is UNKNOWN, never safe."""
     rendered = [_render_row(r) for r in rows]
@@ -66,11 +102,13 @@ def build_comparison(rows):
                 name: [r for r in items if r["check"] == name] for name in CHECKS
             },
             "coverage": {name: "OBSERVED" if any(r["check"] == name and r["execution_status"] == "SUCCESS"
-                                             and r["evidence_integrity"] == "MATCH" for r in items)
+                                             and r["evidence_integrity"] == "MATCH"
+                                             and r["finding_status"] in {"POTENTIAL", "CONFIRMED", "NOT_DETECTED"} for r in items)
                          else "NOT_TESTED" for name in CHECKS}
         }
     return {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(),
             "comparison_type": "INDEPENDENT_ENVIRONMENTS_NOT_BEFORE_AFTER",
+            "retests": _retests(rendered),
             "disclaimer": "Local HTTP and EC2 DVWA are different applications, not remediation before/after. Recorded results only. No record is NOT_TESTED, never a safe verdict. No CVE is proven by a configuration result.",
             "environments": by_env}
 

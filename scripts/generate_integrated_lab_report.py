@@ -18,7 +18,10 @@ from api.report_pdf import render_report_pdf
 from scripts.generate_lab_comparison import build_comparison
 
 
-def build_integrated_snapshot(*, local_scan_id: int, ec2_scan_id: int):
+def build_integrated_snapshot(*, local_scan_id: int, ec2_scan_id: int,
+                              runtime_context="OPERATOR_STORED_OBSERVATIONS", safe_sql_evidence=None):
+    if runtime_context not in {"OPERATOR_STORED_OBSERVATIONS", "GITHUB_ACTIONS_DISPOSABLE_DOCKER"}:
+        raise ValueError("Unsupported report runtime context")
     if local_scan_id < 1 or ec2_scan_id < 1 or local_scan_id == ec2_scan_id:
         raise ValueError("Two distinct positive scan IDs required")
     connection = get_connection()
@@ -44,7 +47,20 @@ def build_integrated_snapshot(*, local_scan_id: int, ec2_scan_id: int):
     ec2 = _assemble(validate_selection(scan_id=ec2_scan_id), right)
     comparison = build_comparison(lab_rows)
     comparison["scan_ids"] = {"LOCAL_BASELINE": local_scan_id, "EC2_LAB": ec2_scan_id}
+    independent_sql = {"status": "NOT_TESTED", "dvwa_remediated": False}
+    if safe_sql_evidence is not None:
+        import hashlib
+        from scripts.verify_safe_sql_baseline import validate_evidence
+        source = Path(safe_sql_evidence)
+        if source.stat().st_size > 16384:
+            raise ValueError("Safe SQL evidence exceeds bound")
+        raw = source.read_bytes()
+        independent_sql = {"status": "OPERATOR_OR_CI_RECORDED_OBSERVATION",
+                           "source_file_sha256": hashlib.sha256(raw).hexdigest(),
+                           "evidence": validate_evidence(json.loads(raw), local_scan_id), "dvwa_remediated": False}
     baseline.update(
+        independent_sql_baseline=independent_sql,
+        runtime_context=runtime_context,
         peer_report=ec2,
         lab_comparison=comparison,
         report_scope="V6+V7 two-scan comparison; one read-only repeatable-read database snapshot",
@@ -56,10 +72,12 @@ def build_integrated_snapshot(*, local_scan_id: int, ec2_scan_id: int):
 
 
 def generate_integrated_report(*, local_scan_id: int, ec2_scan_id: int,
-                               output_dir="reports", format="both"):
+                               output_dir="reports", format="both",
+                               runtime_context="OPERATOR_STORED_OBSERVATIONS", safe_sql_evidence=None):
     if format not in {"json", "pdf", "both"}:
         raise ValueError("Unsupported export format")
-    snapshot = build_integrated_snapshot(local_scan_id=local_scan_id, ec2_scan_id=ec2_scan_id)
+    snapshot = build_integrated_snapshot(local_scan_id=local_scan_id, ec2_scan_id=ec2_scan_id,
+                                         runtime_context=runtime_context, safe_sql_evidence=safe_sql_evidence)
     directory = Path(output_dir).resolve()
     directory.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
@@ -88,13 +106,14 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--local-scan-id", type=int, required=True)
     p.add_argument("--ec2-scan-id", type=int, required=True)
+    p.add_argument("--safe-sql-evidence-file", type=Path)
     p.add_argument("--output-dir", default="reports")
     p.add_argument("--format", choices=("json", "pdf", "both"), default="both")
     a = p.parse_args(argv)
     try:
         print(json.dumps(generate_integrated_report(
             local_scan_id=a.local_scan_id, ec2_scan_id=a.ec2_scan_id,
-            output_dir=a.output_dir, format=a.format), ensure_ascii=False))
+            output_dir=a.output_dir, format=a.format, safe_sql_evidence=a.safe_sql_evidence_file), ensure_ascii=False))
         return 0
     except Exception as e:
         print(json.dumps({"error": type(e).__name__}), file=__import__("sys").stderr)

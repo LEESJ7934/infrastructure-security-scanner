@@ -59,7 +59,7 @@ SSM 셸에서 실습 SSH 프로세스의 실제 인수를 확인합니다.
 
 PC의 검증된 Nuclei 바이너리 및 별도 DVWA 실습 계정 환경변수를 준비한 후 PowerShell에서 실행합니다. 비밀번호를 명령줄에 적거나 Git에 저장하지 않습니다.
 
-    python -m scripts.ec2_lab_tunnel_run --instance-id i-036b5556c800856e0 --region ap-northeast-2 --phase before --baseline-scan-id LOCAL_SCAN_ID --scope-file config/scope.example.json --nuclei-binary APPROVED_NUCLEI_PATH --ssh-policy-file ssh_policy.local.json --execute
+    python -m scripts.ec2_lab_tunnel_run --instance-id i-036b5556c800856e0 --region ap-northeast-2 --phase before --baseline-scan-id LOCAL_SCAN_ID --scope-file config/scope.example.json --nuclei-binary APPROVED_NUCLEI_PATH --binary-sha256 VERIFIED_EXECUTABLE_SHA256 --ssh-policy-file ssh_policy.local.json --execute
 
 실행기는 EC2와 SSM Online, 위험한 SG 공개 설정, 포트 충돌을 먼저 검사하고, 원격 서비스 스캔 → FTP·SSH·HTTP → DVWA·Nuclei → MySQL 증적 → JSON/PDF와 SSM 실행 manifest 저장을 처리합니다. 실제 실행이 실패한 항목은 CONFIRMED 처리하지 않습니다.
 
