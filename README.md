@@ -422,3 +422,16 @@ GitHub Actions 일회용 환경에서 Python 회귀 테스트 **269개**, MySQL 
 | Nuclei | 별도 미실행 | 매칭 `POTENTIAL` (CVE 확정 아님) |
 
 실제 실행 기록: [일회용 Docker 통합 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844206) · [자동 회귀 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844259). 실제 보고서 파일은 통합 테스트 실행의 아티팩트로 제공합니다. **AWS EC2는 미검증 상태이며 사용자 소유 서버의 SSH/네트워크 설정은 변경하지 않았습니다.** 실습 포트는 모두 루프백으로만 바인딩됩니다.
+
+
+### 사용자 소유 EC2 실측 실행 준비 (SSM 전용)
+
+스크린샷에서 기존 test_server(t3.micro, 서울 리전)가 실행 중인 것을 확인했으나, 실제 SSM 연결/배포/EC2 진단은 아직 실행되지 않았습니다. 기존 인스턴스의 공개 IPv4를 스캔하지 않고 SSM의 127.0.0.1 포트 전달만 이용하도록 준비했습니다.
+
+- 실제 EC2 사전 검사: scripts/ec2_lab_preflight.py (running, SSM Online, 보안 그룹 실습 포트 전체 공개 여부, AWS 변경 없음)
+- 원격 Docker 배포 게이트: lab/ec2_resource_gate.sh (IMDSv2 인스턴스 ID, 메모리/디스크, 포트 격리, 명시적 사용자 승인)
+- EC2 원격 검증/재점검: scripts/ec2_lab_tunnel_run.py (기존 MySQL V7, DVWA/Nuclei, JSON/PDF, SSM manifest)
+- 증적 일관성 검사: scripts/ec2_report_verify.py (이전/이후 스캔 ID·SHA-256·NOT_TESTED/오류 구분)
+- 사용 명령과 주의사항: [EC2 실행 지침](docs/ec2_execution_plan.md)
+
+**t3.micro의 1GiB RAM은 다중 컨테이너 실습에 부족할 수 있어 자동 배포가 차단됩니다.** 인스턴스 유형/EBS/IAM/보안 그룹을 자동 변경하지 않습니다. GitHub CI는 기존 Docker 실습과 신규 EC2 실행기 오프라인 테스트이며 **AWS 실제 테스트 성공이 아닙니다.**
