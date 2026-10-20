@@ -74,7 +74,9 @@ def verify_dvwa_sqli(*, origin: str, approved_ip: str, username: str, password: 
                 steps.append({"label": "auth_validation", "http_status": home.status_code,
                               "login_http_status": login.status_code,
                               "login_page_detected": "name=\"username\"" in home.text.lower(),
-                              "logout_marker_detected": "logout" in home.text.lower()})
+                              "logout_marker_detected": "logout" in home.text.lower(),
+                              "login_redirect_path": urlsplit(login.headers.get("Location", "")).path[:80],
+                              "home_redirect_path": urlsplit(home.headers.get("Location", "")).path[:80]})
                 return _result("ERROR", "DVWA_AUTH_UNCONFIRMED", steps, started)
             target = base + "/vulnerabilities/sqli/"
             for label, user_id in (("baseline", "1"), ("injection", "1' OR '1'='1")):
