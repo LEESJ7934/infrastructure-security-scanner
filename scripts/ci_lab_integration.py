@@ -134,7 +134,20 @@ def main():
                                     if k in {"finding_status", "steps", "request_labels"}}}))
             finally:
                 conn.close()
-        assert outcome["finding_status"] == "CONFIRMED", outcome
+        if outcome["finding_status"] != "CONFIRMED":
+            conn = get_connection()
+            try:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute("SELECT evidence_json FROM lab_verification_results WHERE id = %s",
+                                   (outcome["observation_id"],))
+                    evidence = cursor.fetchone()["evidence_json"]
+                    if isinstance(evidence, str):
+                        evidence = json.loads(evidence)
+                    raise AssertionError("DVWA result not established: " + str({
+                        "finding_status": evidence.get("finding_status"),
+                        "steps": evidence.get("details", {}).get("steps", [])}))
+            finally:
+                conn.close()
 
     output = generate_integrated_report(local_scan_id=local_id, ec2_scan_id=ec2_id,
                                         output_dir="reports/ci", format="both")
