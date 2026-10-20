@@ -107,7 +107,9 @@ def verify_ftp_remediation(port):
                    check=True, capture_output=True, text=True, timeout=90)
     result = None
     for _ in range(30):
-        result = FTPChecker(timeout=2, allow_anonymous_login=True,
+        # pyftpdlib deliberately delays denied authentication by 3 seconds.
+        # Match the established runner timeout so a real 530 can be observed.
+        result = FTPChecker(timeout=5, allow_anonymous_login=True,
             approved_endpoints=((port["host_ip"], int(port["port"])),)).run_check(port, {})
         if result.get("details", {}).get("finding_status") == "NOT_DETECTED":
             break
