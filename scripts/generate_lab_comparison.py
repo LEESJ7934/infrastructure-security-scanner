@@ -1,0 +1,162 @@
+"""Export recorded laboratory configuration checks. Does not scan or contact targets."""
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+
+from db.lab_repository import read_observations
+
+
+CHECKS = ("FTP_ANONYMOUS", "SSH_AUTH_POLICY", "HTTP_SECURITY_HEADERS", "DVWA_SQLI", "NUCLEI")
+
+
+GUIDANCE = {
+    "FTP_ANONYMOUS": ("MEDIUM", "Disable anonymous access unless explicitly required; restrict access and recheck."),
+    "HTTP_SECURITY_HEADERS": ("LOW", "Review application context; apply CSP/frame restrictions, nosniff and Referrer-Policy."),
+    "SSH_AUTH_POLICY": ("MEDIUM", "Review effective daemon and Match policies; preserve approved key access before any change."),
+    "DVWA_SQLI": ("HIGH", "Keep DVWA isolated; production queries require parameter binding and least privilege."),
+    "NUCLEI": ("REVIEW_REQUIRED", "Review template and evidence manually; a match is not CVE confirmation."),
+}
+
+
+def _render_row(row):
+    details = row["evidence_json"]
+    if isinstance(details, (bytes, str)):
+        details = json.loads(details)
+    canonical = json.dumps(details, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    actual = hashlib.sha256(canonical.encode()).hexdigest()
+    binding_matches = all(details[key] == row.get(column) for key, column in (
+        ("check_name", "check_name"), ("environment", "environment_label"),
+        ("execution_status", "execution_status"), ("finding_status", "finding_status"),
+        ("scan_id", "scan_id"), ("port_id", "port_id"), ("asset_uid", "asset_uid"),
+        ("scope_uid", "scope_uid"), ("scope_sha256", "scope_sha256")) if key in details)
+    if "observed_at" in details:
+        binding_matches = binding_matches and (
+            datetime.fromisoformat(details["observed_at"]) == datetime.fromisoformat(str(row["observed_at"])))
+    integrity_matches = actual == row["evidence_sha256"] and binding_matches
+    risk, recommendation = GUIDANCE.get(row["check_name"], ("REVIEW_REQUIRED", "Review evidence."))
+    trusted = integrity_matches and row["execution_status"] == "SUCCESS"
+    if not trusted:
+        risk = "UNASSESSED"
+    elif row["finding_status"] == "NOT_DETECTED":
+        risk = "NO_FINDING_IN_CHECK_SCOPE"
+    elif row["finding_status"] not in {"CONFIRMED", "POTENTIAL"}:
+        risk = "UNASSESSED"
+    return {
+        "risk": risk, "risk_basis": "Qualitative check-specific guidance; not CVSS or proof of exploitability",
+        "recommendation": recommendation,
+        "check": row["check_name"], "asset_uid": row["asset_uid"],
+        "environment": row["environment_label"], "execution_status": row["execution_status"],
+        "finding_status": row["finding_status"], "observed_at": str(row["observed_at"]),
+        "evidence_sha256": row["evidence_sha256"],
+        "evidence_integrity": "MATCH" if integrity_matches else "MISMATCH",
+        "evidence": details,
+    }
+
+
+def _retests(rendered):
+    groups = {}
+    for row in rendered:
+        evidence = row["evidence"]
+        if (row["evidence_integrity"] != "MATCH" or row["execution_status"] != "SUCCESS"
+                or row["finding_status"] not in {"POTENTIAL", "CONFIRMED", "NOT_DETECTED"}
+                or evidence.get("details", {}).get("fixture_only")):
+            continue
+        # A different scan, port, asset, environment or check cannot be called
+        # remediation of the same service. Independent SQL apps never pair.
+        identity = (evidence.get("scan_id"), evidence.get("port_id"), row["asset_uid"],
+                    row["environment"], row["check"])
+        if None in identity:
+            continue
+        groups.setdefault(identity, []).append(row)
+    output = []
+    for identity, items in groups.items():
+        items = sorted(items, key=lambda r: r["observed_at"])
+        before, after = items[0], items[-1]
+        if (before["finding_status"] not in {"POTENTIAL", "CONFIRMED"}
+                or after["finding_status"] != "NOT_DETECTED"
+                or before["observed_at"] >= after["observed_at"]):
+            continue
+        context = after["evidence"].get("details", {}).get("remediation_context")
+        output.append({"scan_id": identity[0], "port_id": identity[1], "asset_uid": identity[2],
+                       "environment": identity[3], "check": identity[4],
+                       "before": {k: before[k] for k in ("finding_status", "observed_at", "evidence_sha256")},
+                       "after": {k: after[k] for k in ("finding_status", "observed_at", "evidence_sha256")},
+                       "change_record": context, "assessment": "OBSERVED_CHANGE_IN_SAME_CHECK_SCOPE",
+                       "limitation": "Observation change alone is not proof of the applied change or overall security."})
+    return output
+
+
+def build_comparison(rows):
+    """No observed service / no row is UNKNOWN, never safe."""
+    rendered = [_render_row(r) for r in rows]
+    by_env = {}
+    for environment in ("LOCAL_BASELINE", "EC2_LAB"):
+        items = [r for r in rendered if r["environment"] == environment]
+        by_env[environment] = {
+            "observations": items,
+            "by_check": {
+                name: [r for r in items if r["check"] == name] for name in CHECKS
+            },
+            "coverage": {name: "OBSERVED" if any(r["check"] == name and r["execution_status"] == "SUCCESS"
+                                             and r["evidence_integrity"] == "MATCH"
+                                             and r["finding_status"] in {"POTENTIAL", "CONFIRMED", "NOT_DETECTED"} for r in items)
+                         else "NOT_TESTED" for name in CHECKS}
+        }
+    return {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(),
+            "comparison_type": "INDEPENDENT_ENVIRONMENTS_NOT_BEFORE_AFTER",
+            "retests": _retests(rendered),
+            "disclaimer": "Local HTTP and EC2 DVWA are different applications, not remediation before/after. Recorded results only. No record is NOT_TESTED, never a safe verdict. No CVE is proven by a configuration result.",
+            "environments": by_env}
+
+
+def export_report(data, output_json, output_pdf=None):
+    output_json = Path(output_json)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    if output_pdf:
+        from api.report_pdf import _body_font
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from xml.sax.saxutils import escape
+        font = _body_font()
+        style = ParagraphStyle("LabEvidence", fontName=font, fontSize=9, leading=13,
+                               spaceAfter=7, wordWrap="CJK")
+        story = [Paragraph("Laboratory Configuration Comparison", style), Spacer(1, 12)]
+        for env, item in data["environments"].items():
+            story.append(Paragraph(escape(env), style))
+            for check, records in item["by_check"].items():
+                if not records:
+                    story.append(Paragraph(escape(check + ": NOT_TESTED"), style))
+                for record in records:
+                    # Render a bounded summary without exposing raw credentials or cookies.
+                    detail = f"{check}: {record['execution_status']} / {record['finding_status']} / hash {record['evidence_sha256']} / integrity {record['evidence_integrity']}"
+                    story.append(Paragraph(escape(detail), style))
+        story.append(Paragraph("Observation absence never proves safety. Review individual evidence in JSON.",style))
+        target = Path(output_pdf)
+        target.parent.mkdir(parents=True,exist_ok=True)
+        SimpleDocTemplate(str(target), pagesize=A4).build(story)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--scan-id", type=int)
+    selection.add_argument("--asset-id")
+    parser.add_argument("--json", type=Path, required=True)
+    parser.add_argument("--pdf", type=Path)
+    args = parser.parse_args(argv)
+    rows = read_observations(scan_id=args.scan_id,asset_uid=args.asset_id)
+    data = build_comparison(rows)
+    export_report(data,args.json,args.pdf)
+    print(json.dumps({"json": str(args.json), "pdf": str(args.pdf) if args.pdf else None,
+                      "observation_count": len(rows)},ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

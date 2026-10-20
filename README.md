@@ -365,3 +365,26 @@ py -m scripts.run_scan scan `
 V6 보고서는 CVE findings와 AWS configuration findings를 별도 항목으로 표시합니다. Security Group이 Internet-wide CIDR를 포함해도 라우팅/NACL/host firewall까지 계산하지 않으므로 실제 인터넷 도달성을 확정하지 않습니다.
 
 현재 SG 설정 진단은 SSH(22), RDP(3389), MySQL(3306), PostgreSQL(5432), MongoDB(27017), FTP(21), Telnet(23), 전체 포트/프로토콜의 Internet-wide ingress를 별도 configuration finding으로 분류합니다.
+
+
+## 보안 검증·증적·재점검 (MySQL V7)
+
+기존 V6의 자산·CVE 후보·위험 평가와 함께 V7 검증 이력을 관리합니다. 실행 상태와 판정 상태를 분리하고 승인 Scope, 검사 시각, 대상, SHA-256을 보존합니다. FTP 익명 인증 허용과 DVWA SQLi는 각 설정/실습 검증이며 특정 CVE 확정을 뜻하지 않습니다. Nuclei 매칭은 `POTENTIAL`입니다. 증적이 없거나 실행에 실패한 항목을 안전하다고 판단하지 않습니다.
+
+- FTP·HTTP·SSH 읽기 전용 검사, 비파괴 DVWA SQLi, 공식 배포본/실행 파일/버전/템플릿 무결성을 확인하는 Nuclei 실행
+- 사용자 수집 EC2 증적의 원본 해시·대상·기존 스캔/포트·Scope 대조 후 V7 추가 저장 및 중복 방지
+- 서로 다른 정상/EC2 스캔을 하나의 읽기 전용 DB 스냅샷에서 JSON/PDF로 출력
+- 동일 서비스의 조치 전후 증적은 별도 이력으로 보존하며 시각·해시·변경 맥락을 함께 비교
+- 별도 파라미터 SQL 앱은 DVWA와 독립 비교이며 DVWA 개선 완료로 표시하지 않음
+
+### 검증 현황
+
+Work의 전체 Python 회귀 테스트 **330개 통과**. GitHub Actions의 [기본 CI](.github/workflows/ci.yml)와 [격리 통합 검증](.github/workflows/lab_integration.yml)은 일회용 Docker/MySQL에서 V6→V7 기록 보존, 실제 FTP·SSH·HTTP·DVWA·Nuclei, HTTP/FTP 개선 후 재점검, JSON/PDF·무결성을 검사합니다. 최신 실행 결과와 보고서 아티팩트는 [Actions](https://github.com/LEESJ7934/infrastructure-security-scanner/actions)에서 확인합니다. CI의 `EC2_LAB`은 모의 환경 저장 라벨이며 실제 AWS 결과가 아닙니다.
+
+사용자 EC2 실측(사용자가 2026-10-20 공유한 결과): FTP `230 Login successful`, SSH 비밀번호 인증 비활성, HTTP 보안 헤더 4종 누락, DVWA 정상 1행→우회 5행. 사용자 확인 기준 DVWA는 Windows MySQL V7의 scan 7/port 4에 `CONFIRMED` 저장됐고 증적 무결성 `MATCH`를 확인했습니다. Work가 사용자 DB를 직접 열어 확인한 것은 아닙니다.
+
+**남은 사용자 확인:** FTP/HTTP/SSH의 실제 V7 추가 저장, 신규 로컬 정상 스캔, 기존 EC2 대상 Nuclei 실행, 실제 Windows 통합 JSON/PDF 생성. 기존 AWS 서비스의 개선은 수행하지 않았습니다. 운영 SSH·Security Group·기존 데이터·다크웹 컨테이너를 변경하지 않습니다. Draft PR #1을 유지하고 최종 Squash 병합은 별도 승인 후 진행합니다.
+
+- [Day 15~17 Windows·EC2 증적 연결](docs/day15_17_work1.md)
+- [Day 18~20 Nuclei·재점검·최종 보고서 실행](docs/day18_20_final.md)
+- [검증 결과와 한계](docs/lab_verification.md) / [Docker 실습 구성](lab/README.md)

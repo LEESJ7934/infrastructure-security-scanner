@@ -1,0 +1,18 @@
+id: controlled-lab-missing-nosniff
+info:
+  name: Controlled laboratory missing nosniff header
+  author: lab-owner
+  severity: info
+  description: A non-intrusive GET checks only a header; not a CVE proof.
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/"
+    redirects: false
+    max-redirects: 0
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "X-Content-Type-Options: nosniff"
+        negative: true
