@@ -52,6 +52,11 @@ class LocalWindowsHTTPBaselineTests(unittest.TestCase):
                         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
                         self.assertEqual(response.headers["Referrer-Policy"], "no-referrer")
                         self.assertIn("default-src", response.headers["Content-Security-Policy"])
+                    from verification.checker_http import HTTPChecker
+                    result = HTTPChecker(timeout=2).run_check(
+                        {"host_ip": "127.0.0.1", "port": port, "service": "http"}, {})
+                    self.assertEqual(result["details"]["finding_status"], "NOT_DETECTED")
+                    self.assertEqual(result["details"]["missing_headers"], [])
                     break
                 except OSError:
                     if time.monotonic() > deadline or proc.poll() is not None:

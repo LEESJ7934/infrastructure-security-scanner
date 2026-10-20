@@ -61,11 +61,34 @@ def make_observation(*, port, environment, check_name, result, scope, observed_a
     }
 
 
-def insert_observation(observation, *, connect=get_connection):
+def insert_observation(observation, *, connect=get_connection, deduplicate=False):
     """Each observation is new: no UPSERT, status rewrite, CVE mutation or data clearing."""
     connection = connect()
+    lock_name = None
     try:
         with connection.cursor() as cursor:
+            if deduplicate:
+                # Serialize imports per scan/port/check, including concurrent CLI runs.
+                identity = ":".join(str(observation[k]) for k in
+                                    ("scan_id", "port_id", "check_name", "environment_label"))
+                lock_name = "labimport:" + hashlib.sha256(identity.encode()).hexdigest()[:48]
+                cursor.execute("SELECT GET_LOCK(%s, 10)", (lock_name,))
+                if cursor.fetchone()[0] != 1:
+                    raise RuntimeError("Could not lock evidence import")
+                source_hash = json.loads(observation["evidence_json"])["details"]["source_file_sha256"]
+                cursor.execute(
+                    """SELECT id, evidence_sha256 FROM lab_verification_results
+                       WHERE scan_id=%s AND port_id=%s AND check_name=%s AND environment_label=%s
+                         AND JSON_UNQUOTE(JSON_EXTRACT(evidence_json, '$.details.source_file_sha256'))=%s
+                       ORDER BY id LIMIT 1""",
+                    tuple(observation[k] for k in ("scan_id", "port_id", "check_name", "environment_label"))
+                    + (source_hash,))
+                existing = cursor.fetchone()
+                if existing:
+                    if existing[1] != observation["evidence_sha256"]:
+                        raise ValueError("Source already imported with different binding or scope")
+                    connection.rollback()
+                    return existing[0]
             cursor.execute(
                 """INSERT INTO lab_verification_results (
                     observation_uid,port_id,scan_id,asset_uid,environment_label,check_name,
@@ -84,7 +107,13 @@ def insert_observation(observation, *, connect=get_connection):
         connection.rollback()
         raise
     finally:
-        connection.close()
+        try:
+            if lock_name is not None:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT RELEASE_LOCK(%s)", (lock_name,))
+                    cursor.fetchone()
+        finally:
+            connection.close()
 
 
 def read_observations(*, scan_id=None, asset_uid=None, connect=get_connection):

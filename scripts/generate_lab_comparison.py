@@ -13,18 +13,43 @@ from db.lab_repository import read_observations
 CHECKS = ("FTP_ANONYMOUS", "SSH_AUTH_POLICY", "HTTP_SECURITY_HEADERS", "DVWA_SQLI", "NUCLEI")
 
 
+GUIDANCE = {
+    "FTP_ANONYMOUS": ("MEDIUM", "Disable anonymous access unless explicitly required; restrict access and recheck."),
+    "HTTP_SECURITY_HEADERS": ("LOW", "Review application context; apply CSP/frame restrictions, nosniff and Referrer-Policy."),
+    "SSH_AUTH_POLICY": ("MEDIUM", "Review effective daemon and Match policies; preserve approved key access before any change."),
+    "DVWA_SQLI": ("HIGH", "Keep DVWA isolated; production queries require parameter binding and least privilege."),
+    "NUCLEI": ("REVIEW_REQUIRED", "Review template and evidence manually; a match is not CVE confirmation."),
+}
+
+
 def _render_row(row):
     details = row["evidence_json"]
     if isinstance(details, (bytes, str)):
         details = json.loads(details)
     canonical = json.dumps(details, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     actual = hashlib.sha256(canonical.encode()).hexdigest()
+    binding_matches = all(details[key] == row.get(column) for key, column in (
+        ("check_name", "check_name"), ("environment", "environment_label"),
+        ("execution_status", "execution_status"), ("finding_status", "finding_status"),
+        ("scan_id", "scan_id"), ("port_id", "port_id"), ("asset_uid", "asset_uid"),
+        ("scope_uid", "scope_uid"), ("scope_sha256", "scope_sha256")) if key in details)
+    integrity_matches = actual == row["evidence_sha256"] and binding_matches
+    risk, recommendation = GUIDANCE.get(row["check_name"], ("REVIEW_REQUIRED", "Review evidence."))
+    trusted = integrity_matches and row["execution_status"] == "SUCCESS"
+    if not trusted:
+        risk = "UNASSESSED"
+    elif row["finding_status"] == "NOT_DETECTED":
+        risk = "NO_FINDING_IN_CHECK_SCOPE"
+    elif row["finding_status"] not in {"CONFIRMED", "POTENTIAL"}:
+        risk = "UNASSESSED"
     return {
+        "risk": risk, "risk_basis": "Qualitative check-specific guidance; not CVSS or proof of exploitability",
+        "recommendation": recommendation,
         "check": row["check_name"], "asset_uid": row["asset_uid"],
         "environment": row["environment_label"], "execution_status": row["execution_status"],
         "finding_status": row["finding_status"], "observed_at": str(row["observed_at"]),
         "evidence_sha256": row["evidence_sha256"],
-        "evidence_integrity": "MATCH" if actual == row["evidence_sha256"] else "MISMATCH",
+        "evidence_integrity": "MATCH" if integrity_matches else "MISMATCH",
         "evidence": details,
     }
 
@@ -40,11 +65,13 @@ def build_comparison(rows):
             "by_check": {
                 name: [r for r in items if r["check"] == name] for name in CHECKS
             },
-            "coverage": {name: "OBSERVED" if any(r["check"] == name for r in items)
+            "coverage": {name: "OBSERVED" if any(r["check"] == name and r["execution_status"] == "SUCCESS"
+                                             and r["evidence_integrity"] == "MATCH" for r in items)
                          else "NOT_TESTED" for name in CHECKS}
         }
     return {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(),
-            "disclaimer": "Recorded results only. No record is NOT_TESTED, never a safe verdict. No CVE is proven by a configuration result.",
+            "comparison_type": "INDEPENDENT_ENVIRONMENTS_NOT_BEFORE_AFTER",
+            "disclaimer": "Local HTTP and EC2 DVWA are different applications, not remediation before/after. Recorded results only. No record is NOT_TESTED, never a safe verdict. No CVE is proven by a configuration result.",
             "environments": by_env}
 
 

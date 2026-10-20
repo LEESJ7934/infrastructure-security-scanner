@@ -261,6 +261,7 @@ def render_report_pdf(snapshot, output_path):
         fields([("baseline_scan_id", comparison.get("scan_ids", {}).get("LOCAL_BASELINE")),
                 ("ec2_scan_id", comparison.get("scan_ids", {}).get("EC2_LAB")),
                 ("scope", "Stored lab configuration observations only; missing means NOT_TESTED.")])
+        story.append(p(comparison.get("disclaimer", "Independent environments; not remediation before/after.")))
         for env_name, group in comparison.get("environments", {}).items():
             story.append(p(env_name, subheading))
             for check, records in group.get("by_check", {}).items():
@@ -272,9 +273,13 @@ def render_report_pdf(snapshot, output_path):
                             ("finding_status", row.get("finding_status")),
                             ("observed_at", row.get("observed_at")),
                             ("evidence_sha256", row.get("evidence_sha256")),
-                            ("evidence_integrity", row.get("evidence_integrity"))])
+                            ("evidence_integrity", row.get("evidence_integrity")),
+                            ("risk", row.get("risk")), ("recommendation", row.get("recommendation"))])
+                    fields([("evidence", row.get("evidence"))])
         section(13, "Peer Environment CVE Findings")
         peer = snapshot.get("peer_report") or {}
+        for scan in peer.get("scans", []):
+            fields([("ec2_scan", scan)])
         for asset in peer.get("assets", []):
             story.append(p(asset.get("asset_name") or asset.get("asset_uid") or "Asset", subheading))
             for finding in asset.get("findings", []):

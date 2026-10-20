@@ -41,6 +41,7 @@ def describe_local_database(connect=get_connection):
                 "v7_schema_complete": False,
                 "counts": {},
                 "current_http_scan_port_candidates": [],
+                "current_scan_port_candidates": [],
                 "warning": (
                     "An HTTP row on Windows is not proof of EC2 origin. "
                     "Only import after the exact target and scan history are independently checked."
@@ -74,14 +75,17 @@ def describe_local_database(connect=get_connection):
                    JOIN scans AS s ON s.id = p.last_scan_id
                    WHERE p.state = 'open' AND p.protocol = 'tcp'
                      AND p.last_scan_id = h.last_scan_id
-                     AND LOWER(COALESCE(p.service,'')) IN ('http','https')
+                     AND LOWER(COALESCE(p.service,'')) IN ('http','https','ftp','ssh')
                    ORDER BY p.last_seen DESC, p.id DESC LIMIT 25"""
             )
             for item in cursor.fetchall():
-                result["current_http_scan_port_candidates"].append({
+                candidate = {
                     k: str(value) if k == "scanned_at" else value
                     for k, value in item.items()
-                })
+                }
+                result["current_scan_port_candidates"].append(candidate)
+                if str(item["service"]).lower() in {"http", "https"}:
+                    result["current_http_scan_port_candidates"].append(candidate)
             return result
     finally:
         connection.close()

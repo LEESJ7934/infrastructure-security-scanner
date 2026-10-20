@@ -16,6 +16,7 @@ from pathlib import Path
 from time import sleep
 
 from db.db_client import get_connection
+from db.lab_repository import insert_observation, make_observation
 from db.query_helpers import get_all_ports
 from scanner.scope import ScopePolicy
 from scripts.run_scan import main as run_scan_main
@@ -201,13 +202,26 @@ def main():
     remediation = verify_header_remediation(weak[8082], ec2_id)
     assert remediation == {"port": 8082, "before": "POTENTIAL", "after": "NOT_DETECTED"}
 
+    # Exercise deduplicated append-only import SQL on real disposable MySQL V7.
+    # This is a CI fixture, never evidence of Windows or AWS execution.
+    imported = make_observation(port=weak[8082], environment="EC2_LAB",
+        check_name="HTTP_SECURITY_HEADERS", scope=SCOPE,
+        result={"status": "POTENTIAL", "checker": "CIDeduplicationFixture",
+                "details": {"finding_status": "INCONCLUSIVE",
+                            "source_file_sha256": hashlib.sha256(b"ci-import-fixture").hexdigest(),
+                            "fixture_only": True}})
+    first = insert_observation(imported, deduplicate=True)
+    second = insert_observation(imported, deduplicate=True)
+    assert first == second, "Repeated source must return existing V7 ID"
+
     output = generate_integrated_report(local_scan_id=local_id, ec2_scan_id=ec2_id,
                                         output_dir="reports/ci", format="both")
     summary = json.loads(Path(output["json_path"]).read_text(encoding="utf-8"))
     assert summary["selection"]["local_scan_id"] == local_id
     assert summary["lab_comparison"]["scan_ids"]["EC2_LAB"] == ec2_id
     changed = summary["lab_comparison"]["environments"]["EC2_LAB"]["by_check"]["HTTP_SECURITY_HEADERS"]
-    statuses = [row["finding_status"] for row in changed if row["evidence"]["port"] == 8082]
+    statuses = [row["finding_status"] for row in changed if row["evidence"]["port"] == 8082
+                and row["evidence"].get("checker") != "CIDeduplicationFixture"]
     assert statuses == ["POTENTIAL", "NOT_DETECTED"], statuses
     assert Path(output["pdf_path"]).read_bytes()[:5] == b"%PDF-"
     for key, group in summary["lab_comparison"]["environments"].items():
