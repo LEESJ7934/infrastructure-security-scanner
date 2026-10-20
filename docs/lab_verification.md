@@ -47,4 +47,6 @@ Nuclei/DVWA 검증 경로는 `scripts.run_lab_special`; Docker 실습 구성, �
 - 사용자 소유 EC2 SSM/VPN 등 안전한 접근이 확보된 후 취약 컨테이너 실제 배포, 재점검 및 장비별 증적 비교. 실제 EC2는 **미검증**입니다.
 - EC2 운영 SSH 설정을 바꾸지 않고, **컨테이너 실습 SSH만** 관리자 정책·실행 옵션을 확인해야 합니다.
 - 이미지 중 일부는 버전 태그로 고정돼 있고 모든 이미지가 digest 고정된 것은 아닙니다. 실제 이미지 digest를 기록해야 합니다.
-- 재점검 자동화의 최종 실행 성공 여부는 최신 [통합 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/workflows/lab_integration.yml) 기록을 기준으로 확인해야 합니다.
+- **조치 후 재점검 성공:** Docker CI에서 `http-weak` 서비스의 누락 보안 헤더를 적용한 컨테이너로만 재생성하고, 동일 자산/포트의 V7 이력에 `POTENTIAL → NOT_DETECTED`를 각각 저장한 뒤 JSON 보고서에서 두 상태가 모두 유지되는지 확인했습니다. 이 조치는 **GitHub Actions 일회용 컨테이너**에만 적용했습니다. [검증 완료 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844206).
+- 실제 실행 중인 두 SSH 실습 컨테이너의 sshd 프로세스 인수에서 `PasswordAuthentication=no/yes`를 각각 읽어 비교했습니다. 사용자 EC2의 SSH 인증 정책을 확인한 결과는 아닙니다.
+- 별도 자동 회귀 테스트 **269개**가 통과했습니다. [CI 실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844259).
