@@ -73,7 +73,7 @@ def main():
                            allow_ftp_anonymous=True, ssh_policy={"127.0.0.1:2222":{
                                "pubkeyauthentication": True, "passwordauthentication": False}})
     baseline = status_map(actual_local)
-    assert baseline[2121] == ("FTP_ANONYMOUS", "SUCCESS", "NOT_DETECTED"), baseline
+    assert baseline.get(2121) == ("FTP_ANONYMOUS", "SUCCESS", "NOT_DETECTED"), (baseline, {p: {"service": row.get("service"), "banner": str(row.get("banner"))[:120]} for p,row in normal.items()})
     assert baseline[2222] == ("SSH_AUTH_POLICY", "SUCCESS", "NOT_DETECTED"), baseline
     assert baseline[8081] == ("HTTP_SECURITY_HEADERS", "SUCCESS", "NOT_DETECTED"), baseline
 
