@@ -59,7 +59,7 @@ def ssm_tunnels(*, instance_id: str, region: str, ports: tuple[int, ...],
                 "--parameters", json.dumps({"portNumber": [str(port)],
                                             "localPortNumber": [str(port)]}),
             ]
-            p = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+            p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
                                  stderr=subprocess.DEVNULL, start_new_session=True)
             processes.append(p)
         for port, process in zip(ports, processes):
@@ -79,6 +79,8 @@ def ssm_tunnels(*, instance_id: str, region: str, ports: tuple[int, ...],
         for process in processes:
             if process.poll() is None:
                 process.terminate()
+            if process.stdin is not None:
+                process.stdin.close()
         for process in processes:
             try:
                 process.wait(timeout=4)
