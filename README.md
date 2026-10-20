@@ -56,29 +56,53 @@ V7 DB는 실행 상태 `SUCCESS/ERROR/SKIPPED`와 판정 상태를 분리합니�
 | [통합 커밋 기본 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487) | 해당 커밋 CI `success`, 로그 `Ran 330 tests` / `OK` | 사용자 Windows·EC2 실행 증거 아님 |
 | [Docker 통합 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39453811884) | 실제 FTP·SSH·HTTP·DVWA·Nuclei 요청, V6→V7 보존, 보고서·해시, FTP/HTTP 재점검을 포함한 워크플로 `success` | 일회용 Ubuntu Docker/MySQL. AWS 실측 아님 |
 | [사용자 실측 기록](docs/windows_mysql_ec2_evidence.md) | 2026-10-20 EC2 FTP 230, SSH 비밀번호 인증 비활성, HTTP 헤더 누락, DVWA 정상 1행→우회 5행 | 사용자 제공 실행 기록. 이 문서 개편에서 Windows DB를 직접 조회하지 않음 |
-| 사용자 확인 기준 DVWA V7 | 기존 scan 7 / port 4 저장과 `MATCH` 기록 | 이 ID를 다른 환경에서 재사용하지 않음 |
+| 사용자 제공 V7 결과 화면 | EC2 4건 `MATCH`, 로컬 HTTP 포함 통합 증적 5건 `MATCH`, Snapshot `MATCH`·`VERIFIED` | PNG 화면과 사용자 설명 확인. 원본 JSON/PDF 재해싱은 별도 |
 
 Docker 통합 실행의 커밋은 `de6b263b78de2a25d0552355efa3c0814a1a42c1`이며 통합 커밋과 파일 트리를 대조해 동일함을 확인했습니다. **330개 테스트 통과**는 해당 통합 커밋 CI 로그에서 확인했습니다. 이번 문서 수정 환경에서 재실행한 숫자는 아닙니다.
 
 - **동일 Docker 서비스 재점검:** FTP `CONFIRMED → NOT_DETECTED`, HTTP 및 nosniff Nuclei `POTENTIAL → NOT_DETECTED`. 서로 다른 시각의 증적·해시와 변경 맥락을 보존합니다.
 - **독립 SQL 앱 비교:** SQLite 파라미터 바인딩 앱은 DVWA와 다른 앱입니다. DVWA 조치 완료로 표현하지 않습니다.
-- **실환경 확인 대기:** FTP/SSH/HTTP 추가 V7 저장, 신규 Windows 정상 스캔, EC2 Nuclei, Windows 통합 JSON/PDF. 사용자 촬영과 원본 확인 후 갱신합니다.
+- **후속 실측:** 사용자 제공 화면에서 EC2 DVWA·FTP·SSH·HTTP 4건과 로컬 HTTP 1건의 V7 통합 결과를 확인했습니다. EC2 Nuclei와 독립 SQL 앱 검사는 이 화면으로 입증하지 않으며 미검사 범위는 `NOT_TESTED`로 남깁니다.
 
 ### 대표 결과 화면
 
-현재 기존 화면은 [노션](https://www.notion.so/300fef5673598095a2a5cc5107dcb62c)에 보존되어 있습니다. V6 결과와 새 V7 결과를 혼합하지 않으며, 실제 공개용 PNG 수령 전에는 이미지 링크를 만들지 않습니다.
+승인·후보·우선순위는 2026-09 로컬 실습, 설정 검증과 보고서는 2026-10 후속 작업입니다. 서로 다른 실행을 같은 결과로 합치지 않습니다. 이미지는 실제 실행 결과의 공개용 캡처이며 신규 4장은 사용자 제공본 그대로 반영했습니다.
 
-| 배치 순서 | 보여줄 판단 | 준비 상태 |
-|---|---|---|
-| 1 | 승인 Scope·서비스 식별 | 기존 화면 유지, 후속 실습 시점 표시 |
-| 2 | 버전 일치 → CVE 후보 | 기존 화면 유지 |
-| 3 | 높은 지표에도 확정 전 `VERIFY` | 기존 우선순위 화면 유지 |
-| 4 | DVWA 정상·우회 결과 및 한계 | 실제 원본/새 캡처 대기 |
-| 5 | V7 저장·실행 상태·증적 무결성 | 실제 캡처 대기 |
-| 6 | 동일 Docker 서비스 조치 전후 | CI 실제 아티팩트 캡처 대기 |
-| 7 | JSON/PDF와 환경·미실행 검사 구분 | 실제 Windows 통합 결과 대기 |
+#### 1. 승인 Scope와 서비스 식별
+![승인된 로컬 실습 범위와 서비스 식별](docs/images/01-scope-service.png)
+로컬 루프백 한 대상·한 포트를 승인 범위와 대조하고 서비스 배너를 관찰했습니다. Apache 배너는 설치 패키지·취약점 확정 증거가 아닙니다.
 
-파일명·명령·캡처 범위·캡션은 [촬영 가이드](docs/portfolio_capture_guide.md)에 있습니다.
+#### 2. CVE 후보와 추가 확인 조건
+![CANDIDATE 미리보기와 패키지·백포트 확인 조건](docs/images/02-cve-candidate.png)
+버전 영향 범위 일치는 `CANDIDATE`입니다. 화면은 PREVIEW이며 저장 성공이나 악용 가능성 확정을 뜻하지 않습니다.
+
+#### 3. 위험도와 검증 우선순위
+![당시 위협정보와 자산 맥락의 P2·VERIFY 판단](docs/images/03-risk-verify.png)
+당시 CVSS·EPSS·KEV와 자산 맥락으로 P2를 산정해도 추가 확인 전에는 `VERIFY`를 유지합니다. EPSS는 현재값이나 해당 자산의 침해 확률이 아닙니다.
+
+#### 4. DVWA SQL Injection 실습 검증
+![DVWA 정상 1행·우회 5행과 SUCCESS·CONFIRMED·MATCH](docs/images/04-dvwa-readonly.png)
+사용자 소유·승인 EC2 실습의 정상 입력 1행과 SQLi 입력 5행을 재현한 증적입니다. `CONFIRMED`는 해당 DVWA 동작을 뜻하며 특정 CVE 확정이나 DVWA 조치 완료를 뜻하지 않습니다. 캡처는 저장 증적 요약이며 입력 원문·전체 HTTP 응답 화면은 아닙니다.
+
+#### 5. MySQL 스키마 V7 증적 무결성
+![DVWA·FTP·SSH·HTTP 4건의 실행·판정과 4/4 MATCH](docs/images/05-v7-integrity.png)
+EC2 증적 4건에서 DVWA·FTP는 `CONFIRMED`, SSH 기본 정책은 `NOT_DETECTED`, HTTP 헤더는 `POTENTIAL`입니다. 4/4 MATCH는 저장 증적의 내용 일치이며 원격 출처 인증이나 전체 시스템 안전 판정이 아닙니다.
+
+#### 6. Docker 동일 서비스 개선 후 재점검
+![Docker FTP·HTTP·Nuclei의 동일 검사 범위 전후 판정 변화](docs/images/06-docker-retest.png)
+GitHub Actions 일회용 Docker에서 FTP `CONFIRMED → NOT_DETECTED`, HTTP·Nuclei `POTENTIAL → NOT_DETECTED`를 확인했습니다. 캡처는 요약표이고 실행 출처는 위 Docker CI 링크로 연결합니다. AWS EC2 개선 완료 결과가 아닙니다.
+
+#### 7. Windows JSON/PDF 통합 보고서 검증 요약
+![로컬 scan 10·EC2 scan 7 통합 결과와 5/5 MATCH·VERIFIED](docs/images/07-integrated-report.png)
+`OPERATOR_STORED_OBSERVATIONS`에서 로컬 정상 환경(scan 10)과 EC2 실습(scan 7)을 통합했습니다. 증적 5/5 MATCH, Snapshot MATCH, 검증 요약 VERIFIED를 확인했습니다. 서로 다른 두 환경의 비교이며 동일 시스템의 개선 전후가 아닙니다. 화면은 JSON/PDF 생성·검증 요약으로 PDF 본문 전체의 확인을 대신하지 않습니다.
+
+사용자가 제공한 최종 보고서 Snapshot SHA-256:
+```text
+f5b6e3c5557fa172c1239a7649f986f5e59e242af5095d93cdc471704533bb3a
+```
+위 전체 해시는 사용자 제공값이며 PNG에 전체 값이 표시되지는 않습니다. 이번 문서 작업에는 원본 JSON/PDF가 첨부되지 않아 이를 직접 재계산하지 않았습니다. PNG 파일 자체의 SHA-256과 보고서 Snapshot SHA-256은 별개입니다.
+
+기존 V6 보고서는 과거 CVE 보고서 예시로만 남기고 V7 대표 결과는 위 4~7번으로 구분했습니다. 오류 화면은 성공으로 전환하지 않았습니다. 공개 이미지 출처·검토 내역은 [이미지 목록](docs/images/README.md), 재현 명령은 [촬영 가이드](docs/portfolio_capture_guide.md)에 있습니다.
 
 ## 4. 실행 환경과 안전한 시작
 
