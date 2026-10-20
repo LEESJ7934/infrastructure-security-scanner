@@ -407,3 +407,18 @@ python -m scripts.generate_integrated_lab_report --local-scan-id 1 --ec2-scan-id
 - CVE 여부와 취약 설정 검증은 별개입니다. 익명 FTP 인증 허용이 확인되었다고 CVE가 CONFIRMED가 되는 것은 아닙니다.
 
 미완료/별도 승인 필요: 기존 EC2의 접근 통제 확인 및 실측, EC2 측 SSH 인증정책의 독립 증적, 조치 후 재점검 및 실제 EC2·로컬 간 비교. `main` 병합 전 Draft PR에서 검토합니다.
+
+### 격리 Docker CI 검증 결과 (2026-10-20)
+
+GitHub Actions 일회용 환경에서 Python 회귀 테스트 **269개**, MySQL 8.0.40 V6→V7 데이터 보존·증적/FK 검사, 실제 FTP·SSH·HTTP와 DVWA/Nuclei 실행, JSON/PDF 생성 및 HTTP 보안 헤더 개선 전후 재점검이 통과했습니다.
+
+| 점검 항목 | 정상 서비스 | 취약 실습 서비스 |
+|---|---|---|
+| FTP 익명 로그인 | 거부(`NOT_DETECTED`) | 허용(`CONFIRMED`, 설정에 한함) |
+| SSH 비밀번호 정책 | 비활성(`NOT_DETECTED`) | 활성(`POTENTIAL`) |
+| HTTP 보안 헤더 | 적용(`NOT_DETECTED`) | 누락(`POTENTIAL`) |
+| HTTP 누락 헤더 조치 후 재점검 | — | `POTENTIAL → NOT_DETECTED` |
+| DVWA SQL Injection | 대응하는 별도 DVWA 서비스 미구축(안전 판정 아님) | 비파괴 실습 재현 |
+| Nuclei | 별도 미실행 | 매칭 `POTENTIAL` (CVE 확정 아님) |
+
+실제 실행 기록: [일회용 Docker 통합 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844206) · [자동 회귀 테스트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415844259). 실제 보고서 파일은 통합 테스트 실행의 아티팩트로 제공합니다. **AWS EC2는 미검증 상태이며 사용자 소유 서버의 SSH/네트워크 설정은 변경하지 않았습니다.** 실습 포트는 모두 루프백으로만 바인딩됩니다.
