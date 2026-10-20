@@ -26,7 +26,8 @@ class FTPChecker(BaseChecker):
         started = time.monotonic()
         details = {"safe_checks": ["ftp_greeting"], "anonymous_login_attempted": False}
         try:
-            welcome = ftp.connect(port_record["host_ip"], int(port_record["port"]), timeout=self.timeout)
+            ftp.connect(port_record["host_ip"], int(port_record["port"]), timeout=self.timeout)
+            welcome = ftp.getwelcome()
             details["banner"] = (welcome or "")[:256]
             if not self.allow_anonymous_login:
                 return check_result(
@@ -63,7 +64,7 @@ class FTPChecker(BaseChecker):
             return check_result(
                 "ERROR", "FTP connection failed; security posture remains unknown.",
                 checker=type(self).__name__, evidence_type="ERROR_LOG",
-                error_code="FTP_CONNECTION_ERROR",
+                error_code="TIMEOUT" if isinstance(exc, TimeoutError) else "FTP_CONNECTION_ERROR",
                 details={**details, "error_type": type(exc).__name__},
             )
         finally:
