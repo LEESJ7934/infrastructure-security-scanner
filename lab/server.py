@@ -19,7 +19,11 @@ if MODE == "ftp":
     FTPServer(("0.0.0.0", 2121), handler).serve_forever()
 elif MODE == "http":
     class Handler(BaseHTTPRequestHandler):
+        def do_HEAD(self):
+            self._handle(send_body=False)
         def do_GET(self):
+            self._handle(send_body=True)
+        def _handle(self, send_body):
             parts = urlsplit(self.path)
             status, body = 200, "Controlled laboratory HTTP service"
             if parts.path == "/lookup":
@@ -39,7 +43,8 @@ elif MODE == "http":
                 self.send_header("Referrer-Policy", "no-referrer")
                 self.send_header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
             self.end_headers()
-            self.wfile.write(payload)
+            if send_body:
+                self.wfile.write(payload)
         def log_message(self, fmt, *args):
             pass
     ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
