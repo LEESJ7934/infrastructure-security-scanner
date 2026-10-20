@@ -365,3 +365,28 @@ py -m scripts.run_scan scan `
 V6 보고서는 CVE findings와 AWS configuration findings를 별도 항목으로 표시합니다. Security Group이 Internet-wide CIDR를 포함해도 라우팅/NACL/host firewall까지 계산하지 않으므로 실제 인터넷 도달성을 확정하지 않습니다.
 
 현재 SG 설정 진단은 SSH(22), RDP(3389), MySQL(3306), PostgreSQL(5432), MongoDB(27017), FTP(21), Telnet(23), 전체 포트/프로토콜의 Internet-wide ingress를 별도 configuration finding으로 분류합니다.
+
+
+## 후속: 격리된 정상·취약 환경 검증 (V7, Draft PR #1)
+
+기존 V6의 CVE 후보, 증적 및 우선순위 평가 기능은 그대로 유지합니다. 추가된 V7은 **설정/실습 검증용 별도 이력**으로, CVE 발견만으로 실증 결과가 확정되지 않도록 설계했습니다.
+
+- 기존의 열린 TCP 포트 관찰값을 승인 Scope로 재검증한 뒤 FTP 익명 로그인, HTTP 헤더, SSH 배너·관리자 제공 인증 정책을 확인합니다.
+- DVWA 실습용 비파괴 SQL Injection 검사와 SHA-256 증적 기록을 위한 별도 실행 명령을 제공합니다. 인증정보·쿠키·사용자 레코드는 증적에 기록하지 않습니다.
+- 공식 바이너리·버전·템플릿 SHA-256을 확인한 제한적 Nuclei 실행 기능이 있습니다. **Nuclei 매칭은 CVE CONFIRMED가 아닙니다.**
+- 정상·취약 환경별 서로 다른 스캔 ID를 입력받아 기존 V6 CVE 결과와 V7 이력을 하나의 읽기 전용 DB 스냅샷에서 집계하는 JSON/PDF 생성기를 추가했습니다.
+- 스코프 밖·미실행·실패한 서비스는 안전하다고 판단하지 않습니다.
+- CI의 Docker 실습은 GitHub Actions의 루프백 컨테이너에서 실행하며 **사용자 소유 AWS EC2의 검증을 대신하지 않습니다.**
+
+상세 환경 구축 및 재현 명령은 [격리 실습 문서](lab/README.md)와 [검증 내역](docs/lab_verification.md)을 참고합니다. CI 실행 결과는 [격리 실습 통합 검증](.github/workflows/lab_integration.yml)에서 확인합니다. 실제 실패한 단계는 완료로 분류하지 않습니다.
+
+```bash
+# V7 스키마를 이전하기 전 외부 백업 필수
+# 기존 스캔 ID를 선택해 DB 쓰기 없는 승인 범위 확인
+python -m scripts.run_lab_verification --scan-id 1 --environment LOCAL_BASELINE --scope-file config/scope.local.json --dry-run
+
+# 서로 다른 스캔 ID의 CVE 및 구성 점검을 합쳐 보고서로 내보내기
+python -m scripts.generate_integrated_lab_report --local-scan-id 1 --ec2-scan-id 2 --format both --output-dir reports
+```
+
+미완료/별도 승인 필요: 기존 EC2의 네트워크 접근 및 실측, EC2 측 SSH 인증정책 독립 증적, 실제 DVWA·Nuclei 성공 CI 증적 확보 후 포트폴리오 확정. `main` 병합 전 Draft PR에서 각 항목을 재검토합니다.
