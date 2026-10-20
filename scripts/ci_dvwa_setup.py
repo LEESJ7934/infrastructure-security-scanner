@@ -1,43 +1,40 @@
-"""Initialize a disposable loopback-only DVWA CI database, never an existing EC2 lab."""
+"""Initialize an entirely disposable CI-only DVWA database; never run against EC2."""
 import ipaddress
 import os
 import time
-
 import requests
 from bs4 import BeautifulSoup
 
 
 def main():
-    if os.environ.get("CI_DISPOSABLE_DVWA") != "YES":
-        raise SystemExit("Refusing to initialize a non-disposable DVWA database")
+    if os.environ.get("CI_DISPOSABLE_DVWA") != "YES" or os.environ.get("GITHUB_ACTIONS") != "true":
+        raise SystemExit("CI-only initialization guard denied")
     url = "http://127.0.0.1:4280"
     assert ipaddress.ip_address("127.0.0.1").is_loopback
     with requests.Session() as session:
         session.trust_env = False
-        for attempt in range(30):
+        for attempt in range(25):
             try:
-                # The login form is the readiness check. Do not reset an already
-                # initialized database, even within a disposable CI container.
-                login = session.get(url + "/login.php", timeout=5, allow_redirects=False)
-                if login.status_code == 200:
-                    login_html = BeautifulSoup(login.text, "html.parser")
-                    if login_html.find("input", {"name": "username"}):
-                        print("Disposable DVWA login form ready; credentials withheld")
-                        return
-                setup = session.get(url + "/setup.php", timeout=5, allow_redirects=False)
-                if setup.status_code == 200:
-                    field = BeautifulSoup(setup.text, "html.parser").find("input", {"name": "user_token"})
-                    if field and field.get("value"):
-                        session.post(
+                page = session.get(url + "/setup.php", timeout=5, allow_redirects=False)
+                if page.status_code == 200:
+                    soup = BeautifulSoup(page.text, "html.parser")
+                    token = soup.find("input", {"name": "user_token"})
+                    if token and token.get("value"):
+                        result = session.post(
                             url + "/setup.php",
                             data={"create_db": "Create / Reset Database",
-                                  "user_token": field["value"]},
-                            timeout=15, allow_redirects=False,
-                        )
+                                  "user_token": token["value"]},
+                            timeout=20, allow_redirects=False)
+                        if result.status_code not in (200, 302, 303):
+                            raise RuntimeError("DVWA setup HTTP failed")
+                        # The database is verified independently in the CI workflow:
+                        # A login form alone is NOT evidence that users were seeded.
+                        print("Disposable DVWA setup request submitted; SQL seed verification required")
+                        return
             except requests.RequestException:
                 pass
             time.sleep(2)
-        raise SystemExit("DVWA disposable database never reached usable login page")
+    raise SystemExit("Disposable DVWA setup endpoint unavailable")
 
 
 if __name__ == "__main__":
