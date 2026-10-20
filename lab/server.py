@@ -47,6 +47,8 @@ elif MODE == "http":
                 self.wfile.write(payload)
         def log_message(self, fmt, *args):
             pass
-    ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+    bind_host = os.environ.get("LAB_HTTP_BIND_HOST", "0.0.0.0")
+    bind_port = int(os.environ.get("LAB_HTTP_BIND_PORT", "8080"))
+    ThreadingHTTPServer((bind_host, bind_port), Handler).serve_forever()
 else:
     raise SystemExit("Unsupported LAB_MODE")
