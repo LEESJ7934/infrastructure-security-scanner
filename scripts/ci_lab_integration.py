@@ -94,7 +94,21 @@ def main():
             environment="EC2_LAB", check="NUCLEI", nuclei_binary=os.environ["CI_NUCLEI_BINARY"],
             template_root="lab/nuclei", template_name=path.name,
             reviewed_sha256=hashlib.sha256(path.read_bytes()).hexdigest(), timeout=35)
-        assert outcome["execution_status"] == "SUCCESS", outcome
+        if outcome["execution_status"] != "SUCCESS":
+            conn = get_connection()
+            try:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute("SELECT evidence_json FROM lab_verification_results WHERE id = %s",
+                                   (outcome["observation_id"],))
+                    saved = cursor.fetchone()
+                    document = saved["evidence_json"]
+                    if isinstance(document, str): document = json.loads(document)
+                    raise AssertionError("Nuclei failed: " + str({
+                        "error_type": document.get("reason"),
+                        "details_reason": document.get("details", {}).get("reason"),
+                        "error_code": document.get("error_code")}))
+            finally:
+                conn.close()
         assert outcome["finding_status"] == "POTENTIAL", outcome
 
     # DVWA must have a freshly initialized isolated database before this step.
