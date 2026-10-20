@@ -12,6 +12,13 @@ from scripts.demo_banner_server import DemoHandler
 
 
 class FingerprintTests(unittest.TestCase):
+    def test_explicit_ftp_greeting_on_nonstandard_port(self):
+        banner = "220 220 controlled-lab FTP ready\\r\\n"
+        result = identify_service(banner, "unknown")
+        self.assertEqual(result["service"], "ftp")
+        self.assertIsNone(result["product"])
+        self.assertEqual(identify_service("220 service ready\\r\\n", "unknown")["service"], "unknown")
+
     def test_http_product_and_version_come_from_server_header(self):
         for token, product, version in (("Apache/2.4.50 (Unix)", "apache_http_server", "2.4.50"),
                                         ("nginx/1.20.0", "nginx", "1.20.0"),
