@@ -55,7 +55,10 @@ def identify_service(banner: str | bytes | None, hint: str = "unknown") -> dict:
         match = re.search(r"\bvsftpd(?:\s+|/)([^\s)]+)", first_line, re.I)
         if match:
             return observed("ftp", "vsftpd", match[1], "ftp_greeting", first_line)
-        # 220 is shared by SMTP and FTP: keep the hint if no product identifies it.
+        # Explicit FTP wording distinguishes nonstandard lab ports from ambiguous SMTP 220.
+        if re.search(r"\\bFTP\\b", first_line, re.I):
+            return observed("ftp", None, None, "ftp_greeting", first_line)
+        # Bare 220 is ambiguous between FTP and SMTP.
         return result
 
     if re.match(r"^HTTP/1\.[01] [0-9]{3}(?: |\r?$)", first_line):
