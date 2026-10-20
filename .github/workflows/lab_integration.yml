@@ -31,17 +31,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo "CI_MYSQL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-          echo "LAB_SSH_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-          echo "DVWA_DB_ROOT_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
-          echo "DVWA_DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          for key in CI_MYSQL_PASSWORD LAB_SSH_PASSWORD DVWA_DB_ROOT_PASSWORD DVWA_DB_PASSWORD; do
+            value="$(openssl rand -hex 24)"
+            echo "::add-mask::$value"
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done
       - name: 테스트 전용 MySQL 시작
         run: |
           set -euo pipefail
           docker run -d --name scanner-lab-mysql -e MYSQL_ROOT_PASSWORD="$CI_MYSQL_PASSWORD" \
             -p 127.0.0.1:3339:3306 mysql:8.0.40
           for i in $(seq 1 90); do
-            if docker exec scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqladmin ping -uroot --silent'; then break; fi
+            if docker exec scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -e "SELECT 1" 2>/dev/null' | grep -qx 1; then break; fi
             sleep 2
           done
           docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot' < sql/init.sql
