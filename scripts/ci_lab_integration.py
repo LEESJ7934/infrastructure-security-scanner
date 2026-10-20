@@ -118,7 +118,22 @@ def main():
             environment="EC2_LAB", check="DVWA_SQLI",
             username=os.environ["CI_DVWA_USERNAME"],
             password=os.environ["CI_DVWA_PASSWORD"], timeout=10)
-        assert outcome["execution_status"] == "SUCCESS", outcome
+        if outcome["execution_status"] != "SUCCESS":
+            conn = get_connection()
+            try:
+                with conn.cursor(dictionary=True) as cursor:
+                    cursor.execute("SELECT evidence_json FROM lab_verification_results WHERE id = %s",
+                                   (outcome["observation_id"],))
+                    saved = cursor.fetchone()
+                    document = saved["evidence_json"]
+                    if isinstance(document, str): document = json.loads(document)
+                    raise AssertionError("DVWA lab execution failed: " + str({
+                        "error_code": document.get("error_code"),
+                        "reason": document.get("reason"),
+                        "details": {k: v for k, v in document.get("details", {}).items()
+                                    if k in {"finding_status", "steps", "request_labels"}}}))
+            finally:
+                conn.close()
         assert outcome["finding_status"] == "CONFIRMED", outcome
 
     output = generate_integrated_report(local_scan_id=local_id, ec2_scan_id=ec2_id,
