@@ -1,0 +1,70 @@
+name: scanner-controlled-lab
+x-lab-base: &lab-base
+  build:
+    context: ..
+    dockerfile: lab/Dockerfile
+  restart: "no"
+  networks: [lab_net]
+  security_opt: ["no-new-privileges:true"]
+
+services:
+  ftp-safe:
+    <<: *lab-base
+    profiles: [baseline]
+    environment: {LAB_MODE: ftp, LAB_VULNERABLE: "0"}
+    ports: ["127.0.0.1:2121:2121"]
+  http-safe:
+    <<: *lab-base
+    profiles: [baseline]
+    environment: {LAB_MODE: http, LAB_VULNERABLE: "0"}
+    ports: ["127.0.0.1:8081:8080"]
+  ssh-safe:
+    <<: *lab-base
+    profiles: [baseline]
+    command: ["/lab/start-ssh.sh"]
+    environment:
+      LAB_VULNERABLE: "0"
+      LAB_SSH_PUBKEY: "${LAB_SSH_PUBKEY:-}"
+    ports: ["127.0.0.1:2222:2222"]
+  ftp-weak:
+    <<: *lab-base
+    profiles: [vulnerable]
+    environment: {LAB_MODE: ftp, LAB_VULNERABLE: "1"}
+    ports: ["127.0.0.1:2122:2121"]
+  http-weak:
+    <<: *lab-base
+    profiles: [vulnerable]
+    environment: {LAB_MODE: http, LAB_VULNERABLE: "1"}
+    ports: ["127.0.0.1:8082:8080"]
+  ssh-weak:
+    <<: *lab-base
+    profiles: [vulnerable]
+    command: ["/lab/start-ssh.sh"]
+    environment:
+      LAB_VULNERABLE: "1"
+      LAB_SSH_PASSWORD: "${LAB_SSH_PASSWORD:?Set a disposable SSH lab password outside Git}"
+    ports: ["127.0.0.1:2223:2222"]
+  dvwa-db:
+    image: mariadb:10.11.10
+    profiles: [vulnerable]
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DVWA_DB_ROOT_PASSWORD:?Set a disposable DVWA database password}"
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: "${DVWA_DB_PASSWORD:?Set DVWA_DB_PASSWORD outside Git}"
+    volumes: [dvwa-data:/var/lib/mysql]
+    networks: [lab_net]
+  dvwa:
+    image: ghcr.io/digininja/dvwa:068d974@sha256:1af2cedda7617e4d22937e61c98bbf71d8b74b98e46f5e41dd6aa0a5183311b0
+    profiles: [vulnerable]
+    restart: "no"
+    environment: {DB_SERVER: dvwa-db, DB_DATABASE: dvwa, DB_USER: dvwa, DB_PASSWORD: "${DVWA_DB_PASSWORD:?Set DVWA_DB_PASSWORD outside Git}"}
+    depends_on: [dvwa-db]
+    ports: ["127.0.0.1:4280:80"]
+    networks: [lab_net]
+networks:
+  lab_net:
+    internal: false
+volumes:
+  dvwa-data:
