@@ -389,4 +389,21 @@ python -m scripts.run_lab_verification --scan-id 1 --environment LOCAL_BASELINE 
 python -m scripts.generate_integrated_lab_report --local-scan-id 1 --ec2-scan-id 2 --format both --output-dir reports
 ```
 
-미완료/별도 승인 필요: 기존 EC2의 네트워크 접근 및 실측, EC2 측 SSH 인증정책 독립 증적, 실제 DVWA·Nuclei 성공 CI 증적 확보 후 포트폴리오 확정. `main` 병합 전 Draft PR에서 각 항목을 재검토합니다.
+### 2026-10-20 Docker·MySQL 실습 검증 결과
+
+[GitHub Actions 실측 검증 실행 #39415402659](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402659)에서 일회용 루프백 Docker 환경의 전체 통합 검증이 성공했습니다. Python 3.12 단위 테스트 **269개**도 통과했습니다.
+
+| 점검 항목 | 정상 실습(scan ID 2) | 의도적 취약 실습(scan ID 3) |
+|---|---|---|
+| FTP 익명 로그인 | SUCCESS / NOT_DETECTED | SUCCESS / CONFIRMED(익명 인증 설정) |
+| SSH 인증 정책 | SUCCESS / NOT_DETECTED | SUCCESS / POTENTIAL |
+| HTTP 보안 헤더 | SUCCESS / NOT_DETECTED | SUCCESS / POTENTIAL |
+| DVWA SQLi | 해당 테스트 미실행 | 통합 워크플로에서 실제 비파괴 검증 단계 통과 |
+| Nuclei | 해당 테스트 미실행 | 실제 Nuclei 3.11.1 템플릿 실행 단계 통과 |
+
+- MySQL 8.0.40 V7 적용, 기존 V6 테스트 기록 보존, 저장 이력의 FK 제약 및 증적 무결성, 두 개의 서로 다른 스캔 ID에 대한 JSON/PDF 생성 과정을 통합 테스트로 확인했습니다.
+- [CI에서 생성된 JSON/PDF 아티팩트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39415402659#artifacts)의 보관 기간은 7일입니다.
+- Docker의 의도적 취약 실습은 AWS EC2가 아닙니다. **사용자 소유 EC2에서의 실측 및 실제 로컬 운영환경에 대한 검증은 아직 하지 않았습니다.**
+- CVE 여부와 취약 설정 검증은 별개입니다. 익명 FTP 인증 허용이 확인되었다고 CVE가 CONFIRMED가 되는 것은 아닙니다.
+
+미완료/별도 승인 필요: 기존 EC2의 접근 통제 확인 및 실측, EC2 측 SSH 인증정책의 독립 증적, 조치 후 재점검 및 실제 EC2·로컬 간 비교. `main` 병합 전 Draft PR에서 검토합니다.
