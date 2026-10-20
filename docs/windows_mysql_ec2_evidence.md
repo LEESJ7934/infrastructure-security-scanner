@@ -94,4 +94,4 @@ py -m scripts.import_ec2_dvwa_evidence --evidence-file .\evidence\dvwa_sqli_evid
 py -m scripts.generate_integrated_lab_report --local-scan-id <LOCAL_SCAN_ID> --ec2-scan-id <EC2_SCAN_ID> --output-dir reports --format both
 ```
 
-보고서와 증적의 상태 및 해시를 검증한 후에만 포트폴리오 결과를 'V7 실제 저장 완료'로 수정합니다. 현재 이 문서와 저장소에서는 **실제 Windows DB 기록을 직접 수행한 적이 없습니다**.
+보고서와 증적의 상태 및 해시를 검증한 후에만 포트폴리오 결과를 'V7 실제 저장 완료'로 수정합니다. **2026-10-20 사용자 실행 결과 보고:** Windows Docker MySQL 8.0.44(`port_scan`) V7 적용 완료. 적용 직후 기존 스캔 9건·자산 3건·포트 16건을 유지했고, 사용자 측에서 EC2 DVWA SQLi 증적을 기존 스캔 ID 7/포트 ID 4에 `EC2_LAB / DVWA_SQLI / SUCCESS / CONFIRMED`로 저장했다고 확인했습니다. `py -m scripts.generate_lab_comparison --scan-id 7 --json .\reports\ec2_v7_findings.json --pdf .\reports\ec2_v7_findings.pdf` 실행 후 `evidence_integrity=MATCH`를 보고했습니다. 이는 **사용자 실행 결과를 근거로 한 기록**으로, ChatGPT가 실제 Windows DB나 원본 파일을 직접 읽지는 않았습니다. 현 단계의 JSON/PDF는 **EC2 V7 증적 요약 보고서**이며 정상 환경과 비교한 최종 통합 보고서가 아닙니다. FTP/SSH/HTTP/Nuclei 실측 결과를 V7에 추가 저장하거나 EC2 조치 후 재점검한 것은 아닙니다.
