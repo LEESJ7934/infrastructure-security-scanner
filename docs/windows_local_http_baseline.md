@@ -5,7 +5,7 @@
 ## 1. 첫 번째 PowerShell: 정상 로컬 HTTP 서버 시작
 
 ```powershell
-cd "C:\Users\Seung Jun\Desktop\Semi-Project\infrastructure-security-scanner-lab"
+cd "<PROJECT_ROOT>"
 git pull --ff-only
 py -m scripts.run_local_http_baseline
 ```
@@ -15,7 +15,7 @@ py -m scripts.run_local_http_baseline
 ## 2. 두 번째 PowerShell: 연결 확인과 실제 스캔 저장
 
 ```powershell
-cd "C:\Users\Seung Jun\Desktop\Semi-Project\infrastructure-security-scanner-lab"
+cd "<PROJECT_ROOT>"
 Test-NetConnection 127.0.0.1 -Port 8081 -InformationLevel Quiet
 py -c "import requests; r=requests.get('http://127.0.0.1:8081/',timeout=5); print('HTTP:',r.status_code); print('CSP:',r.headers.get('Content-Security-Policy')); print('XCTO:',r.headers.get('X-Content-Type-Options')); print('Referrer:',r.headers.get('Referrer-Policy'))"
 py -m scripts.run_scan scan -sT -sV --target 127.0.0.1 --ports 8081 --scope-file config/scope.example.json --max-workers 1
