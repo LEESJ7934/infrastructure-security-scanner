@@ -255,7 +255,36 @@ def render_report_pdf(snapshot, output_path):
     if not findings:
         story.append(p("N/A"))
 
-    section(12, "Report Integrity")
+    if snapshot.get("lab_comparison"):
+        comparison = snapshot["lab_comparison"]
+        section(12, "Controlled Laboratory Comparison")
+        fields([("baseline_scan_id", comparison.get("scan_ids", {}).get("LOCAL_BASELINE")),
+                ("ec2_scan_id", comparison.get("scan_ids", {}).get("EC2_LAB")),
+                ("scope", "Stored lab configuration observations only; missing means NOT_TESTED.")])
+        for env_name, group in comparison.get("environments", {}).items():
+            story.append(p(env_name, subheading))
+            for check, records in group.get("by_check", {}).items():
+                if not records:
+                    story.append(p(check + ": NOT_TESTED", small))
+                    continue
+                for row in records:
+                    fields([("check", check), ("execution_status", row.get("execution_status")),
+                            ("finding_status", row.get("finding_status")),
+                            ("observed_at", row.get("observed_at")),
+                            ("evidence_sha256", row.get("evidence_sha256")),
+                            ("evidence_integrity", row.get("evidence_integrity"))])
+        section(13, "Peer Environment CVE Findings")
+        peer = snapshot.get("peer_report") or {}
+        for asset in peer.get("assets", []):
+            story.append(p(asset.get("asset_name") or asset.get("asset_uid") or "Asset", subheading))
+            for finding in asset.get("findings", []):
+                fields([("cve_id", finding.get("cve_id")),
+                        ("status", finding.get("status")),
+                        ("effective_priority", finding.get("effective_priority")),
+                        ("assessment_freshness", finding.get("assessment_freshness"))])
+        story.append(p("Configuration findings never imply CVE confirmation. CVE details for both scans are preserved in the JSON snapshot."))
+
+    section(14 if snapshot.get("lab_comparison") else 12, "Report Integrity")
     fields([("snapshot_sha256", snapshot.get("integrity", {}).get("snapshot_sha256")),
             ("digest_basis", "Canonical JSON with generated_at and integrity.snapshot_sha256 excluded."),
             ("integrity_limit", "The hash identifies snapshot content. It is not a signature or proof of source authenticity.")])
