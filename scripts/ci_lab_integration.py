@@ -10,6 +10,8 @@ import io
 import json
 import os
 import re
+import subprocess
+import requests
 from pathlib import Path
 from time import sleep
 
@@ -51,6 +53,50 @@ def status_map(results):
             for row in results}
 
 
+def check_running_ssh_password_policy(service: str, expected: str) -> bool:
+    # Read the effective command line of the running *lab container's* sshd.
+    # No change to operating-system SSH or credentials is made.
+    cmd = subprocess.run(
+        ["docker", "compose", "-f", "lab/compose.yml", "exec", "-T", service,
+         "sh", "-c", "tr '\\000' ' ' </proc/1/cmdline"],
+        check=True, capture_output=True, text=True, timeout=15,
+    ).stdout
+    if "/usr/sbin/sshd" not in cmd:
+        raise AssertionError("Lab SSH process not identified")
+    observed = re.findall(r"PasswordAuthentication=(yes|no)", cmd)
+    if observed != [expected]:
+        raise AssertionError("Lab SSH runtime auth policy differs from expected")
+    return expected == "yes"
+
+
+def verify_header_remediation(port, scan_id):
+    # Re-create ONLY disposable lab http-weak with good security headers.
+    # No host SSH, EC2, IAM or user database changes occur.
+    command = ["docker", "compose", "-f", "lab/compose.yml",
+               "-f", "lab/compose.retest.yml", "--profile", "vulnerable",
+               "up", "-d", "--no-deps", "--force-recreate", "http-weak"]
+    subprocess.run(command, check=True, capture_output=True, text=True, timeout=90)
+    from scanner.targets import ResolvedTarget
+    from verification.checker_http import HTTPChecker
+    from db.lab_repository import insert_observation, make_observation
+    SCOPE.authorize([ResolvedTarget("127.0.0.1", "127.0.0.1", "IP")],
+                    worker_count=1, port_count=1)
+    result = None
+    for _ in range(30):
+        result = HTTPChecker(timeout=2).run_check(port, {})
+        if result.get("details", {}).get("finding_status") == "NOT_DETECTED":
+            break
+        sleep(1)
+    if result.get("details", {}).get("finding_status") != "NOT_DETECTED":
+        raise AssertionError("HTTP remediation did not remove missing header finding")
+    observation = make_observation(
+        port=port, environment="EC2_LAB", check_name="HTTP_SECURITY_HEADERS",
+        result=result, scope=SCOPE,
+    )
+    insert_observation(observation)
+    return {"port":port["port"], "before":"POTENTIAL", "after":"NOT_DETECTED"}
+
+
 def check_historical_preservation(conn):
     with conn.cursor(dictionary=True) as cursor:
         cursor.execute("SELECT COUNT(*) AS c FROM scans WHERE scan_uid='pre-v7-fixture'")
@@ -67,6 +113,9 @@ def main():
             assert cursor.fetchone()["c"] == 1
     finally:
         conn.close()
+
+    assert check_running_ssh_password_policy("ssh-safe", "no") is False
+    assert check_running_ssh_password_policy("ssh-weak", "yes") is True
 
     local_id, normal = checked_scan([2121, 2222, 8081])
     actual_local = execute(policy=SCOPE, environment="LOCAL_BASELINE", scan_id=local_id,
@@ -149,11 +198,17 @@ def main():
             finally:
                 conn.close()
 
+    remediation = verify_header_remediation(weak[8082], ec2_id)
+    assert remediation == {"port": 8082, "before": "POTENTIAL", "after": "NOT_DETECTED"}
+
     output = generate_integrated_report(local_scan_id=local_id, ec2_scan_id=ec2_id,
                                         output_dir="reports/ci", format="both")
     summary = json.loads(Path(output["json_path"]).read_text(encoding="utf-8"))
     assert summary["selection"]["local_scan_id"] == local_id
     assert summary["lab_comparison"]["scan_ids"]["EC2_LAB"] == ec2_id
+    changed = summary["lab_comparison"]["environments"]["EC2_LAB"]["by_check"]["HTTP_SECURITY_HEADERS"]
+    statuses = [row["finding_status"] for row in changed if row["evidence"]["port"] == 8082]
+    assert statuses == ["POTENTIAL", "NOT_DETECTED"], statuses
     assert Path(output["pdf_path"]).read_bytes()[:5] == b"%PDF-"
     for key, group in summary["lab_comparison"]["environments"].items():
         assert group["coverage"]["FTP_ANONYMOUS"] == "OBSERVED"
