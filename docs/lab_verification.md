@@ -52,3 +52,16 @@ Optional SSH admin evidence file (local, do **not** commit): `{"127.0.0.1:2222":
 The new records contain `execution_status` (`SUCCESS/ERROR/SKIPPED`) and independent `finding_status` (`CANDIDATE/POTENTIAL/CONFIRMED/NOT_DETECTED/INCONCLUSIVE`). `CONFIRMED` from FTP is confirmation **only of an anonymously accessible FTP configuration**, not a CVE. For SSH/HTTP, observations are preliminary when applicability cannot be proven. Unobserved or absent services are not marked safe. Snapshot/PDF and DVWA/Nuclei integration are not yet implemented.
 
 **Limitations:** Mock tests, not live lab proof; configuration checks are not currently represented in the V6 JSON/PDF exporter. No EC2, SSM, MySQL, Nuclei or DVWA deployment was performed.
+
+
+## Additional code paths (not yet live-validated)
+
+- `verification.reviewed_nuclei.execute_reviewed` is a **standalone API**, not the default CVE dispatcher. It requires an explicitly pinned binary, a reviewed local template with matching SHA-256, and an exact approved numeric IP+port origin. Matched templates become `POTENTIAL`, never `CONFIRMED`. No reviewed production templates are shipped.
+- `scripts.generate_lab_comparison` reads V7 results and exports a separate JSON and optional PDF comparison. It does not alter the existing V6 report generator. Missing rows are `NOT_TESTED` rather than secure. The PDF is a bounded summary; detailed sanitized evidence is in JSON.
+- These code paths have unit tests with mocks, but have not been executed against a real Nuclei installation or live MySQL.
+
+```powershell
+py -m scripts.generate_lab_comparison --scan-id 1 --json reports/lab_comparison.json --pdf reports/lab_comparison.pdf
+```
+
+Neither the Nuclei process wrapper nor the separate laboratory comparison report should be represented as end-to-end validated until a real isolated laboratory run is recorded. The full existing report integration, DVWA login/SQLi verification, and AWS deployment remain open.
