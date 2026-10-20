@@ -61,7 +61,25 @@ jobs:
             done
             if [ "$ok" != "1" ]; then echo "Missing live port $port"; exit 1; fi
           done
-      - name: 실제 FTP SSH HTTP 스캔 및 MySQL 보고서 통합 검증
+      - name: 일회용 DVWA 데이터베이스 준비
+        env:
+          CI_DISPOSABLE_DVWA: "YES"
+        run: python -m scripts.ci_dvwa_setup
+      - name: 고정 해시로 Nuclei 실제 바이너리 설치
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 --connect-timeout 15 \
+            https://github.com/projectdiscovery/nuclei/releases/download/v3.11.1/nuclei_3.11.1_linux_amd64.zip -o "$RUNNER_TEMP/nuclei.zip"
+          echo "ea63d4ae232808cd7c6bc00d0142428e231fab59dae01042246097d195835ab6  $RUNNER_TEMP/nuclei.zip" | sha256sum -c -
+          unzip -q -j "$RUNNER_TEMP/nuclei.zip" nuclei -d "$RUNNER_TEMP"
+          chmod 0755 "$RUNNER_TEMP/nuclei"
+          "$RUNNER_TEMP/nuclei" -version
+          echo "CI_NUCLEI_BINARY=$RUNNER_TEMP/nuclei" >> "$GITHUB_ENV"
+      - name: 실제 FTP SSH HTTP DVWA Nuclei 스캔 및 MySQL 보고서 통합 검증
+        env:
+          CI_DVWA_USERNAME: admin
+          CI_DVWA_PASSWORD: password
         run: python -m scripts.ci_lab_integration
       - name: 진단 로그 및 종료 상태 확인
         if: always()
