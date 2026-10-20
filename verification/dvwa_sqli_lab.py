@@ -69,6 +69,12 @@ def verify_dvwa_sqli(*, origin: str, approved_ip: str, username: str, password: 
             session.cookies.set("security", "low")
             home = session.get(base + "/index.php", timeout=timeout, allow_redirects=False)
             if home.status_code != 200 or "logout" not in home.text.lower():
+                # Record only non-sensitive diagnostics; never include redirects,
+                # body, credentials or session identifiers in the evidence.
+                steps.append({"label": "auth_validation", "http_status": home.status_code,
+                              "login_http_status": login.status_code,
+                              "login_page_detected": "name=\"username\"" in home.text.lower(),
+                              "logout_marker_detected": "logout" in home.text.lower()})
                 return _result("ERROR", "DVWA_AUTH_UNCONFIRMED", steps, started)
             target = base + "/vulnerabilities/sqli/"
             for label, user_id in (("baseline", "1"), ("injection", "1' OR '1'='1")):
