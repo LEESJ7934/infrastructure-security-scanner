@@ -36,3 +36,6 @@ config/scope.*.local.json
 !*.tfvars.example
 crash.log
 .terraform.tfstate.lock.info
+
+# Operator-collected EC2 lab evidence; never publish raw artifacts
+evidence/
