@@ -66,7 +66,12 @@ def verify_dvwa_sqli(*, origin: str, approved_ip: str, username: str, password: 
             if login.status_code not in (200, 302, 303) or not session.cookies.get("PHPSESSID"):
                 return _result("ERROR", "DVWA_LOGIN_FAILED", steps, started)
             # DVWA uses a lab-only security cookie. No server-side configuration changes.
-            session.cookies.set("security", "low")
+            # Avoid two same-name cookies (DVWA may set "security=impossible").
+            # A duplicate can keep the default level and silently invalidate proof.
+            for existing in list(session.cookies):
+                if existing.name == "security":
+                    session.cookies.clear(existing.domain, existing.path, existing.name)
+            session.cookies.set("security", "low", domain=urlsplit(base).hostname, path="/")
             home = session.get(base + "/index.php", timeout=timeout, allow_redirects=False)
             if home.status_code != 200 or "logout" not in home.text.lower():
                 # Record only non-sensitive diagnostics; never include redirects,
