@@ -8,6 +8,7 @@ import hashlib
 import ipaddress
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 from urllib.parse import urlsplit
@@ -96,5 +97,5 @@ def execute_reviewed(*, nuclei_binary: str, template_root: str, template_allowli
             "reason": "Template match needs separate CVE-specific verification",
             "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
             "template_sha256": template_allowlist[template_name],
-            "version_output": version.stdout.strip()[:200],
+            "version_output": (re.search(r"v[0-9]+\\.[0-9]+\\.[0-9]+", version.stdout + version.stderr) or ["UNAVAILABLE"])[0],
             "process_returncode": finished.returncode, "results": observed}
