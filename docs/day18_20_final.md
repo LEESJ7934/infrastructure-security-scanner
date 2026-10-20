@@ -2,7 +2,7 @@
 
 ## 코드와 실측의 구분
 
-기존 브랜치와 Draft PR #1을 유지합니다. 이 문서는 프로젝트 루트 `infrastructure-security-scanner-lab`의 VS Code PowerShell을 기준으로 합니다. 비밀번호·개인 경로를 Git에 추가하지 않습니다.
+개발 기능은 main `51aae3a65406410ebe7ebb5ba2c107d8928722a7`에 통합되었습니다. 예전 작업 브랜치로 전환할 필요가 없습니다. 이 문서는 프로젝트 루트 `infrastructure-security-scanner-lab`의 VS Code PowerShell을 기준으로 합니다. 비밀번호·개인 경로를 Git에 추가하지 않습니다.
 
 - Work: Nuclei 바이너리/버전/템플릿 검증, 안전한 JSONL 출력 및 V7 연결, Docker HTTP/FTP 개선 후 재점검, 독립 SQL 앱 검증, 보고서·테스트 구현.
 - GitHub Actions: 일회용 Docker/MySQL에서 실제 Nuclei와 HTTP·FTP 전후 이력, DVWA 읽기 전용 재현, V6→V7 보존, JSON/PDF·해시 확인. 최신 실행의 성공 여부를 확인해야 합니다.
@@ -14,8 +14,8 @@
 ## 1. Windows: 기존 데이터와 브랜치 확인
 
 ```powershell
-git switch feat/controlled-lab-verification-20261020
-git pull --ff-only origin feat/controlled-lab-verification-20261020
+git switch main
+git pull --ff-only origin main
 py -m scripts.windows_v7_preflight
 ```
 
@@ -46,7 +46,8 @@ Get-NetTCPConnection -LocalPort 80 -State Listen -ErrorAction SilentlyContinue
 다른 서비스가 점유하고 있으면 해당 프로세스를 종료하지 말고 연결 구성을 검토합니다. 비어 있을 때만 다음 SSM 전달을 실행해 창을 유지합니다. AWS CLI와 Session Manager Plugin이 기존 설정돼 있어야 합니다.
 
 ```powershell
-aws ssm start-session --target i-036b5556c800856e0 --region ap-northeast-2 --document-name AWS-StartPortForwardingSession --parameters 'portNumber=80,localPortNumber=80'
+$instanceId = Read-Host '사용자 소유 승인된 EC2 인스턴스 ID'
+aws ssm start-session --target $instanceId --region ap-northeast-2 --document-name AWS-StartPortForwardingSession --parameters 'portNumber=80,localPortNumber=80'
 ```
 
 이는 기존 인스턴스의 기존 HTTP 80에 대한 임시 세션이며 새 AWS 유료 리소스나 공개 접근 규칙을 만들지 않습니다. 연결이 끝나면 이 창에서 Ctrl+C로 터널만 종료합니다.
@@ -112,6 +113,6 @@ py -c "import json,sys; from api.analysis_report import snapshot_sha256; d=json.
 
 `retests`는 같은 스캔·자산·포트·환경·검사의 서로 다른 시각 증적만 비교합니다. 해시 불일치·실행 실패·INCONCLUSIVE·다른 서비스·동일 시각은 전후 성공으로 묶지 않습니다. 변화가 관찰됐다는 사실과 어떤 조치를 수행했는지는 구분하고 변경 기록이 있는 경우 함께 출력합니다. `EC2_LAB`은 DB 저장 라벨이며 CI 보고서에는 `GITHUB_ACTIONS_DISPOSABLE_DOCKER` 실행 맥락을 별도로 표시합니다.
 
-## 병합 전 남은 확인
+## 사용자 실환경 확인 대기
 
-사용자는 일반 Chat에서 새 로컬 ID, 추가 증적 저장 결과, 실제 Nuclei 실행 결과, 최종 JSON/PDF와 해시 검증 출력을 확인해야 합니다. 기존 EC2의 설정 개선은 승인·실행하지 않았으므로 완료로 쓰지 않습니다. 새 실환경 스크린샷이 없다면 만들지 않으며 기존 핵심 화면을 유지합니다. 이 확인이 끝나기 전에는 프로젝트 전체 실환경 검증 완료나 Squash 병합 준비 완료라고 단정하지 않습니다. 최종 병합은 별도 사용자 승인 후 `포트스캐너 보안 검증 기능 및 포트폴리오 개선` 메시지로 수행할 계획이며 이번 Work에서는 실행하지 않습니다.
+사용자는 일반 Chat에서 새 로컬 ID, 추가 증적 저장 결과, 실제 Nuclei 실행 결과, 최종 JSON/PDF와 해시 검증 출력을 확인해야 합니다. 기존 EC2의 설정 개선은 승인·실행하지 않았으므로 완료로 쓰지 않습니다. 새 실환경 스크린샷이 없다면 만들지 않으며 기존 핵심 화면을 유지합니다. 기능 병합과 사용자 실환경 검증 완료는 별개입니다. 아직 확인하지 않은 실측·이미지를 완료로 표기하지 않습니다. 현재 촬영 순서는 [촬영 가이드](portfolio_capture_guide.md)를 따릅니다.
