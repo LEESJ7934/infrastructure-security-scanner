@@ -10,11 +10,18 @@ from .base_checker import BaseChecker, check_result
 
 
 class FTPChecker(BaseChecker):
-    def __init__(self, timeout=5, *, allow_anonymous_login=False):
+    def __init__(self, timeout=5, *, allow_anonymous_login=False, approved_endpoints=()):
         self.timeout = timeout
         self.allow_anonymous_login = allow_anonymous_login
+        self.approved_endpoints = frozenset(approved_endpoints)
 
     def run_check(self, port_record, vuln_candidate):
+        if self.allow_anonymous_login and (port_record["host_ip"], int(port_record["port"])) not in self.approved_endpoints:
+            return check_result(
+                "ERROR", "Anonymous authentication was not authorized for this exact endpoint.",
+                checker=type(self).__name__, evidence_type="ERROR_LOG",
+                error_code="SCOPE_DENIED", details={"safe_checks": []},
+            )
         ftp = FTP()
         started = time.monotonic()
         details = {"safe_checks": ["ftp_greeting"], "anonymous_login_attempted": False}
