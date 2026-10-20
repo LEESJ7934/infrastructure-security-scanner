@@ -1,0 +1,77 @@
+name: 격리 실습 통합 검증
+
+on:
+  push:
+    branches: [feat/controlled-lab-verification-20261020]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3339"
+      DB_USER: root
+      DB_NAME: port_scan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: 파이썬 의존성 설치
+        run: python -m pip install -r requirements.txt
+      - name: 일회용 실습 암호 생성과 DB 실행
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "CI_MYSQL_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "LAB_SSH_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "DVWA_DB_ROOT_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "DVWA_DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+      - name: 테스트 전용 MySQL 시작
+        run: |
+          set -euo pipefail
+          docker run -d --name scanner-lab-mysql -e MYSQL_ROOT_PASSWORD="$CI_MYSQL_PASSWORD" \
+            -p 127.0.0.1:3339:3306 mysql:8.0.40
+          for i in $(seq 1 90); do
+            if docker exec scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqladmin ping -uroot --silent'; then break; fi
+            sleep 2
+          done
+          docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot' < sql/init.sql
+          docker exec scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot port_scan' \
+            -e "INSERT INTO scans (scan_uid,target,scan_type,port_range,started_at,status) VALUES ('pre-v7-fixture','127.0.0.1','tcp','2121',UTC_TIMESTAMP(),'COMPLETED')"
+          docker exec -i scanner-lab-mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot' < sql/migration_v7.sql
+          echo "DB_PASSWORD=$CI_MYSQL_PASSWORD" >> "$GITHUB_ENV"
+      - name: 테스트용 Docker 서비스 빌드 및 실행
+        run: |
+          set -euo pipefail
+          docker compose -f lab/compose.yml --profile baseline --profile vulnerable up -d --build
+          for port in 2121 2122 2222 2223 8081 8082 4280; do
+            ok=0
+            for i in $(seq 1 80); do
+              if timeout 2 bash -c "echo > /dev/tcp/127.0.0.1/$port" 2>/dev/null; then ok=1; break; fi
+              sleep 2
+            done
+            if [ "$ok" != "1" ]; then echo "Missing live port $port"; exit 1; fi
+          done
+      - name: 실제 FTP SSH HTTP 스캔 및 MySQL 보고서 통합 검증
+        run: python -m scripts.ci_lab_integration
+      - name: 진단 로그 및 종료 상태 확인
+        if: always()
+        run: |
+          docker compose -f lab/compose.yml --profile baseline --profile vulnerable ps || true
+          docker logs --tail 70 scanner-lab-mysql || true
+      - name: 실습 결과 보존
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-docker-lab-evidence
+          path: reports/ci/
+          retention-days: 7
