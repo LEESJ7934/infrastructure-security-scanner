@@ -1,87 +1,67 @@
 # 인프라 보안 진단 스캐너
-**Infrastructure Security Scanner | 보안 진단·증적 관리 프로젝트**
+**Infrastructure Security Scanner**
 
-승인된 자산의 **서비스 식별 → 취약점 후보 분석 → 설정·실습 검증 → 위험 우선순위 → 증적·재점검 → JSON/PDF 보고서**를 연결한 보안 진단 프로젝트입니다.
+승인된 자산의 서비스·버전을 식별하고, **CVE 후보 / 실제 설정 검증 / 위험 우선순위 / 증적 / 재점검 / 보고서**를 구분해 관리하는 인프라 보안 진단 프로젝트입니다.
 
-- **팀 프로젝트:** 2025.12 ~ 2026.01 (이후 개인적으로 기능 확장 및 검증 보완)
-- **기술:** Python, MySQL, Docker, AWS EC2/VPC, Nuclei, NVD CVSS, FIRST EPSS, CISA KEV
-- **포트폴리오:** [프로젝트 설명 및 검증 화면](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
+**[노션 포트폴리오: 담당 역할·검증 결과·실제 스크린샷 보기](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)**
 
-## 1. 문제와 개선 방향
+| 구분 | 내용 |
+|---|---|
+| 수행 구분 | 팀 프로젝트(2025.12–2026.01) / 이후 기능 확장·실습 검증 |
+| 주요 기술 | Python, MySQL, Docker, AWS EC2, Nuclei, NVD CVSS, FIRST EPSS, CISA KEV |
+| 검증 기록 | Python 회귀 테스트 330개 통과, 격리 Docker/MySQL/Nuclei E2E |
+| 주요 결과 | EC2·로컬 실습 증적 5/5 MATCH, 별도 Docker 환경의 동일 대상 재점검 |
 
-초기 포트 스캔만으로는 **점검 승인 여부, 자산 중요도, 실제 서비스, 취약점 판단 근거 및 조치 이력**을 설명하기 어려웠습니다. 따라서 단순 열린 포트 목록이 아니라 **관찰한 사실과 추가 확인이 필요한 판단을 분리해 기록하는 구조**로 확장했습니다.
+## 기술진단 데이터 흐름
 
-```text
-승인 Scope → 자산·포트 스캔 → 서비스/버전 식별 → CVE 후보
-                    ↓                             ↓
-             자산·관찰 이력                 읽기 전용 검증
-                    └─────────┬───────────────────┘
-                        CVSS/EPSS/KEV + 자산 맥락
-                                  ↓
-                          증적·조치·재점검
-                                  ↓
-                          JSON/PDF 보고서
+```mermaid
+flowchart TB
+    A["승인 Scope · 자산 정보"] --> B["포트 스캔 · 서비스 식별"]
+    B --> C["제품·버전 관찰"]
+    C --> D["CVE 후보 · CANDIDATE"]
+    D --> E["설정·실습 읽기 전용 검증"]
+    E --> F["증적과 판정 상태 저장"]
+    C --> G["CVSS · EPSS · KEV + 자산 맥락"]
+    G --> H["위험 우선순위"]
+    F --> I[("MySQL: 자산·스캔·증적·이력")]
+    H --> I
+    I --> J["조치 기록 · 별도 재점검"]
+    I --> K["JSON / PDF 보고서"]
+    J --> K
 ```
 
-## 2. 핵심 구현
+*검사 단계는 승인과 실행 조건에 따라 각각 호출됩니다. 도식은 데이터의 논리적 연결이며 자동 연속 실행을 뜻하지 않습니다.*
 
-| 영역 | 구현 및 판단 근거 |
-|---|---|
-| 점검 범위 | IP/CIDR/호스트 대상 승인 Scope, 허가 유효기간, 실행 한도, dry-run |
-| 자산 관리 | 자산 ID, 중요도·담당자·개인정보 처리·노출 여부, 변경 전후 감사이력 |
-| 서비스 식별 | 포트 번호 추측 대신 서비스 응답을 기반으로 제품·버전을 기록 |
-| CVE 후보 | 공식 공지를 검토한 4개 CVE의 영향 범위를 비교하며 **CANDIDATE는 확정 취약점과 구분** |
-| 검증 | FTP·SSH·HTTP 설정 및 DVWA 실습, Nuclei 결과를 검사 유형별 증적으로 보관 |
-| 우선순위 | CVSS·EPSS·KEV와 자산 맥락을 고려하되 우선순위와 취약 확정 여부를 별도 관리 |
-| 보고서 | 검사 시각·대상·판정·증적 해시·조치이력·누락 사항을 JSON/PDF로 연결 |
-| AWS 확장 | EC2·Security Group 읽기 전용 자산/설정 점검, 발견과 스캔 승인을 분리 |
+## 핵심 구현
 
-## 3. 검증 사례 및 결과
+| 영역 | 주요 구현 | 근거 |
+|---|---|---|
+| 승인 범위 · 자산 | IP/CIDR/호스트 허가 범위·기간·스캔 한도와 자산 중요도 관리 | `scanner/`, `asset_management/` |
+| 서비스 · CVE 후보 | 서비스 응답·버전과 검토된 4개 CVE의 공식 영향 범위 비교 | `analysis/`, `scanner/` |
+| 검증 · 판정 | FTP·SSH·HTTP·DVWA·Nuclei, 후보·가능성·해당 검사 확인 구분 | `verification/`, `lab/` |
+| 위험 우선순위 | CVSS·EPSS·KEV·자산 맥락을 고려하되 확정 여부와 분리 | `analysis/` |
+| 증적 · 보고서 | 검사 시각·판정·SHA-256·이력과 JSON/PDF 통합 | `sql/`, `scripts/` |
+| 클라우드 | EC2·Security Group 읽기 전용 조회와 스캔 승인 분리 | `cloud_security/`, `infra/aws/` |
 
-**① 승인 EC2·로컬 실습 결과 (2026.10):** FTP 익명 로그인 성공, SSH 비밀번호 인증 비활성, HTTP 보안 헤더 4종 누락, DVWA 정상 조회 1행 대비 우회 입력 5행을 각각 관찰했습니다. 저장 결과 화면에서는 EC2 4건과 로컬 HTTP 1건의 **증적 5/5 MATCH 및 Snapshot MATCH**를 확인했습니다. 이는 해당 증적의 내용 일치 확인으로, 전체 시스템의 안전성이나 모든 검사 완료를 뜻하지 않습니다.
+## 검증 범위와 한계
 
-**② 별도 Docker 통합 검증:** 동일한 FTP 실습 서비스의 익명 로그인 차단 전후, 동일 HTTP 서비스의 보안 헤더 적용 전후를 검사하고 Nuclei 결과도 재점검했습니다. **CONFIRMED/POTENTIAL → NOT_DETECTED**는 *해당 검사 범위*에 한정되며, 실제 EC2 설정을 변경·개선했다는 의미가 아닙니다.
+| 환경 | 관찰·검증 | 해석 |
+|---|---|---|
+| 승인 EC2 실습 | FTP 익명 로그인, SSH 기본 인증 정책, HTTP 보안 헤더, DVWA 실습 | 해당 시점·검사 범위의 관찰 |
+| EC2 + 로컬 증적 | 저장 증적 5/5 MATCH 및 통합 Snapshot MATCH | 내용 일치 확인, 원격 출처 인증 아님 |
+| GitHub Actions 격리 Docker | 같은 FTP·HTTP 서비스 설정 개선 전후, Nuclei·MySQL·보고서 | 실제 EC2 설정을 개선한 결과 아님 |
+| 회귀 테스트 | Python 330개 통과 | 기능 테스트이며 운영 적합성 보증 아님 |
 
-**③ 회귀 테스트와 보고서:** Python 회귀 테스트 330개 및 Docker/MySQL/Nuclei 통합 검증을 GitHub Actions에서 수행했습니다. [기본 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487) · [격리 통합 검증](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39453811884)
+[기본 CI 실행 결과](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487) · [Docker 통합 검증](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39453811884)
 
-### 대표 증적 화면
+**CANDIDATE**(버전 기반 후보), **POTENTIAL**(설정 위험 가능성), **CONFIRMED**(해당 검사 조건 확인)는 다릅니다. **NOT_DETECTED**, **ERROR**, **NOT_TESTED**도 각각 미발견·검사 실패·미검사를 의미합니다. CVE 자동 확정이나 운영환경 전체 안전을 주장하지 않습니다.
 
-| 승인 범위·서비스 식별 | 설정 검증·증적 |
-|---|---|
-| ![Scope와 서비스 식별](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/01-scope-service.png) | ![검증 결과 무결성](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/05-v7-integrity.png) |
+## 구현 코드·설계·재현 자료
 
-| 동일 Docker 서비스 재점검 | 통합 보고서 검증 |
-|---|---|
-| ![FTP HTTP 개선 후 재점검](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/06-docker-retest.png) | ![JSON PDF 통합 보고서](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/07-integrated-report.png) |
+- [아키텍처와 설계 판단](docs/architecture.md) · [검증 방법 및 판정 기준](docs/validation.md)
+- 코드: `scanner/` · `asset_management/` · `analysis/` · `verification/` · `cloud_security/`
+- 데이터베이스·인프라: `sql/` · `docker/` · `infra/aws/`
+- 회귀·격리 검증: `tests/` · `lab/` · [GitHub Actions](.github/workflows/lab_integration.yml)
+- **실제 점검 화면·조치 전후·통합 보고서:** [노션 상세 포트폴리오](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
 
-> 화면은 각각의 실습 시점 결과입니다. 이미지에 포함된 판정 상태는 해당 검사·환경의 결과이며, CVE 확정이나 전체 운영환경 안전 판정을 의미하지 않습니다.
-
-## 4. 설계상 중요한 구분
-
-- **CANDIDATE / POTENTIAL / CONFIRMED:** 배너·버전 일치, 설정 위험 가능성, 해당 설정·실습 검증 결과를 구분합니다. FTP 허용 설정의 CONFIRMED가 특정 CVE 확정을 뜻하지는 않습니다.
-- **NOT_DETECTED / ERROR / NOT_TESTED:** 미발견, 검사 실패, 검증 증적 미확보는 서로 다릅니다.
-- **CVSS·EPSS·KEV:** 검토 우선순위를 판단하는 자료이지 취약점 확정 근거가 아닙니다.
-- **SHA-256:** 증적 내용 일치를 검토하며 원격 출처 인증이나 전자서명을 대신하지 않습니다.
-- **AWS Security Group:** 광범위한 접근 허용 설정을 찾지만 네트워크 전체 도달성을 단정하지 않습니다.
-
-## 5. 코드 및 검증 자료
-
-- [아키텍처·설계 판단](docs/architecture.md) · [실제 검증 결과·한계](docs/validation.md)
-- 주요 구현: `scanner/`, `asset_management/`, `analysis/`, `verification/`, `cloud_security/`, `sql/`, `infra/aws/`
-- 검증 코드·실습 환경: `tests/`, `lab/`, `.github/workflows/`
-- MySQL 테이블 및 마이그레이션 구조는 `sql/`에, AWS Terraform 구성은 `infra/aws/terraform/`에 보관했습니다.
-
-## 6. 실행 개요
-
-Windows PowerShell, Python 3.10 이상, Docker Desktop 기준:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-py -m pip install -r requirements.txt
-Copy-Item .env.example .env
-docker compose -f docker/docker-compose.yml up -d
-Copy-Item config/scope.example.json config/scope.local.json
-```
-
-로컬 설정의 비밀번호와 승인 대상을 실제 실습 환경에 맞춰 수정한 뒤, `py -m scripts.run_scan scan --target 127.0.0.1 --ports 22,80,443 --scope-file config/scope.local.json --dry-run`으로 승인 범위를 먼저 확인합니다. **허가받지 않은 외부 자산에는 실행하지 않습니다.** 자세한 순서는 위 기술 문서를 참고합니다.
+검증 이미지 원본은 `docs/images/`에서 관리합니다. 이 README에서는 노션과 중복되는 스크린샷을 다시 렌더링하지 않습니다.
