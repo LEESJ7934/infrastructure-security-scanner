@@ -64,14 +64,12 @@
 - **SHA-256:** 증적 내용 일치를 검토하며 원격 출처 인증이나 전자서명을 대신하지 않습니다.
 - **AWS Security Group:** 광범위한 접근 허용 설정을 찾지만 네트워크 전체 도달성을 단정하지 않습니다.
 
-## 5. 주요 코드 및 기술 문서
+## 5. 코드 및 검증 자료
 
-- [설계·데이터 흐름](docs/architecture.md) · [DB 구조](docs/database_schema.md)
-- [자산 및 Scope 관리](docs/asset_management.md) · [서비스/CVE 매핑](docs/service_cve_mapping.md)
-- [AWS 구성](docs/aws_architecture.md) · [AWS 검증 절차](docs/aws_validation.md)
-- [테스트·검증 기준](docs/validation.md) · [격리 실습환경](lab/README.md)
-- 주요 구현: `scanner/`, `asset_management/`, `analysis/`, `verification/`, `cloud_security/`, `sql/`
-- 테스트: `tests/`, `.github/workflows/`
+- [아키텍처·설계 판단](docs/architecture.md) · [실제 검증 결과·한계](docs/validation.md)
+- 주요 구현: `scanner/`, `asset_management/`, `analysis/`, `verification/`, `cloud_security/`, `sql/`, `infra/aws/`
+- 검증 코드·실습 환경: `tests/`, `lab/`, `.github/workflows/`
+- MySQL 테이블 및 마이그레이션 구조는 `sql/`에, AWS Terraform 구성은 `infra/aws/terraform/`에 보관했습니다.
 
 ## 6. 실행 개요
 
