@@ -308,14 +308,11 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 
 이 한계를 명시하는 이유는 자동화 결과를 실제 사실보다 강하게 해석하지 않기 위해서다.
 
-## 13. 관련 문서
+## 13. 관련 자료
 
-- [README](../README.md)
-- [데이터베이스 V5](database_schema.md)
-- [자산관리와 승인 스코프](asset_management.md)
-- [서비스 식별과 CVE 후보](service_cve_mapping.md)
-- [검증 기록](validation.md)
-- [포트폴리오·면접 스토리](project_story.md)
+- [프로젝트 개요](../README.md)
+- [검증 범위와 결과](validation.md)
+- 소스 코드 및 설정 근거: `../sql/`, `../asset_management/`, `../analysis/`, `../verification/`, `../infra/aws/terraform/`
 
 ## AWS V6 extension
 
@@ -329,4 +326,4 @@ AWS read-only API
 approved ScopePolicy ──> existing private-IP scanner ──> CVE pipeline
 ```
 
-CVE findings and AWS configuration findings remain separate data types. AWS discovery never triggers a scan automatically. See `docs/aws_architecture.md` for network/IAM design and `docs/aws_validation.md` for the lab runbook.
+CVE findings and AWS configuration findings remain separate data types. AWS discovery never triggers a scan automatically. AWS VPC, IAM, Security Group의 실제 구성은 `infra/aws/terraform/`, 검증 자동화는 `.github/workflows/`와 `tests/`에서 확인할 수 있습니다.
