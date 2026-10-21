@@ -214,7 +214,7 @@ CLOSED
 다만 최종 CVE 검증의 **검토된 CVE 상태 전이 경로는 CVE별 읽기 전용 verifier**를 사용한다.
 Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니다.
 
-따라서 포트폴리오에서는 다음처럼 구분하는 것이 정확하다.
+검증 도구와 CVE 상태 판정 로직은 용도를 구분했다.
 
 - Nuclei/DVWA: 로컬 검증·증적 실습 도구
 - CVE별 verifier: 현재 상태 전이에 사용하는 보수적인 읽기 전용 검증 경로
@@ -252,7 +252,7 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 보고서를 생성하는 순간 스캔이나 외부 API를 다시 실행하면
 보고서 내용이 이전 단계의 저장 결과와 달라질 수 있다.
 
-그래서 보고서 생성 보고서는:
+따라서 보고서는 다음 원칙으로 생성한다.
 
 - 하나의 consistent read transaction에서 DB snapshot 조회
 - INSERT / UPDATE / DELETE 없음
@@ -271,7 +271,7 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 
 ## 11. 데이터베이스 설계의 핵심
 
-현재 스키마는 V5다.
+자산·취약점·조치 이력의 핵심 구조는 V5에서 정리했고, 이후 V6(AWS 자산·설정)와 V7(검증 증적) 관련 테이블을 추가했다.
 
 주요 설계 판단:
 
@@ -314,9 +314,9 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 - [검증 범위와 결과](validation.md)
 - 소스 코드 및 설정 근거: `../sql/`, `../asset_management/`, `../analysis/`, `../verification/`, `../infra/aws/terraform/`
 
-## AWS V6 extension
+## 14. AWS 자산·설정 점검 확장
 
-The cloud extension is an adapter around the existing scan pipeline, not a replacement scanner.
+AWS 기능은 기존 스캔 로직을 교체하지 않고, 자산 조회와 설정 점검을 추가하는 구조다.
 
 ```text
 AWS read-only API
@@ -326,4 +326,4 @@ AWS read-only API
 approved ScopePolicy ──> existing private-IP scanner ──> CVE pipeline
 ```
 
-CVE findings and AWS configuration findings remain separate data types. AWS discovery never triggers a scan automatically. AWS VPC, IAM, Security Group의 실제 구성은 `infra/aws/terraform/`, 검증 자동화는 `.github/workflows/`와 `tests/`에서 확인할 수 있습니다.
+CVE 후보와 AWS 설정 점검 결과는 별도 데이터로 관리한다. AWS 자산 조회 결과가 스캔 승인으로 이어지지는 않는다. VPC·IAM·Security Group 설정은 `infra/aws/terraform/`, 검증 코드는 `.github/workflows/`와 `tests/`에서 확인할 수 있다.
