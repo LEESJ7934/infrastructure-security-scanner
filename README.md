@@ -48,11 +48,11 @@
 
 | 승인 범위·서비스 식별 | 설정 검증·증적 |
 |---|---|
-| ![Scope와 서비스 식별](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/0806691a1baf8df509376b3de8e69d3a017e51a2/docs/images/01-scope-service.png) | ![검증 결과 무결성](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/0806691a1baf8df509376b3de8e69d3a017e51a2/docs/images/05-v7-integrity.png) |
+| ![Scope와 서비스 식별](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/01-scope-service.png) | ![검증 결과 무결성](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/05-v7-integrity.png) |
 
 | 동일 Docker 서비스 재점검 | 통합 보고서 검증 |
 |---|---|
-| ![FTP HTTP 개선 후 재점검](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/0806691a1baf8df509376b3de8e69d3a017e51a2/docs/images/06-docker-retest.png) | ![JSON PDF 통합 보고서](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/0806691a1baf8df509376b3de8e69d3a017e51a2/docs/images/07-integrated-report.png) |
+| ![FTP HTTP 개선 후 재점검](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/06-docker-retest.png) | ![JSON PDF 통합 보고서](https://raw.githubusercontent.com/LEESJ7934/infrastructure-security-scanner/main/docs/images/07-integrated-report.png) |
 
 > 화면은 각각의 실습 시점 결과입니다. 이미지에 포함된 판정 상태는 해당 검사·환경의 결과이며, CVE 확정이나 전체 운영환경 안전 판정을 의미하지 않습니다.
 
