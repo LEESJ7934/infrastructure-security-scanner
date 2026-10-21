@@ -3,8 +3,6 @@
 
 승인된 자산의 서비스·버전을 식별하고, **CVE 후보 / 실제 설정 검증 / 위험 우선순위 / 증적 / 재점검 / 보고서**를 구분해 관리하는 인프라 보안 진단 프로젝트입니다.
 
-**[노션 포트폴리오: 담당 역할·검증 결과·실제 스크린샷 보기](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)**
-
 | 구분 | 내용 |
 |---|---|
 | 수행 구분 | 팀 프로젝트(2025.12–2026.01) / 이후 기능 확장·실습 검증 |
@@ -30,8 +28,6 @@ flowchart TB
     J --> K
 ```
 
-*검사 단계는 승인과 실행 조건에 따라 각각 호출됩니다. 도식은 데이터의 논리적 연결이며 자동 연속 실행을 뜻하지 않습니다.*
-
 ## 핵심 구현
 
 | 영역 | 주요 구현 | 근거 |
@@ -52,7 +48,6 @@ flowchart TB
 | GitHub Actions 격리 Docker | 같은 FTP·HTTP 서비스 설정 개선 전후, Nuclei·MySQL·보고서 | 실제 EC2 설정을 개선한 결과 아님 |
 | 회귀 테스트 | Python 330개 통과 | 기능 테스트이며 운영 적합성 보증 아님 |
 
-[기본 CI 실행 결과](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487) · [Docker 통합 검증](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39453811884)
 
 **CANDIDATE**(버전 기반 후보), **POTENTIAL**(설정 위험 가능성), **CONFIRMED**(해당 검사 조건 확인)는 다릅니다. **NOT_DETECTED**, **ERROR**, **NOT_TESTED**도 각각 미발견·검사 실패·미검사를 의미합니다. CVE 자동 확정이나 운영환경 전체 안전을 주장하지 않습니다.
 
@@ -62,6 +57,4 @@ flowchart TB
 - 코드: `scanner/` · `asset_management/` · `analysis/` · `verification/` · `cloud_security/`
 - 데이터베이스·인프라: `sql/` · `docker/` · `infra/aws/`
 - 회귀·격리 검증: `tests/` · `lab/` · [GitHub Actions](.github/workflows/lab_integration.yml)
-- **실제 점검 화면·조치 전후·통합 보고서:** [노션 상세 포트폴리오](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
 
-검증 이미지 원본은 `docs/images/`에서 관리합니다. 이 README에서는 노션과 중복되는 스크린샷을 다시 렌더링하지 않습니다.
