@@ -1,0 +1,1 @@
+alert udp $EXTERNAL_NET any -> $HOME_NET 39003 (msg:"DAY3 LAB synthetic marker"; content:"DAY3-IDS-MARKER"; sid:1000003; rev:1;)
