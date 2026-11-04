@@ -23,7 +23,7 @@ class FinalNucleiTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         base = Path(self.tmp.name)
-        (base / 'safe.yaml').write_text('id: safe\n')
+        (base / 'safe.yaml').write_bytes(b'id: safe\n')
         (base / 'nuclei').write_bytes(b'test binary')
         self.params = dict(nuclei_binary=str(base/'nuclei'), template_root=str(base),
                            template_allowlist={'safe.yaml': hashlib.sha256(b'id: safe\n').hexdigest()},

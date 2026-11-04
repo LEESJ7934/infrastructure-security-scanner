@@ -8,6 +8,7 @@ import unittest
 from scripts.ec2_lab_tunnel_run import _write_manifest
 from scripts.ec2_report_verify import EvidenceValidationError, verify_report
 
+BASH_PATH = shutil.which("bash")
 INSTANCE = "i-036b5556c800856e0"
 
 
@@ -103,10 +104,10 @@ class EC2ReportVerificationTests(unittest.TestCase):
         with self.assertRaises(EvidenceValidationError):
             self.verify()
 
-    @unittest.skipUnless(shutil.which("bash"), "Bash not installed on this platform")
+    @unittest.skipUnless(BASH_PATH, "Bash not installed on this platform")
     def test_ec2_owner_deployment_script_syntax(self):
         root = Path(__file__).resolve().parents[1]
-        finished = subprocess.run(["bash", "-n", str(root / "lab/ec2_resource_gate.sh")],
+        finished = subprocess.run([str(Path(BASH_PATH).absolute()), "-n", str(root / "lab/ec2_resource_gate.sh")],
                                   capture_output=True, text=True, check=False)
         self.assertEqual(finished.returncode, 0, finished.stderr)
 
