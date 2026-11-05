@@ -1,0 +1,12 @@
+Day4 manual evidence provenance / source notes
+Evidence review/registration time (not original traffic test time): 2026-11-05T16:51:52.248871+00:00
+All JSON verified_at values use time_basis=artifact_review. Original test timezone is unverified.
+Screenshot log timestamps are displayed as 2026-11-05T16:xx:xx without a visible timezone; no timezone is inferred.
+FW-02: screenshots show WAN 10.77.50.10 -> 10.77.50.1 TCP/443 timeout and block, label Default deny / state violation rule.
+FW-03: screenshots show WAN 10.77.50.10 -> 10.77.50.1 TCP/22 timeout and block, same default-deny label. Scope excludes forwarding into LAN.
+FW-04: screenshot shows 18 entries, default deny, anti-lockout, LAN default allow, and a greyed/disabled lab block row above default LAN allow. No complete effective-policy claim.
+FW-05 source: operator report in this conversation, not a captured API response file. Operator reports GET /api/diagnostics/firewall/log?limit=20 HTTP 200 COLLECTED and rule ID lookup HTTP 403. Neither API was queried during registration.
+FW-06 allow source: existing screenshots/fw06-ping-allow.txt is a conversation-output transcript, not a screenshot or independently captured console log. The user confirms 4 sent, 4 received, 0% loss. Only these totals and the stated lab endpoints are relied on; individual reply lines, TTL and latency are not independently verified.
+FW-06 block: screenshots show 4 sent, 0 received, 100% loss, plus ICMP block for 10.77.40.10 -> 10.77.50.10 and label LAB-D4-Block-Windows-Alpine.
+FW-06 restoration source: operator statement in this conversation says the rule was disabled and normal communication restored. No original restore file, packet count or test timestamp was supplied. No synthetic restored 4/4 test is entered.
+Manual evidence does not replace current automatic findings. No firewall configuration or API permission was changed.

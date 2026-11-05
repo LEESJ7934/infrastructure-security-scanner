@@ -1,0 +1,18 @@
+Evidence type: User-pasted Windows PowerShell console output (text transcript; not a screenshot)
+Source: User message in this conversation, FW-06 allow test
+Command: ping -n 4 10.77.50.10
+Source host: Windows LAN 10.77.40.10
+Destination: Alpine WAN 10.77.50.10
+
+PS C:\Projects\infrastructure-security-scanner-clone> ping -n 4 10.77.50.10
+
+Ping 10.77.50.10 32바이트 데이터 사용:
+10.77.50.10의 응답: 바이트=32 시간<1ms TTL=63
+10.77.50.10의 응답: 바이트=32 시간<1ms TTL=63
+10.77.50.10의 응답: 바이트=32 시간<1ms TTL=63
+10.77.50.10의 응답: 바이트=32 시간<1ms TTL=63
+
+10.77.50.10에 대한 Ping 통계:
+    패킷: 보냄 = 4, 받음 = 4, 손실 = 0 (0% 손실),
+왕복 시간(밀리초):
+    최소 = 0ms, 최대 = 0ms, 평균 = 0ms

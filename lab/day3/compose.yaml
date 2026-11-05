@@ -1,0 +1,96 @@
+name: infra-day3-lab
+
+x-lab-restrictions: &lab-restrictions
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+
+services:
+  suricata:
+    <<: *lab-restrictions
+    image: jasonish/suricata:8.0.6
+    user: suricata
+    profiles: [tools]
+    network_mode: none
+    entrypoint:
+      - /usr/bin/suricata
+      - -c
+      - /etc/suricata/suricata.yaml
+      - -S
+      - /lab/day3.rules
+      - -l
+      - /tmp
+      - --set
+      - vars.address-groups.HOME_NET=[198.51.100.0/24]
+      - --set
+      - outputs.1.eve-log.enabled=yes
+      - --set
+      - unix-command.enabled=no
+    command: [-r, /lab/day3.pcap]
+    volumes:
+      - type: bind
+        source: ./suricata/day3.rules
+        target: /lab/day3.rules
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./artifacts/day3.pcap
+        target: /lab/day3.pcap
+        read_only: true
+        bind:
+          create_host_path: false
+
+  backend:
+    <<: *lab-restrictions
+    image: python:3.12.12-slim-bookworm
+    user: "65534:65534"
+    read_only: true
+    command: [python, -B, /lab/backend.py]
+    networks: [day3]
+    volumes:
+      - type: bind
+        source: ./waf/backend.py
+        target: /lab/backend.py
+        read_only: true
+        bind:
+          create_host_path: false
+
+  waf:
+    <<: *lab-restrictions
+    image: owasp/modsecurity-crs:4.25.2-nginx-202610180210-lts
+    depends_on: [backend]
+    networks: [day3]
+    environment:
+      PORT: "8080"
+      BACKEND: http://backend:8081
+      MODSEC_RULE_ENGINE: "On"
+      MODSEC_AUDIT_ENGINE: RelevantOnly
+      MODSEC_AUDIT_LOG_FORMAT: JSON
+      MODSEC_AUDIT_LOG_TYPE: Serial
+      MODSEC_AUDIT_LOG: /dev/stdout
+      MODSEC_AUDIT_LOG_PARTS: ABFHZ
+      MODSEC_REQ_BODY_ACCESS: "On"
+      BLOCKING_PARANOIA: "1"
+      DETECTION_PARANOIA: "1"
+      ANOMALY_INBOUND: "5"
+      ALLOWED_METHODS: GET HEAD POST OPTIONS
+
+  client:
+    <<: *lab-restrictions
+    image: python:3.12.12-slim-bookworm
+    profiles: [tools]
+    user: "65534:65534"
+    read_only: true
+    command: [python, -B, /lab/check_waf.py]
+    networks: [day3]
+    volumes:
+      - type: bind
+        source: ./waf/check_waf.py
+        target: /lab/check_waf.py
+        read_only: true
+        bind:
+          create_host_path: false
+
+networks:
+  day3:
+    internal: true

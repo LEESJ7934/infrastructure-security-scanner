@@ -1,0 +1,2 @@
+# PDF extraction assertions; ReportLab is already in requirements.txt.
+pypdf>=6,<7

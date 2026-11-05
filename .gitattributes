@@ -19,3 +19,6 @@ Dockerfile text eol=lf
 *.ico binary
 *.pdf binary
 *.zip binary
+
+# Day4 evidence hashes and tar member bytes must survive checkout unchanged.
+evidence/day4/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

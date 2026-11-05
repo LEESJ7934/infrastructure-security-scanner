@@ -1,0 +1,48 @@
+{
+  "source": "OPNsense firewall log API",
+  "endpoint": "/api/diagnostics/firewall/log?limit=50",
+  "captured_at_utc": "2026-11-05T17:56:18.111554+00:00",
+  "timestamp_timezone": "not_explicit_in_log_response",
+  "test": "WAN TCP 22 connection timeout",
+  "logs": [
+    {
+      "__timestamp__": "2026-11-05T17:53:41",
+      "src": "10.77.50.10",
+      "srcport": "41993",
+      "dst": "10.77.50.1",
+      "dstport": "22",
+      "protoname": "tcp",
+      "interface": "hn0",
+      "action": "block",
+      "rid": "02f4bab031b57d1e30553ce08e0ec131",
+      "rulenr": "6",
+      "label": "Default deny / state violation rule"
+    },
+    {
+      "__timestamp__": "2026-11-05T17:53:40",
+      "src": "10.77.50.10",
+      "srcport": "41993",
+      "dst": "10.77.50.1",
+      "dstport": "22",
+      "protoname": "tcp",
+      "interface": "hn0",
+      "action": "block",
+      "rid": "02f4bab031b57d1e30553ce08e0ec131",
+      "rulenr": "6",
+      "label": "Default deny / state violation rule"
+    },
+    {
+      "__timestamp__": "2026-11-05T17:53:39",
+      "src": "10.77.50.10",
+      "srcport": "41993",
+      "dst": "10.77.50.1",
+      "dstport": "22",
+      "protoname": "tcp",
+      "interface": "hn0",
+      "action": "block",
+      "rid": "02f4bab031b57d1e30553ce08e0ec131",
+      "rulenr": "6",
+      "label": "Default deny / state violation rule"
+    }
+  ]
+}
