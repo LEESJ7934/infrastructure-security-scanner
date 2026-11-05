@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "asset_id": "SJ-D4-OPNsense",
+  "checks": [
+    {
+      "check_id": "FW-02",
+      "reported_status": "NOT_TESTED",
+      "verified_at": null,
+      "scope": "wan_to_firewall_tcp443_only",
+      "sources": [],
+      "tests": []
+    },
+    {
+      "check_id": "FW-03",
+      "reported_status": "NOT_TESTED",
+      "verified_at": null,
+      "scope": "wan_to_firewall_tcp22_only",
+      "sources": [],
+      "tests": []
+    },
+    {
+      "check_id": "FW-04",
+      "reported_status": "NOT_TESTED",
+      "verified_at": null,
+      "scope": "rules_inspect_screen_only",
+      "sources": [],
+      "tests": []
+    },
+    {
+      "check_id": "FW-05",
+      "reported_status": "NOT_TESTED",
+      "verified_at": null,
+      "scope": "log_collection_only",
+      "sources": [],
+      "tests": []
+    },
+    {
+      "check_id": "FW-06",
+      "reported_status": "NOT_TESTED",
+      "verified_at": null,
+      "scope": "windows_to_alpine_icmp_lab_only",
+      "sources": [],
+      "tests": []
+    }
+  ]
+}

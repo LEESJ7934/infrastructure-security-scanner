@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "asset_id": "SJ-D4-OPNsense",
+  "checks": [
+    {
+      "check_id": "FW-02",
+      "reported_status": "PASS",
+      "verified_at": "2026-11-05T16:51:52.248871+00:00",
+      "time_basis": "artifact_review",
+      "scope": "wan_to_firewall_tcp443_only",
+      "sources": [
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw02-wan-443-block.png",
+          "sha256": "e9905ebd58f8767039979bdd1b9dba8e795f510fa3b68a05d9747beafe8ff366"
+        },
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw02-wan-443-console.png",
+          "sha256": "9622aba8a6eed4b6afa0718191b77146c395f582d7d60bd57ebf07dff028d548"
+        },
+        {
+          "kind": "operator_note",
+          "path": "registration-source-notes.txt",
+          "sha256": "da01f65be3c6dde0d313b3f9bbbf39226dd85073ce08158bb4d5979626fc2e35"
+        }
+      ],
+      "tests": [
+        {
+          "scenario": "block",
+          "source": "10.77.50.10",
+          "destination": "10.77.50.1",
+          "protocol": "tcp",
+          "port": 443,
+          "expected_result": "blocked",
+          "actual_result": "timeout",
+          "firewall_action": "block",
+          "rule_name": "Default deny / state violation rule",
+          "source_indices": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "check_id": "FW-03",
+      "reported_status": "PASS",
+      "verified_at": "2026-11-05T16:51:52.248871+00:00",
+      "time_basis": "artifact_review",
+      "scope": "wan_to_firewall_tcp22_only",
+      "sources": [
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw03-wan-22-block.png",
+          "sha256": "fa1b26868fe7d7452021da58573bb537ca5473e854644876e3506ebc67be4223"
+        },
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw03-wan-22-console.png",
+          "sha256": "64f8fb05cddd63db925b70567278ebe748a8600e060e51dbad5e0204b4808445"
+        },
+        {
+          "kind": "operator_note",
+          "path": "registration-source-notes.txt",
+          "sha256": "da01f65be3c6dde0d313b3f9bbbf39226dd85073ce08158bb4d5979626fc2e35"
+        }
+      ],
+      "tests": [
+        {
+          "scenario": "block",
+          "source": "10.77.50.10",
+          "destination": "10.77.50.1",
+          "protocol": "tcp",
+          "port": 22,
+          "expected_result": "blocked",
+          "actual_result": "timeout",
+          "firewall_action": "block",
+          "rule_name": "Default deny / state violation rule",
+          "source_indices": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "check_id": "FW-04",
+      "reported_status": "NEEDS_REVIEW",
+      "verified_at": "2026-11-05T16:51:52.248871+00:00",
+      "time_basis": "artifact_review",
+      "scope": "rules_inspect_screen_only",
+      "sources": [
+        {
+          "kind": "inspect_view",
+          "path": "screenshots/fw04-rules-inspect.png",
+          "sha256": "509ffdee4034ab1424cc510104b3316e631b0e96e55b32cc0e6e7ef0849d775a"
+        },
+        {
+          "kind": "operator_note",
+          "path": "registration-source-notes.txt",
+          "sha256": "da01f65be3c6dde0d313b3f9bbbf39226dd85073ce08158bb4d5979626fc2e35"
+        }
+      ],
+      "tests": [],
+      "inspection": {
+        "rule_count": 18,
+        "default_deny_seen": true,
+        "anti_lockout_seen": true,
+        "lan_default_allow_seen": true,
+        "lab_block_before_default_allow": true,
+        "lab_block_enabled": false
+      }
+    },
+    {
+      "check_id": "FW-05",
+      "reported_status": "NEEDS_REVIEW",
+      "verified_at": "2026-11-05T16:51:52.248871+00:00",
+      "time_basis": "artifact_review",
+      "scope": "log_collection_only",
+      "sources": [
+        {
+          "kind": "operator_note",
+          "path": "registration-source-notes.txt",
+          "sha256": "da01f65be3c6dde0d313b3f9bbbf39226dd85073ce08158bb4d5979626fc2e35"
+        }
+      ],
+      "tests": []
+    },
+    {
+      "check_id": "FW-06",
+      "reported_status": "PASS",
+      "verified_at": "2026-11-05T16:59:06.806166+00:00",
+      "time_basis": "artifact_review",
+      "scope": "windows_to_alpine_icmp_lab_only",
+      "sources": [
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw06-icmp-block.png",
+          "sha256": "bad13e3e177a90b6824571bcd0e1df0fb7b80ee36e0de25ab2e9e7264bb02e11"
+        },
+        {
+          "kind": "screenshot",
+          "path": "screenshots/fw06-ping-block.png",
+          "sha256": "a180522cf6382d146d33d851cde0dd7226eeec788e9079a5290337265c448566"
+        },
+        {
+          "kind": "operator_note",
+          "path": "screenshots/fw06-ping-allow.txt",
+          "sha256": "cae91602daf5365f30ab2e59b410aacc39c3b7146b7a79632d11c13de30747e5"
+        },
+        {
+          "kind": "operator_note",
+          "path": "registration-source-notes.txt",
+          "sha256": "da01f65be3c6dde0d313b3f9bbbf39226dd85073ce08158bb4d5979626fc2e35"
+        },
+        {
+          "kind": "test_output",
+          "path": "fw06-restore-ping.txt",
+          "sha256": "6c2708b0023eb9551761fd61ef0a266238d65bb80c649229c670ed83b90eb2bd"
+        },
+        {
+          "kind": "operator_note",
+          "path": "fw06-restore-followup-notes.txt",
+          "sha256": "913cb1e30909b5b02457dbb47bf09e0847de938561072d9442a17096f46a2a98"
+        }
+      ],
+      "tests": [
+        {
+          "scenario": "pass",
+          "source": "10.77.40.10",
+          "destination": "10.77.50.10",
+          "protocol": "icmp",
+          "port": null,
+          "expected_result": "allowed",
+          "actual_result": "success",
+          "firewall_action": "not_observed",
+          "rule_name": null,
+          "source_indices": [
+            2,
+            3
+          ],
+          "packets_sent": 4,
+          "packets_received": 4
+        },
+        {
+          "scenario": "block",
+          "source": "10.77.40.10",
+          "destination": "10.77.50.10",
+          "protocol": "icmp",
+          "port": null,
+          "expected_result": "blocked",
+          "actual_result": "timeout",
+          "firewall_action": "block",
+          "rule_name": "LAB-D4-Block-Windows-Alpine",
+          "source_indices": [
+            0,
+            1
+          ],
+          "packets_sent": 4,
+          "packets_received": 0
+        },
+        {
+          "scenario": "restored",
+          "source": "10.77.40.10",
+          "destination": "10.77.50.10",
+          "protocol": "icmp",
+          "port": null,
+          "expected_result": "allowed",
+          "actual_result": "success",
+          "firewall_action": "not_observed",
+          "rule_name": null,
+          "source_indices": [
+            4,
+            5
+          ],
+          "packets_sent": 4,
+          "packets_received": 4
+        }
+      ]
+    }
+  ]
+}

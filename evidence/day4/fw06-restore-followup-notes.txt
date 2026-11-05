@@ -1,0 +1,12 @@
+FW-06 later restoration verification / provenance
+Capture source: actual Windows PowerShell output file fw06-restore-ping.txt, as reported by the operator.
+CapturedAt exactly as recorded in the source file: 2026-11-06T01:56:29.4652546+09:00
+Command: ping -n 4 10.77.50.10
+Observed source contents: sent 4, received 4, loss 0%; four replies with TTL=63.
+This is a separate later restoration test, not a contemporaneous capture of the earlier allow/block tests.
+Previous FW-06 evidence-review timestamp: 2026-11-05T16:51:52.248871+00:00
+Current completion review timestamp: 2026-11-05T16:59:06.806166+00:00
+The current manual verified_at uses time_basis=artifact_review and does not replace original test timestamps.
+Earlier conversation-only restoration limitations in registration-source-notes.txt are historical; this later actual file now supplies the missing restored 4/4 result.
+Existing allow transcript and block screenshots remain unchanged. The initial allow transcript remains an operator_note, not an independently captured screenshot.
+The operator reports the lab block rule was disabled after the experiment. This registration performs no firewall API request or configuration change.
