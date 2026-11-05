@@ -16,6 +16,12 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (HRFlowable, LongTable, Paragraph, SimpleDocTemplate,
                                Spacer, TableStyle)
 
+
+def render_day5_report_pdf(snapshot, output_path):
+    """Separate offline audit schema; never invoke the DB report assembly path."""
+    from api.day5_report_pdf import render
+    return render(snapshot, output_path)
+
 NAVY = colors.HexColor("#182B44")
 TEAL = colors.HexColor("#126B75")
 INK = colors.HexColor("#25354A")
