@@ -453,7 +453,7 @@ class RunnerTests(unittest.TestCase):
     def test_windows_ping_status_and_source_guard(self):
         for reply, expected in (("Success", "allowed"), ("TimedOut", "blocked"), ("DestinationHostUnreachable", "inconclusive")):
             result = subprocess.CompletedProcess([], 0, json.dumps({"status": reply}), "SECRET_VALUE")
-            with patch.object(fw.subprocess, "run", return_value=result) as run:
+            with patch.object(fw, "_is_windows", return_value=True), patch.object(fw.subprocess, "run", return_value=result) as run:
                 p = fw.ping_lan(RUN, "pass")
             self.assertEqual(p.outcome, expected)
             self.assertFalse(p.control_ok)
@@ -461,12 +461,28 @@ class RunnerTests(unittest.TestCase):
             self.assertNotIn("shell", run.call_args.kwargs)
 
     def test_ping_source_failure_and_timeout(self):
-        with patch.object(fw.subprocess, "run", return_value=subprocess.CompletedProcess([], 2, "", "SECRET")):
+        with patch.object(fw, "_is_windows", return_value=True), patch.object(fw.subprocess, "run", return_value=subprocess.CompletedProcess([], 2, "", "SECRET")):
             with self.assertRaisesRegex(fw.CollectionError, "^ping_source_or_execution_failed$"):
                 fw.ping_lan(RUN, "block")
-        with patch.object(fw.subprocess, "run", side_effect=subprocess.TimeoutExpired("SECRET", 15)):
+        with patch.object(fw, "_is_windows", return_value=True), patch.object(fw.subprocess, "run", side_effect=subprocess.TimeoutExpired("SECRET", 15)):
             with self.assertRaisesRegex(fw.CollectionError, "^ping_execution_failed$"):
                 fw.ping_lan(RUN, "pass")
+
+    def test_non_windows_ping_refused_before_process_execution(self):
+        with patch.object(fw, "_is_windows", return_value=False), patch.object(fw.subprocess, "run") as run:
+            with self.assertRaisesRegex(fw.CollectionError, "^windows_probe_required$"):
+                fw.ping_lan(RUN, "pass")
+        run.assert_not_called()
+
+    def test_native_non_windows_guard(self):
+        # On Ubuntu this exercises the real platform check, without any mock.
+        if not fw._is_windows():
+            with patch.object(fw.subprocess, "run") as run:
+                with self.assertRaisesRegex(fw.CollectionError, "^windows_probe_required$"):
+                    fw.ping_lan(RUN, "block")
+            run.assert_not_called()
+        else:
+            self.assertTrue(fw._is_windows())
 
 
 class ActualResponseCompatibilityTests(unittest.TestCase):
