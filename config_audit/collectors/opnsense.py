@@ -571,10 +571,15 @@ finally { $p.Dispose() }
 """
 
 
+def _is_windows():
+    """Narrow platform boundary; tests mock this function, never global os.name."""
+    return os.name == "nt"
+
+
 def ping_lan(execution_id, scenario):
     if scenario not in {"pass", "block"}:
         raise CollectionError("scenario_rejected")
-    if os.name != "nt":
+    if not _is_windows():
         raise CollectionError("windows_probe_required")
     started = datetime.now(timezone.utc)
     try:
