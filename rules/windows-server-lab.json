@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "policy_id": "WINDOWS-LOCAL-LAB",
+  "version": "0.3",
+  "approval": {
+    "status": "DRAFT",
+    "authority": null,
+    "approved_at": null,
+    "basis": null,
+    "scope": {
+      "asset_ids": [],
+      "server_releases": ["2022"],
+      "build_numbers": ["20348"],
+      "check_ids": ["WIN-LAB-002", "WIN-LAB-003", "WIN-LAB-004", "WIN-LAB-009"],
+      "role": "standalone_local_sam_and_system_audit"
+    },
+    "evidence": {"path": null, "sha256": null}
+  },
+  "password": {
+    "minimum_length": 14,
+    "complexity_required": true,
+    "lockout_threshold": 10,
+    "duration_minutes": null,
+    "reset_minutes": null
+  },
+  "audit": {
+    "0cce9215-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce923f-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce9235-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce922f-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce922b-69ae-11d9-bed3-505054503030": {"success": true, "failure": false}
+  }
+}

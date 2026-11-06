@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "mode": "LAB",
+  "rule_version": "LAB-1.0",
+  "server_releases": ["2022"],
+  "password": {
+    "minimum_length": 14,
+    "complexity_required": true,
+    "lockout_threshold": 10,
+    "duration_minutes": 30,
+    "reset_minutes": 30
+  },
+  "firewall_profiles": ["domain", "private", "public"],
+  "audit": {
+    "0cce9215-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce923f-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce9235-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce922f-69ae-11d9-bed3-505054503030": {"success": true, "failure": true},
+    "0cce922b-69ae-11d9-bed3-505054503030": {"success": true, "failure": false}
+  }
+}
