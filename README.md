@@ -7,8 +7,8 @@
 ## 팀 프로젝트와 개인 확장
 
 - **팀 프로젝트 기반(2025.12~2026.01):** 포트·서비스 식별, CVE 후보, DB 저장, 위험평가 및 보고서 흐름을 출발점으로 사용했습니다. 기존 팀 기능 전체를 개인 단독 개발로 설명하지 않습니다.
-- **개인 후속 확장:** Day1~5 공통 설정 진단 엔진·수집기·증적 인덱스·재점검·JSON/PDF와 Phase2 대상별 진단 및 격리 LAB을 추가했습니다. LAB/STRICT, 자동/수동, 합성/실제 수집을 구분합니다.
-- 기여·증거·면접 표현의 단일 기준: [포트폴리오 근거 매핑](docs/portfolio-evidence-mapping.md).
+- **개인 후속 확장(2026.10~11):** 공통 설정 진단 엔진과 대상별 수집·판정, 증적 관리, 재점검 비교, JSON/PDF 보고서를 개발하고 격리 실습을 진행했습니다. 자동·수동 확인과 합성·실제 관찰 결과를 구분합니다.
+- 대상별 진단항목·수행 근거·검증 한계: [진단 항목별 검증 근거](docs/portfolio-evidence-mapping.md).
 
 ## 기술진단 절차
 
@@ -27,7 +27,7 @@ flowchart LR
 
 | 분야 | 점검 내용·방법 | 확인된 수준과 한계 |
 |---|---|---|
-| 서버 — Linux | `sshd -T`, 중요 파일 소유권·권한, LAB 서비스 리스너, rsyslog 인증 로그 경로 | Phase2 Replay에서 Linux 5건 FAIL→PASS. 실제 SSH 로그인·로그 전달·모든 서비스 점검은 아님 |
+| 서버 — Linux | `sshd -T`, 중요 파일 소유권·권한, LAB 서비스 리스너, rsyslog 인증 로그 경로 | 별도 격리 Replay LAB에서 Linux 5건 FAIL→PASS. 실제 SSH 로그인·로그 전달·모든 서비스 점검은 아님 |
 | 서버 — Windows Server | Guest, 암호·잠금, Spooler, 방화벽, SMB, 감사 정책. 읽기 전용 PowerShell JSON과 수동 확인 분리 | Server 2022 build 20348 저장 자료의 LAB 재분석 PASS 8 / NEEDS_REVIEW 1. 개선 3건은 수동 확인을 포함하며 2019/2025 미검증 |
 | 네트워크 — Router/Switch | Linux/FRRouting 노드의 관리 서비스·전용 nft input 정책·bridge 연결 목록 | R03/R04 2건 개선. 별도 LAB에서 양방향 Router 경유 확인. 물리 장비·Switch 관리면·802.1Q VLAN은 검증하지 않음 |
 | DBMS — MySQL | 계정 Host·익명 계정, GLOBAL 변수, 지정 앱 계정의 역할·권한 | MySQL 8.4.13 Replay 5건 FAIL→PASS. 실제 TCP TLS handshake·운영 DB 전체 권한 감사는 아님 |
@@ -36,7 +36,7 @@ flowchart LR
 | 보안장비 — ModSecurity | 엔진·감사·본문·CRS 설정 및 GET/PUT와 감사 이벤트 상관분석 | WAF 6개 PASS 요약 존재. 원시 HTTP/감사 로그가 없어 현재 파일만으로 실제 차단을 독립 재확인할 수 없음 |
 | 추가 — AWS | IAM/SG/VPC/NACL/CloudTrail/Flow Logs P1 8개. Scope 제한 읽기 전용 수집·정규화 | 독립 LAB 4건 FAIL→PASS. CT-01 FAIL, IAM-03 NEEDS_REVIEW 유지. 설정 판정이며 패킷 차단·로그 전달 증명 아님 |
 
-**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 기존 코드·테스트·역사적 Day3 보고서는 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
+**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 기존 코드·테스트·기존 개발 기록은 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
 
 ## 대표 취약 설정 → 개선 → 재점검
 
@@ -44,11 +44,11 @@ flowchart LR
 |---|---|---|
 | Linux 직접 root 로그인·암호 인증 | 원격 관리 노출을 줄이도록 두 정책을 비활성화. 운영 적용 전 별도 키 접근 확보 필요 | `LINUX-LAB-001/002`: 유효 설정 yes→no |
 | MySQL 원격 root·과도한 앱 권한 | 원격 root 제거, 지정 테이블 SELECT로 최소화 | `MYSQL-LAB-002/005`: 대상 계정 1→0, EXCESSIVE→USAGE/SELECT |
-| Windows 암호·잠금·SMB 서명 | 최소 길이 14, 잠금 10회/30분, 서버 서명 필수 | 0→14, 0→10, False→True는 사용자 PowerShell 확인 출처를 포함한 LAB 개선 3건 |
+| Windows 암호·잠금·SMB 서명 | 최소 길이 14, 잠금 10회/30분, 서버 서명 필수 | 0→14, 0→10, False→True는 PowerShell 수동 확인 기록을 포함한 LAB 개선 3건 |
 | Nginx/Tomcat 정보·경로 노출 | 목록/버전·불필요 경로·기본 앱을 제한하고 접근 로그 활성화 | 구성 및 제한된 HTTP 응답 재확인, 전후 health endpoint 정상 |
 | AWS 관리 포트 공개·내부 서브넷 공개 설정 | 미부착 SG 공개 규칙 제거, 내부 대상의 자동 공인 IP·IGW 기본 경로 제거 | 같은 LAB SG/Subnet 재조회 PASS. 인터넷 도달 가능성 시험으로 해석하지 않음 |
 
-Linux와 MySQL을 합한 Phase2 **10건**은 별도 Replay LAB의 결과입니다. Day2의 개선 2건과 합산하거나 같은 baseline으로 취급하지 않습니다. Windows의 수동 baseline을 자동 수집값으로 위조하지 않습니다.
+Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습의 개선 2건과 기준·시점이 다릅니다. Windows의 수동 확인 결과 역시 자동 수집값과 구분합니다.
 
 ## 개선 전후 결과와 증적
 
@@ -58,16 +58,16 @@ Linux와 MySQL을 합한 Phase2 **10건**은 별도 Replay LAB의 결과입니�
 - AWS 독립 LAB: SG-01/NACL-01/VPC-01/FL-01 FAIL→PASS, 개선 관찰 4건. CT-01과 IAM-03은 미해결로 남깁니다.
 - OPNsense: WAN→방화벽 TCP 443/22 및 LAN→WAN ICMP의 **수동 시험 범위**에 한정합니다.
 
-모든 수치는 **기존 로컬 자료 대조**에 근거하며 이번 문서 작업에서 장비를 새로 조회한 결과가 아닙니다. [근거 매핑의 증적 목록](docs/portfolio-evidence-mapping.md#증적-및-보고서-목록)에 실제 파일 경로와 없는 자료를 구분했습니다.
+모든 수치는 **기존 로컬 자료 대조**에 근거하며 2026-11-07 문서 대조 시 장비를 새로 조회한 결과는 아닙니다. [근거 매핑의 증적 목록](docs/portfolio-evidence-mapping.md#증적-및-보고서-목록)에 실제 파일 경로와 없는 자료를 구분했습니다.
 
 ## JSON/PDF와 공개 샘플
 
 공통 모델, 증적 경로 제한·SHA-256, 명시적 before/after 관계, 판정 채널·범위·시각을 보고서에 연결합니다. 해시 일치는 **현재 파일 무결성**이며 수집 출처의 진위 인증이나 완전성 증명이 아닙니다. 재점검 개선 관찰도 조치의 인과관계 전체를 증명하지 않습니다.
 
 - [공개 합성 PDF](examples/day5-demo/sample-integrated-report.pdf) · [합성 JSON](examples/day5-demo/sample-integrated-report.json) · [샘플 설명](examples/day5-demo/README.md)
-- [Day5 보고서 구조](docs/day5-final-report.md) · [증적 인덱스](docs/day5-evidence-index.md) · [재점검 비교](docs/day5-comparison.md)
+- [통합 보고서 구조](docs/day5-final-report.md) · [증적 인덱스](docs/day5-evidence-index.md) · [재점검 비교](docs/day5-comparison.md)
 
-실제 `logs/`, `reports/`, `evidence/`, AWS 계정/자산 Scope와 Terraform state·개인 변수는 공개 샘플이 아닙니다. 링크가 아닌 로컬 경로로만 설명하며 원본을 Git에 추가하지 않습니다. 기존 Day5 25레코드 보고서는 역사적 산출물로서 현재 Phase2 성과 합계가 아닙니다.
+실제 `logs/`, `reports/`, `evidence/`, AWS 계정/자산 Scope와 Terraform state·개인 변수는 공개 샘플이 아닙니다. 링크가 아닌 로컬 경로로만 설명하며 원본을 Git에 추가하지 않습니다. 초기 통합 보고서의 25개 시점별 레코드는 별도 과거 기록이며 후속 실습의 개선 성과를 포함한 합계가 아닙니다.
 
 ## 검증 한계와 테스트 기록
 
@@ -75,7 +75,7 @@ Linux와 MySQL을 합한 Phase2 **10건**은 별도 Replay LAB의 결과입니�
 - 설정 확인, 패킷 경로, 수동 확인, 자동 판정을 분리합니다. 미지원 Switch 기능과 미완료 감사·로그/규칙 연계는 숨기지 않습니다.
 - AWS LAB 정리는 완료되지 않았습니다. 현재 자원·비용은 별도 인증/조회가 필요하며 기존 state·증적을 보존합니다.
 - Git 최종 통합 기준(2026-11-07, Windows/Python 3.12.10, `99c8f10`): 핵심 **322개 통과**, 전체 **1,300개 통과 / 1개 실패**. 기존 WSL `/bin/bash` 오류를 성공으로 처리하지 않습니다.
-- 330/381/694개 등의 과거 수치는 당시 단계·환경의 기록입니다. 현재 CI 성공 여부나 새 실행 결과로 대신 사용하지 않습니다. 이번 재실행 기록은 [테스트 기준표](docs/portfolio-evidence-mapping.md#테스트-기록과-기준)에 구분합니다.
+- 330/381/694개 등의 과거 수치는 당시 단계·환경의 기록입니다. 현재 CI 성공 여부나 새 실행 결과로 대신 사용하지 않습니다. 테스트 실행별 기록은 [테스트 기준표](docs/portfolio-evidence-mapping.md#테스트-기록과-기준)에 구분합니다.
 
 ## 오프라인 실행·재현
 
@@ -92,11 +92,11 @@ Linux와 MySQL을 합한 Phase2 **10건**은 별도 Replay LAB의 결과입니�
 .\.venv\Scripts\python.exe -B -m scripts.run_day5_report
 ```
 
-실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 위 문서 검증에서는 VM·Docker·SSH·DB·AWS를 실행하지 않습니다. 샘플 생성과 Day5 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
+실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 2026-11-07 문서 검증 과정에서는 VM·Docker·SSH·DB·AWS를 실행하지 않았습니다. 샘플 생성과 Day5 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
 
 ## 상세 문서와 코드
 
-- [검증 기록](docs/validation.md) · [아키텍처](docs/architecture.md) · [면접/Notion/PPT 공통 근거](docs/portfolio-evidence-mapping.md)
+- [검증 기록](docs/validation.md) · [아키텍처](docs/architecture.md) · [진단 항목별 검증 근거](docs/portfolio-evidence-mapping.md)
 - 서버: [Linux/MySQL 실습](docs/phase2-linux-mysql-recovery.md) · [Windows](docs/phase2-windows-server.md)
 - 네트워크: [설정 진단](docs/phase2-network-devices.md) · [패킷 경유](docs/phase2-network-packets.md)
 - WEB/WAS: [Nginx/Tomcat](docs/phase2-web-was.md)

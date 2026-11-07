@@ -1,6 +1,6 @@
-# Phase2 최종 통합 범위
+# 인프라 기술진단 통합 범위
 
-항목·실제 자료·판정 한계·면접 표현은 [포트폴리오 근거 매핑](portfolio-evidence-mapping.md)을 단일 기준으로 사용한다.
+진단 항목·실제 자료·판정 한계는 [포트폴리오 근거 매핑](portfolio-evidence-mapping.md)을 단일 기준으로 사용한다.
 아래는 기존 코드/원본을 새로 조회하지 않고 2026-11-07에 대조한 요약이다.
 
 | 분야 | 확인한 저장 자료와 한계 |
@@ -36,7 +36,7 @@ Windows 최종 LAB 보고서와 Network 전용 PDF는 현 프로젝트 보고서
 
 ## 최종 보고서 제외 범위
 
-**Suricata IDS/IPS는 이번 최종 통합 보고서의 검증 대상과 개선 완료 집계에서 제외한다.**
+**Suricata IDS/IPS는 통합 보고서의 검증 대상과 개선 완료 집계에서 제외한다.**
 기존 IDS/IPS 소스, 규칙, 테스트, 과거 Day3/IPS 문서와 원본 증적은 삭제하지 않는다.
 기존 문서의 역사적 IDS 결과는 이번 최종 보고서의 새로운 검증 결과가 아니다.
 인라인 IPS의 실제 차단 성공을 주장하지 않으며 테스트의 합성 PASS도 대신 사용하지 않는다.
@@ -48,7 +48,6 @@ Windows 최종 LAB 보고서와 Network 전용 PDF는 현 프로젝트 보고서
 Terraform state/backup/.terraform/개인 tfvars/plan 및 잠금 정보는 커밋하지 않는다.
 공개 fixture는 합성 테스트 자료이며 실장비 증적이 아니다.
 AWS LAB 삭제는 미완료이므로 state·개인 변수·증적 원본을 그대로 유지해야 한다.
-브랜치 삭제는 이미 main에 포함된 Git 참조만 정리하며 실습 파일 삭제가 아니다.
 실제 자원 정리에는 별도 계정·삭제 Plan 검증과 사용자 승인이 필요하다.
 
 ## 오프라인 검증
@@ -59,5 +58,5 @@ AWS LAB 삭제는 미완료이므로 state·개인 변수·증적 원본을 그�
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p "test_*.py"
 ```
 
-실제 AWS/VM/Docker 기동·자산 변경은 이 Git 통합 작업의 검증에 포함하지 않는다.
+실제 AWS/VM/Docker 기동·자산 변경은 이 문서에 기재된 오프라인 검증에 포함하지 않는다.
 Windows Bash 실행 환경 오류가 있으면 다른 실패와 구분하여 그대로 보고한다.

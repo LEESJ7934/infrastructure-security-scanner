@@ -1,12 +1,12 @@
-# 포트폴리오 근거 매핑
+# 진단 항목별 검증 근거
 
-> README·Notion·PPT·면접 답변의 단일 기준 자료. 2026-11-07 KST에 저장된 코드·로컬 원본을 대조했다. 실제 장비를 새로 조회하거나 설정을 변경하지 않았다. 특정 기업 공고 원문을 분석한 문서가 아니라, 요청된 기술 분야 5개와 AWS에 맞춘 근거 정리다.
+> 서버·네트워크·DBMS·WEB/WAS·보안장비 및 AWS 설정 진단의 항목별 근거를 기록했다. 2026-11-07 KST 기준 코드와 저장된 실습 자료를 대조했으며, 이 과정에서 실장비를 재조회하거나 설정을 변경하지 않았다.
 
 ## 읽는 기준과 기여 구분
 
 - **구현:** 소스와 테스트가 존재한다. 합성 단위 테스트의 PASS를 실제 장비 PASS로 바꾸지 않는다.
 - **저장된 실제 LAB:** 당시 수집 JSON·수동 파일·패킷 기록이 존재한다. 이번 검토는 그 파일의 재분석이며 현재 장비 상태가 아니다.
-- **수동 확인:** 사용자 PowerShell/화면/실습 확인이다. 자동 수집값과 구분하고 시각·범위가 없으면 만들어 넣지 않는다.
+- **수동 확인:** PowerShell 출력·화면·실습 전사본 등 수동 시험 기록이다. 자동 수집값과 구분하고 시각·범위가 없으면 만들어 넣지 않는다.
 - **독립 재확인 한계:** 요약 PASS만 있거나 원시 로그가 없으면 해당 동작의 전체 증거를 독립 재확인했다고 쓰지 않는다. 해시 일치는 파일 무결성이지 출처 인증이 아니다.
 - 기준은 내부 LAB 식별자다. 확인하지 않은 KISA 공식 번호·인증·고객사 기준 준수는 주장하지 않는다.
 
@@ -37,14 +37,12 @@
 실제 SSH 로그인, rsyslog 이벤트 전달/중앙 보관, 전체 서비스·PAM·모든 계정 감사,
 재부팅 후 영속성까지 검증한 것은 아니다.
 
-면접 설명: “설정 파일 존재만 보지 않고 sshd 유효값과 파일 소유권/권한을 읽었고,
-LAB 개선 후 같은 기준으로 재조회했습니다.” 금지 표현: “Linux 서버 전체 보안 적합성 검증 완료.”
 
 ### Windows Server
 
 - 대상: Windows Server 2022 Standard Evaluation, build 20348, Server Core 저장 자료. 2019/2025 실검증 완료로 표시하지 않는다.
 - 구현: [수집 PowerShell](../scripts/collect_windows_server.ps1), [수집기](../config_audit/collectors/windows_server.py), [LAB 평가](../config_audit/windows_lab.py), [STRICT 정책](../config_audit/windows_policy.py), [기준 JSON](../rules/windows-server-personal-lab.json).
-- 자동 수집 E5/E6과 사용자 PowerShell 확인 E7을 이번에 **오프라인 재분석**하여 PASS 8 / NEEDS_REVIEW 1, LAB 조치·재점검 3건을 재현했다. 새 VM 수집이 아니다.
+- 자동 수집 E5/E6과 수동 PowerShell 확인 E7을 **오프라인 재분석**하여 PASS 8 / NEEDS_REVIEW 1, LAB 조치·재점검 3건을 재현했다. 새 VM 수집이 아니다.
 
 | ID | 내부 LAB 기준·방법 | 확인 결과·개선 및 출처 |
 |---|---|---|
@@ -69,8 +67,6 @@ STRICT 비교와 LAB 결과는 다르며 [Windows 문서](phase2-windows-server.
 현재 프로젝트 reports/에서 별도 Windows 최종 LAB JSON/PDF 파일은 확인하지 못했다.
 생성기 구현과 저장 원본 재분석 가능성을 설명하고 “완성된 Windows PDF 원본 확인”으로 확대하지 않는다.
 
-면접 설명: “서비스 미설치와 조회 실패를 구분하고, 자동 설정과 사용자의 역할 확인을 분리했습니다.”
-금지 표현: “수동 baseline까지 자동으로 수집했고 공식 Windows 보안 인증을 완료했습니다.”
 
 ## ② 네트워크 — Router / Switch
 
@@ -95,8 +91,6 @@ E8/E9에서 R03/R04 개선 2건이 확인된다. 기존 packet-existing.json은 
 이 ICMP 성공은 R03 관리 접근 차단 시험이 아니며 설정 결과와 별도 증거다.
 전용 Network PDF 원본은 확인하지 못했으며 JSON/공통 결과 어댑터 구현으로 설명한다.
 
-면접 설명: “input 관리 정책과 forward 데이터 경로를 분리했고, 양단 Ping만으로 Router 경유를 단정하지 않았습니다.”
-금지 표현: “실물 Switch 보안·VLAN·포트 차단을 검증했습니다.”
 
 ## ③ DBMS — MySQL
 
@@ -121,8 +115,6 @@ LAB-SSH-002와 LAB-MYSQL-002는 원본 FAIL→PASS 2건, 나머지는 PASS 유�
 Day5 엄격 비교는 메타데이터 부족으로 UNVERIFIABLE 4건이다.
 이 2건을 Phase2 Replay 10건과 같은 baseline/집계로 취급하지 않는다.
 
-면접 설명: “계정의 Host 범위와 지정 앱의 권한을 분리하고, 개선 후 GLOBAL 값을 재조회했습니다.”
-금지 표현: “MySQL TLS 연결과 전체 유효 권한을 모두 검증했습니다.”
 
 ## ④ WEB/WAS — Nginx / Tomcat
 
@@ -135,7 +127,7 @@ Day5 엄격 비교는 메타데이터 부족으로 UNVERIFIABLE 4건이다.
 | WEB-LAB-N01 | 디렉터리 파일 목록 노출 제한 | autoindex on→off, /files/의 목록 접근 제한 확인 |
 | WEB-LAB-N02 | 제품 버전 노출 최소화 | server_tokens on→off + 응답/오류의 버전 숨김 확인 |
 | WEB-LAB-N03 | 불필요한 데이터 경로 공개 제한 | /private/ 정적 경로→404 확인 |
-| WEB-LAB-N04 | 요청 추적을 위한 접근 로그 | access_log off→활성, 이번 요청 표식 기록 확인 |
+| WEB-LAB-N04 | 요청 추적을 위한 접근 로그 | access_log off→활성, 검증 요청 표식 기록 확인 |
 | WAS-LAB-T01 | 예상치 못한 자동 배포 제한 | Host autoDeploy true→false 재조회 |
 | WAS-LAB-T02 | 불필요 기본 앱 제거 | LAB before의 docs/examples 존재→없음. manager/host-manager 부재도 확인 |
 | WAS-LAB-T03 | 오류 상세/서버 정보 노출 제한 | showReport/showServerInfo false, 중립 Server 값 + 오류 응답 확인 |
@@ -147,8 +139,6 @@ Tomcat before에서 manager 취약 인증을 재현한 것은 아니며 실제 �
 버전 숨김만으로 특정 CVE가 해소됐다고 하지 않는다. autoDeploy는 이 LAB 기준이며 모든
 운영 배포 방식에서 일률적으로 취약하다는 의미가 아니다. TLS·전체 웹 취약점·부하 검증은 제외다.
 
-면접 설명: “정보 노출·불필요 경로·로깅을 개선하면서 정상 프록시 경로가 깨지지 않았는지 함께 확인했습니다.”
-금지 표현: “웹 애플리케이션 침투테스트와 모든 관리 앱 보안 검증을 완료했습니다.”
 
 ## ⑤ 보안장비 — OPNsense / ModSecurity
 
@@ -173,8 +163,6 @@ IP/포트별 관리 접근 노출을 제한하되 자동 정책 변경은 하지
 기존 로그를 현재 실행 증거로 취급하지 않는다. 필요한 후속 자료는 시험 시각대·출발 포트·
 전후 규칙 세대·동일 캡처 맥락이다. [FW-05 상세](day4-fw05-log-rule-evidence.md).
 
-면접 설명: “API 403과 로그 수집 성공을 분리했고, 수동 패킷 증거를 자동 PASS로 덮어쓰지 않았습니다.”
-금지 표현: “방화벽 전체 정책과 과거 로그의 규칙 연결을 자동 검증했습니다.”
 
 ### ModSecurity
 
@@ -190,14 +178,12 @@ IP/포트별 관리 접근 노출을 제한하되 자동 정책 변경은 하지
 - 재검증에는 같은 실행 ID의 정상 요청·차단 요청·원시 감사 이벤트를 함께 보존해야 한다.
   운영환경 WAF 우회 방어 또는 모든 공격 차단으로 확대하지 않는다.
 
-면접 설명: “CRS가 로드됐다는 설정과 실제 차단의 증거를 분리했습니다.”
-금지 표현: “현재 원본만으로 WAF 실제 차단을 독립 검증했습니다.”
 
 ## 추가 영역 — AWS 클라우드
 
 - 구현: [aws_live.py](../cloud_security/aws_live.py), [범위](../cloud_security/aws_scope.py), [관찰 정규화](../cloud_security/aws_observations.py), [판정](../config_audit/collectors/aws_security.py), [JSON/PDF](../config_audit/aws_report.py).
 - 표준 credential chain/IAM 역할, STS 계정 gate, 계정·리전·리소스 allowlist,
-  읽기 API 목록·페이지/호출/시간 제한을 적용한다. 이번 문서 작업은 API를 호출하지 않았다.
+  읽기 API 목록·페이지/호출/시간 제한을 적용한다. 문서상 근거 대조 시 실제 AWS API를 호출하지 않았다.
 - E17/E18/E19에서 실제 독립 LAB 네 항목 FAIL→PASS 및 개선 관찰 4건을 확인했다.
 
 | ID | 기준·수집·위험 근거 | 저장 자료의 결과·조치 |
@@ -217,8 +203,6 @@ NACL 기준은 문서용 시험 주소의 지정 TCP 22/23/3389 및 반환 포�
 계정 ID/실제 리소스 ID·state·개인 tfvars는 이 공개 문서에 싣지 않는다.
 AWS LAB 삭제는 미완료이며 현재 자원·비용·삭제 Plan은 별도 인증과 조회가 필요하다.
 
-면접 설명: “설정 노출과 실제 도달성을 구분하고, 별도 LAB에서 네 항목만 개선해 같은 자산을 재조회했습니다.”
-금지 표현: “IAM 유효 권한·실제 NACL 차단·CloudTrail/Flow Logs 전달까지 모두 검증했습니다.”
 
 ## 증적 및 보고서 목록
 
@@ -256,7 +240,7 @@ Day5의 `reports/day5/day5-integrated-report.json/pdf` 등은 과거 산출물�
 | 기록 | 환경·범위 | 결과·해석 |
 |---|---|---|
 | 초기 330개 CI 링크 | validation.md의 과거 기본 CI | 당시 실행 기록. 이번 작업에서 최신 CI로 재확인하지 않음 |
-| Day3 381개 | 당시 사용자 Windows 콘솔 확인 기록 | [Day3 문서](progress/DAY3.md). 당시 Codex 제한 환경 결과와도 구분 |
+| Day3 381개 | 당시 사용자 Windows 콘솔 확인 기록 | [Day3 문서](progress/DAY3.md). 당시 제한된 실행 환경 결과와도 구분 |
 | Day5 694개 | 당시 Windows 단계별 회귀 기록 | 693 통과/환경 오류 1의 역사적 값, 현재 최신 수치 아님 |
 | Git 통합 2026-11-07 | Windows / Python 3.12.10 / source 99c8f10 | 핵심 322 통과; 전체 1,301 중 1,300 통과·1 실패 |
 
@@ -265,14 +249,14 @@ Git 통합의 원본 `core-unittest.txt` / `full-unittest.txt`는 저장소 밖 
 WSL `execvpe(/bin/bash) failed: No such file or directory`였다. 다른 시점의
 WinError 1920/0xC0000022를 같은 오류 메시지로 복사하지 않는다.
 
-### 이번 문서 검증의 실제 재실행
+### 2026-11-07 회귀 테스트
 
 - 실행 완료: **2026-11-07 13:41:56 KST**, Windows / Python 3.12.10.
-- 대상: source `99c8f10` + 이번 문서 수정. 코드·테스트 파일은 변경하지 않았다.
+- 대상: source `99c8f10` 기준. 문서 정리 중 진단 코드·테스트 파일은 변경하지 않았다.
 - 핵심 공통 엔진·Day4·Day5 선택 테스트: **322개 통과, 실패 0**.
 - 전체 `unittest discover`: **1,301개 실행, 1,300개 통과 / 1개 실패** (18.427초).
 - 실패는 위와 같은 기존 WSL `/bin/bash` 부재이며 새 기능 회귀로 분류하지 않았다.
-- 이번 원본 로그 `core-unittest.txt`, `full-unittest.txt`는 저장소 밖 비공개 문서 검증 작업기록에 보존했다.
+- 원본 로그 `core-unittest.txt`, `full-unittest.txt`는 저장소 밖 비공개 문서 검증 작업기록에 보존했다.
   테스트 실패를 skip/삭제하거나 성공으로 표시하지 않았다. GitHub CI 결과는 별도다.
 
 
@@ -285,16 +269,3 @@ Windows 실행 명령:
 테스트가 통과해도 실제 LAB 실행을 대신하지 않는다. 원본이 없는 공개 체크아웃은
 실제 증적 의존 테스트의 기존 적용 조건 때문에 숫자가 달라질 수 있다.
 CI 배지는 동적 상태이며 이 로컬 기록이 새 GitHub Actions 성공을 보장하지 않는다.
-
-## Notion / PPT용 짧은 문구
-
-**한 문장:** “서버·네트워크·DBMS·WEB/WAS·보안장비와 AWS를 대상으로, 설정 근거와 위험을 설명하고 격리 LAB에서 개선 후 같은 범위를 재점검한 인프라 기술진단 프로젝트입니다.”
-
-**핵심 사례:** “Linux/MySQL 10개 설정과 WEB/WAS 8개 설정의 전후 결과를 보존했고, AWS는 별도 LAB의 4개 항목만 개선 관찰로 기록했습니다.”
-
-**판정 태도:** “수동 확인·자동 수집·패킷 동작을 분리하고, FW-04/05와 IAM-03처럼 증거가 부족한 항목은 추가 검토 상태로 남겼습니다.”
-
-**면접 마무리:** “도구 실행 횟수보다 왜 취약한지, 어떤 대책을 적용했는지, 무엇이 재점검됐고 무엇이 아직 미확인인지 설명하는 데 초점을 뒀습니다.”
-
-금지 문구: 고객사 컨설팅 수행, KISA 공식 인증 완료, 실물 Switch 전체 보안 검증,
-WAF 독립 차단 증명, Suricata IPS 차단 완료, 전체 AWS 보안 적합성 또는 모든 로그 전달 성공.

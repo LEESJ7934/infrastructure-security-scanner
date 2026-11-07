@@ -2,22 +2,22 @@
 
 본 문서는 **자동 테스트 / 격리 Docker 통합 검증 / 승인 EC2·로컬 실습**을 구분해 기술합니다. 테스트 통과를 실제 운영환경의 전체 보안 검증 완료로 해석하지 않습니다.
 
-## 0. 현재 포트폴리오 근거와 검증 시점
+## 최근 진단 및 검증 기록
 
-[포트폴리오 근거 매핑](portfolio-evidence-mapping.md)에 5개 기술 분야와 AWS의
+[진단 항목별 검증 근거](portfolio-evidence-mapping.md)에 5개 기술 분야와 AWS의
 코드·실제 LAB·수동 확인·누락 증적을 분리했다. Suricata IDS/IPS는 현재 최종 검증 성과에서 제외한다.
 
 - Git 최종 통합 기록: 2026-11-07 KST, Windows/Python 3.12.10, source `99c8f10`.
   핵심 322개 통과, 전체 1,301개 중 1,300개 통과·1개 실패.
 - 당시 실패는 기존 WSL `/bin/bash` 부재다. 실패를 성공으로 처리하지 않는다.
-- 이번 문서 검토는 저장된 Linux/MySQL Replay 10건, WEB/WAS 8건,
+- 2026-11-07 자료 대조에서는 저장된 Linux/MySQL Replay 10건, WEB/WAS 8건,
   Router 설정 2건, AWS 독립 LAB 4건의 개선 자료를 대조했다. 새 장비 실습이 아니다.
 - OPNsense 수동 PASS 3개와 NEEDS_REVIEW 2개, Windows 수동 출처 포함 LAB 결과,
   ModSecurity 원시 동작 증거 부재도 같은 기준 문서에 명시한다.
-- 아래 330개 CI·2026-10-20 EC2/로컬 실습은 과거 기록이다. 현재 Phase2나
+- 아래 330개 CI·2026-10-20 EC2/로컬 실습은 과거 기록이다. 후속 격리 실습이나
   이번 GitHub Actions 실행의 결과로 바꿔 읽지 않는다.
 
-이번 문서 수정 후 재실행 결과는 [테스트 기준표](portfolio-evidence-mapping.md#테스트-기록과-기준)에 기록한다.
+2026-11-07 회귀 테스트 결과는 [테스트 기준표](portfolio-evidence-mapping.md#테스트-기록과-기준)에 기록한다.
 
 ## 1. 과거 자동 테스트와 CI
 
