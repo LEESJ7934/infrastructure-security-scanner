@@ -1,5 +1,11 @@
 # Day5 5단계: 오프라인 최종 JSON/PDF 보고서
 
+> 역사적 Day5 구현·산출물 설명이다. 현재 Phase2 성과와 테스트의 기준은
+> [포트폴리오 근거 매핑](portfolio-evidence-mapping.md)이다. 아래 Day3 입력과
+> 기존 25레코드 보고서에는 역사적 IDS 채널도 포함돼 있지만, Suricata IDS/IPS는
+> 현재 최종 검증 성과·개선 집계에서 제외한다. 원본 JSON/PDF를 수정하거나
+> Phase2 자료를 넣어 당시 산출물을 재작성하지 않는다. 과거 테스트 수치는 해당 단계 기록이다.
+
 ## 실행
 
 프로젝트 루트의 Windows PowerShell에서 실행한다.

@@ -1,5 +1,22 @@
 # Phase2 최종 통합 범위
 
+항목·실제 자료·판정 한계·면접 표현은 [포트폴리오 근거 매핑](portfolio-evidence-mapping.md)을 단일 기준으로 사용한다.
+아래는 기존 코드/원본을 새로 조회하지 않고 2026-11-07에 대조한 요약이다.
+
+| 분야 | 확인한 저장 자료와 한계 |
+|---|---|
+| Linux/MySQL | Phase2 Replay 10건 FAIL→PASS. 기존 Day2 개선 2건과 별개 |
+| Windows | Server 2022 저장 JSON + 사용자 수동 확인의 LAB 재분석: PASS 8 / NEEDS_REVIEW 1, 개선 3건. 수동 baseline을 자동값으로 표시하지 않음 |
+| Router/Switch | R03/R04 2건 개선, 별도 fabric LAB의 양방향 패킷 경유. Switch 관리면/VLAN은 미지원 |
+| WEB/WAS | Nginx/Tomcat 8건 FAIL→PASS, 전후 프록시 health HTTP 정상 |
+| OPNsense | FW-02/03/06 수동 한정 PASS, FW-04/05 NEEDS_REVIEW 유지 |
+| ModSecurity | WAF 6개 PASS 요약. 원시 HTTP·감사 로그가 없어 현재 자료만으로 독립 차단 재확인 불가 |
+| AWS | 독립 LAB 4건 개선 관찰. CT-01 FAIL 및 IAM-03 NEEDS_REVIEW 유지 |
+
+실습별 숫자를 고유 취약점 총계로 합치지 않는다. 실제 JSON/PDF는 비공개 로컬 원본이며,
+Windows 최종 LAB 보고서와 Network 전용 PDF는 현 프로젝트 보고서 폴더에서 확인하지 못했다.
+문서별 초기 테스트 숫자는 당시 단계의 기록이며 [테스트 기준표](portfolio-evidence-mapping.md#테스트-기록과-기준)와 구분한다.
+
 ## 개발 코드 통합
 
 - Windows Server: 읽기 전용 PowerShell 수집, LAB/STRICT 판정 분리,

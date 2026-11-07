@@ -2,18 +2,35 @@
 
 본 문서는 **자동 테스트 / 격리 Docker 통합 검증 / 승인 EC2·로컬 실습**을 구분해 기술합니다. 테스트 통과를 실제 운영환경의 전체 보안 검증 완료로 해석하지 않습니다.
 
-## 1. 자동 테스트와 CI
+## 0. 현재 포트폴리오 근거와 검증 시점
 
-- Python 전체 회귀 테스트 **330개 통과** ([기본 CI 실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487))
+[포트폴리오 근거 매핑](portfolio-evidence-mapping.md)에 5개 기술 분야와 AWS의
+코드·실제 LAB·수동 확인·누락 증적을 분리했다. Suricata IDS/IPS는 현재 최종 검증 성과에서 제외한다.
+
+- Git 최종 통합 기록: 2026-11-07 KST, Windows/Python 3.12.10, source `99c8f10`.
+  핵심 322개 통과, 전체 1,301개 중 1,300개 통과·1개 실패.
+- 당시 실패는 기존 WSL `/bin/bash` 부재다. 실패를 성공으로 처리하지 않는다.
+- 이번 문서 검토는 저장된 Linux/MySQL Replay 10건, WEB/WAS 8건,
+  Router 설정 2건, AWS 독립 LAB 4건의 개선 자료를 대조했다. 새 장비 실습이 아니다.
+- OPNsense 수동 PASS 3개와 NEEDS_REVIEW 2개, Windows 수동 출처 포함 LAB 결과,
+  ModSecurity 원시 동작 증거 부재도 같은 기준 문서에 명시한다.
+- 아래 330개 CI·2026-10-20 EC2/로컬 실습은 과거 기록이다. 현재 Phase2나
+  이번 GitHub Actions 실행의 결과로 바꿔 읽지 않는다.
+
+이번 문서 수정 후 재실행 결과는 [테스트 기준표](portfolio-evidence-mapping.md#테스트-기록과-기준)에 기록한다.
+
+## 1. 과거 자동 테스트와 CI
+
+- 과거 Python 전체 회귀 테스트 **330개 통과** ([기본 CI 실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39456387487))
 - 승인 Scope, 서비스 fingerprint, CVE 영향 버전 매핑, 증적 중복 방지, 위험도 평가, 스냅샷 보고서, 비밀정보 검사 등 테스트
 - [격리 Docker 통합 CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/39453811884): MySQL V6→V7 마이그레이션, 기존 데이터 보존, FTP·SSH·HTTP·DVWA·Nuclei 실습, 증적 해시 및 JSON/PDF 생성 확인
 
 실행:
 
 ```powershell
-py -m unittest discover -s .\tests -p "test_*.py" -v
-py -m compileall -q .\asset_management .\scanner .\db .\scripts .\analysis .\verification .\api
-py .\scripts\check_secrets.py
+.\.venv\Scripts\python.exe -B -m unittest discover -s .\tests -p "test_*.py" -v
+.\.venv\Scripts\python.exe -m compileall -q .\asset_management .\scanner .\db .\scripts .\analysis .\verification .\api
+.\.venv\Scripts\python.exe -B .\scripts\check_secrets.py
 docker compose -f .\docker\docker-compose.yml config --quiet
 ```
 
