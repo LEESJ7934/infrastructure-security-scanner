@@ -1,0 +1,6 @@
+*.tfplan
+*.plan.json
+*.state.json
+*.outputs.json
+*.receipt.json
+.terraform.lock.hcl.backup

@@ -1,0 +1,78 @@
+{
+  "name": "scanner-p2web",
+  "services": {
+    "nginx": {
+      "build": {
+        "context": ".",
+        "dockerfile": "nginx.Dockerfile",
+        "args": {
+          "LAB_STAGE": "${WEB_WAS_STAGE:-before}"
+        }
+      },
+      "image": "scanner-p2web-nginx:${WEB_WAS_STAGE:-before}",
+      "user": "10001:10001",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m,uid=10001,gid=10001,mode=1777"
+      ],
+      "networks": [
+        "backend"
+      ],
+      "mem_limit": "128m",
+      "cpus": 0.5,
+      "pids_limit": 96,
+      "restart": "no",
+      "depends_on": {
+        "tomcat": {
+          "condition": "service_started"
+        }
+      }
+    },
+    "tomcat": {
+      "build": {
+        "context": ".",
+        "dockerfile": "tomcat.Dockerfile",
+        "args": {
+          "LAB_STAGE": "${WEB_WAS_STAGE:-before}"
+        }
+      },
+      "image": "scanner-p2web-tomcat:${WEB_WAS_STAGE:-before}",
+      "user": "10001:10001",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m,uid=10001,gid=10001,mode=1777",
+        "/usr/local/tomcat/logs:rw,nosuid,size=16m,uid=10001,gid=10001",
+        "/usr/local/tomcat/work:rw,nosuid,size=32m,uid=10001,gid=10001",
+        "/usr/local/tomcat/temp:rw,nosuid,size=16m,uid=10001,gid=10001"
+      ],
+      "networks": [
+        "backend"
+      ],
+      "mem_limit": "384m",
+      "cpus": 0.5,
+      "pids_limit": 96,
+      "restart": "no",
+      "environment": {
+        "JAVA_OPTS": "-Xms32m -Xmx192m -XX:+UseSerialGC"
+      }
+    }
+  },
+  "networks": {
+    "backend": {
+      "driver": "bridge",
+      "internal": true
+    }
+  }
+}

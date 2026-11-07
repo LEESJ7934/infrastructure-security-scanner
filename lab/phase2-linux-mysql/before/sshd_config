@@ -1,0 +1,10 @@
+Port 22
+HostKey /etc/ssh/ssh_host_ed25519_key
+PidFile /run/sshd.pid
+PermitRootLogin yes
+PasswordAuthentication yes
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+UsePAM yes
+LogLevel VERBOSE
+Subsystem sftp internal-sftp

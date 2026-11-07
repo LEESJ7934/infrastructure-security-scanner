@@ -1,0 +1,11 @@
+<Server port="-1">
+<Service name="Catalina">
+<Connector port="8080" protocol="HTTP/1.1" server="Apache-Coyote/1.1" xpoweredBy="false" />
+<Engine name="Catalina" defaultHost="localhost">
+<Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="true" deployOnStartup="true">
+<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="true" showServerInfo="true" />
+
+</Host>
+</Engine>
+</Service>
+</Server>

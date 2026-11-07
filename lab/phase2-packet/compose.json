@@ -1,0 +1,131 @@
+{
+  "name": "scanner-p2pkt",
+  "services": {
+    "router": {
+      "build": {
+        "context": ".",
+        "dockerfile": "Dockerfile"
+      },
+      "image": "scanner-p2pkt:local",
+      "pull_policy": "never",
+      "environment": {
+        "PACKET_LAB_ROLE": "router"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "cap_add": [
+        "NET_ADMIN",
+        "NET_RAW"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "mem_limit": "96m",
+      "pids_limit": 24,
+      "sysctls": {
+        "net.ipv4.ip_forward": "1",
+        "net.ipv4.conf.all.send_redirects": "0",
+        "net.ipv4.conf.default.send_redirects": "0",
+        "net.ipv6.conf.all.disable_ipv6": "1",
+        "net.ipv4.conf.all.accept_redirects": "0",
+        "net.ipv4.conf.default.accept_redirects": "0"
+      },
+      "networks": {
+        "fabric": {
+          "ipv4_address": "10.204.10.254",
+          "interface_name": "data0",
+          "driver_opts": {
+            "com.docker.network.endpoint.sysctls": "net.ipv4.conf.IFNAME.send_redirects=0,net.ipv4.conf.IFNAME.accept_redirects=0,net.ipv4.conf.IFNAME.forwarding=1"
+          }
+        }
+      }
+    },
+    "client-a": {
+      "image": "scanner-p2pkt:local",
+      "pull_policy": "never",
+      "environment": {
+        "PACKET_LAB_ROLE": "client-a"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "cap_add": [
+        "NET_ADMIN",
+        "NET_RAW"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "mem_limit": "64m",
+      "pids_limit": 24,
+      "sysctls": {
+        "net.ipv6.conf.all.disable_ipv6": "1",
+        "net.ipv4.conf.all.send_redirects": "0",
+        "net.ipv4.conf.default.send_redirects": "0",
+        "net.ipv4.conf.all.accept_redirects": "0",
+        "net.ipv4.conf.default.accept_redirects": "0"
+      },
+      "networks": {
+        "fabric": {
+          "ipv4_address": "10.204.10.10",
+          "interface_name": "data0",
+          "driver_opts": {
+            "com.docker.network.endpoint.sysctls": "net.ipv4.conf.IFNAME.send_redirects=0,net.ipv4.conf.IFNAME.accept_redirects=0,net.ipv4.conf.IFNAME.forwarding=0"
+          }
+        }
+      }
+    },
+    "client-b": {
+      "image": "scanner-p2pkt:local",
+      "pull_policy": "never",
+      "environment": {
+        "PACKET_LAB_ROLE": "client-b"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "cap_add": [
+        "NET_ADMIN",
+        "NET_RAW"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "mem_limit": "64m",
+      "pids_limit": 24,
+      "sysctls": {
+        "net.ipv6.conf.all.disable_ipv6": "1",
+        "net.ipv4.conf.all.send_redirects": "0",
+        "net.ipv4.conf.default.send_redirects": "0",
+        "net.ipv4.conf.all.accept_redirects": "0",
+        "net.ipv4.conf.default.accept_redirects": "0"
+      },
+      "networks": {
+        "fabric": {
+          "ipv4_address": "10.204.20.10",
+          "interface_name": "data0",
+          "driver_opts": {
+            "com.docker.network.endpoint.sysctls": "net.ipv4.conf.IFNAME.send_redirects=0,net.ipv4.conf.IFNAME.accept_redirects=0,net.ipv4.conf.IFNAME.forwarding=0"
+          }
+        }
+      }
+    }
+  },
+  "networks": {
+    "fabric": {
+      "driver": "bridge",
+      "internal": true,
+      "ipam": {
+        "config": [
+          {
+            "subnet": "10.204.0.0/16",
+            "aux_addresses": {
+              "router-b": "10.204.20.254"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

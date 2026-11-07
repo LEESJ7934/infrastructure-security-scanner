@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "vpcs": {
+    "ap-northeast-2": "vpc-001"
+  },
+  "targets": {
+    "IAM-01": {
+      "region": "global",
+      "resource_id": "123456789012"
+    },
+    "IAM-02": {
+      "region": "global",
+      "resource_id": "123456789012"
+    },
+    "IAM-03": {
+      "region": "global",
+      "resource_id": "arn:aws:iam::123456789012:role/phase2-lab"
+    },
+    "SG-01": {
+      "region": "ap-northeast-2",
+      "resource_id": "sg-001"
+    },
+    "VPC-01": {
+      "region": "ap-northeast-2",
+      "resource_id": "subnet-001"
+    },
+    "NACL-01": {
+      "region": "ap-northeast-2",
+      "resource_id": "acl-001"
+    },
+    "CT-01": {
+      "region": "ap-northeast-2",
+      "resource_id": "arn:aws:cloudtrail:ap-northeast-2:123456789012:trail/phase2-lab"
+    },
+    "FL-01": {
+      "region": "ap-northeast-2",
+      "resource_id": "vpc-001"
+    }
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "origin": "synthetic",
+  "account_id": "123456789012",
+  "partition": "aws",
+  "collected_at": "2026-01-01T00:01:00Z",
+  "sections": {
+    "IAM-01": {
+      "service": "iam",
+      "region": "global",
+      "resource_id": "123456789012",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "SummaryMap": {
+          "AccountAccessKeysPresent": 0,
+          "AccountMFAEnabled": 1,
+          "AccountPasswordPresent": 1,
+          "AccountSigningCertificatesPresent": 0
+        }
+      }
+    },
+    "IAM-02": {
+      "service": "iam",
+      "region": "global",
+      "resource_id": "123456789012",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "SummaryMap": {
+          "AccountAccessKeysPresent": 0,
+          "AccountMFAEnabled": 1,
+          "AccountPasswordPresent": 1,
+          "AccountSigningCertificatesPresent": 0
+        }
+      }
+    },
+    "IAM-03": {
+      "service": "iam",
+      "region": "global",
+      "resource_id": "arn:aws:iam::123456789012:role/phase2-lab",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "RoleArn": "arn:aws:iam::123456789012:role/phase2-lab",
+        "PolicySetComplete": true,
+        "PolicyDocuments": [
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": "ec2:DescribeInstances",
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::phase2-lab-demo/*"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "SG-01": {
+      "service": "ec2",
+      "region": "ap-northeast-2",
+      "resource_id": "sg-001",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "GroupId": "sg-001",
+        "VpcId": "vpc-001",
+        "IpPermissions": []
+      }
+    },
+    "VPC-01": {
+      "service": "ec2",
+      "region": "ap-northeast-2",
+      "resource_id": "subnet-001",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "SubnetId": "subnet-001",
+        "VpcId": "vpc-001",
+        "MapPublicIpOnLaunch": false,
+        "RouteTableAssociationResolved": true,
+        "RouteTable": {
+          "RouteTableId": "rtb-001",
+          "VpcId": "vpc-001",
+          "Associations": [
+            {
+              "SubnetId": "subnet-001"
+            }
+          ],
+          "Routes": [
+            {
+              "DestinationCidrBlock": "10.20.0.0/16",
+              "GatewayId": "local",
+              "State": "active"
+            }
+          ]
+        },
+        "NetworkInterfaces": [
+          {
+            "NetworkInterfaceId": "eni-001",
+            "SubnetId": "subnet-001",
+            "Association": {},
+            "Ipv6Addresses": []
+          }
+        ]
+      }
+    },
+    "NACL-01": {
+      "service": "ec2",
+      "region": "ap-northeast-2",
+      "resource_id": "acl-001",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "NetworkAclId": "acl-001",
+        "VpcId": "vpc-001",
+        "Associations": [
+          {
+            "SubnetId": "subnet-001"
+          }
+        ],
+        "Entries": [
+          {
+            "RuleNumber": 100,
+            "Egress": false,
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "CidrBlock": "10.20.1.0/24",
+            "PortRange": {
+              "From": 22,
+              "To": 22
+            }
+          },
+          {
+            "RuleNumber": 100,
+            "Egress": true,
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "CidrBlock": "0.0.0.0/0",
+            "PortRange": {
+              "From": 1024,
+              "To": 65535
+            }
+          },
+          {
+            "RuleNumber": 32767,
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "CidrBlock": "0.0.0.0/0"
+          },
+          {
+            "RuleNumber": 32767,
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "CidrBlock": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "CT-01": {
+      "service": "cloudtrail",
+      "region": "ap-northeast-2",
+      "resource_id": "arn:aws:cloudtrail:ap-northeast-2:123456789012:trail/phase2-lab",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "TrailPresent": true,
+        "TrailARN": "arn:aws:cloudtrail:ap-northeast-2:123456789012:trail/phase2-lab",
+        "HomeRegion": "ap-northeast-2",
+        "IsMultiRegionTrail": true,
+        "IncludeGlobalServiceEvents": true,
+        "Status": {
+          "IsLogging": true,
+          "LatestDeliveryError": ""
+        },
+        "EventSelectors": [
+          {
+            "IncludeManagementEvents": true,
+            "ReadWriteType": "All",
+            "ExcludeManagementEventSources": []
+          }
+        ],
+        "AdvancedEventSelectors": []
+      }
+    },
+    "FL-01": {
+      "service": "ec2",
+      "region": "ap-northeast-2",
+      "resource_id": "vpc-001",
+      "state": "COLLECTED",
+      "pagination": {
+        "complete": true,
+        "pages": 1,
+        "next_token_present": false
+      },
+      "collected_at": "2026-01-01T00:01:00Z",
+      "data": {
+        "TargetResourceId": "vpc-001",
+        "FlowLogs": [
+          {
+            "FlowLogId": "fl-001",
+            "ResourceId": "vpc-001",
+            "TrafficType": "ALL",
+            "FlowLogStatus": "ACTIVE",
+            "DeliverLogsStatus": "SUCCESS",
+            "LogDestinationType": "cloud-watch-logs",
+            "LogDestination": "arn:aws:logs:ap-northeast-2:123456789012:log-group:phase2-lab"
+          }
+        ]
+      }
+    }
+  }
+}

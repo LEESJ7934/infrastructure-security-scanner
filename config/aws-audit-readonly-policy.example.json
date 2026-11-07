@@ -1,0 +1,44 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "IdentityAndAccountSummary",
+      "Effect": "Allow",
+      "Action": ["sts:GetCallerIdentity", "iam:GetAccountSummary"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "NamedLabRoleMetadata",
+      "Effect": "Allow",
+      "Action": ["iam:GetRole", "iam:ListAttachedRolePolicies", "iam:ListRolePolicies", "iam:GetRolePolicy"],
+      "Resource": "arn:aws:iam::123456789012:role/phase2-lab"
+    },
+    {
+      "Sid": "NamedPolicyVersions",
+      "Effect": "Allow",
+      "Action": ["iam:GetPolicy", "iam:GetPolicyVersion"],
+      "Resource": "arn:aws:iam::123456789012:policy/phase2-lab-readonly"
+    },
+    {
+      "Sid": "RegionalVpcMetadata",
+      "Effect": "Allow",
+      "Action": ["ec2:DescribeSecurityGroups", "ec2:DescribeVpcs", "ec2:DescribeSubnets", "ec2:DescribeRouteTables", "ec2:DescribeInternetGateways", "ec2:DescribeNetworkInterfaces", "ec2:DescribeNetworkAcls", "ec2:DescribeFlowLogs"],
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-northeast-2"}}
+    },
+    {
+      "Sid": "RegionalTrailDiscovery",
+      "Effect": "Allow",
+      "Action": "cloudtrail:DescribeTrails",
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-northeast-2"}}
+    },
+    {
+      "Sid": "NamedTrailStatusAndSelectors",
+      "Effect": "Allow",
+      "Action": ["cloudtrail:GetTrailStatus", "cloudtrail:GetEventSelectors"],
+      "Resource": "arn:aws:cloudtrail:ap-northeast-2:123456789012:trail/phase2-lab",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-northeast-2"}}
+    }
+  ]
+}

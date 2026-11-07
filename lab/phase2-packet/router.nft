@@ -1,0 +1,18 @@
+table inet phase2_packet_guard {
+  chain input {
+    type filter hook input priority 0; policy drop;
+    iifname "lo" accept
+    ct state established,related accept
+    ip saddr { 10.204.10.0/24, 10.204.20.0/24 } meta l4proto icmp accept
+  }
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+    iifname "data0" oifname "data0" ip saddr 10.204.10.0/24 ip daddr 10.204.20.0/24 counter accept
+    iifname "data0" oifname "data0" ip saddr 10.204.20.0/24 ip daddr 10.204.10.0/24 counter accept
+  }
+  chain output {
+    type filter hook output priority 0; policy drop;
+    oifname "lo" accept
+    ip daddr { 10.204.10.0/24, 10.204.20.0/24 } accept
+  }
+}

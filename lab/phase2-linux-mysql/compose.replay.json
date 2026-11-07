@@ -1,0 +1,104 @@
+{
+  "name": "scanner-p2lm-replay",
+  "services": {
+    "linux": {
+      "build": {
+        "context": ".",
+        "dockerfile": "linux.Dockerfile",
+        "args": {
+          "LAB_STAGE": "${LINUX_MYSQL_STAGE:-before}"
+        }
+      },
+      "image": "scanner-p2lm-replay-linux:${LINUX_MYSQL_STAGE:-before}",
+      "cap_add": [
+        "CHOWN",
+        "DAC_OVERRIDE",
+        "FOWNER",
+        "SETUID",
+        "SETGID",
+        "NET_BIND_SERVICE",
+        "SYS_CHROOT"
+      ],
+      "mem_limit": "192m",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "isolated"
+      ],
+      "pids_limit": 96,
+      "cpus": 0.5,
+      "restart": "no",
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "/opt/lab/collect-linux.py",
+          "--health"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 15,
+        "start_period": "5s"
+      }
+    },
+    "mysql": {
+      "build": {
+        "context": ".",
+        "dockerfile": "mysql.Dockerfile"
+      },
+      "image": "scanner-p2lm-replay-mysql:local",
+      "cap_add": [
+        "CHOWN",
+        "DAC_OVERRIDE",
+        "FOWNER",
+        "SETUID",
+        "SETGID"
+      ],
+      "mem_limit": "768m",
+      "tmpfs": [
+        "/var/lib/mysql:rw,nosuid,size=512m",
+        "/run/lab:rw,noexec,nosuid,size=1m",
+        "/var/run/mysqld:rw,nosuid,size=4m"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "mysql --defaults-extra-file=/run/lab/client.cnf --batch --execute=\"SELECT 1\" >/dev/null 2>&1"
+        ],
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 30,
+        "start_period": "90s"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "isolated"
+      ],
+      "pids_limit": 96,
+      "cpus": 0.5,
+      "restart": "no",
+      "command": [
+        "mysqld",
+        "--local-infile=ON",
+        "--require-secure-transport=OFF",
+        "--innodb-buffer-pool-size=64M",
+        "--innodb-redo-log-capacity=16M"
+      ]
+    }
+  },
+  "networks": {
+    "isolated": {
+      "driver": "bridge",
+      "internal": true
+    }
+  }
+}

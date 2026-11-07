@@ -1,0 +1,3 @@
+FROM scanner-p2net:local
+COPY start.py probe.py /opt/ips/
+ENTRYPOINT ["/sbin/tini", "--", "python3", "/opt/ips/start.py"]

@@ -1,0 +1,1 @@
+<%@ page contentType="text/plain" %><% response.setHeader("X-Lab-Backend", "tomcat"); %>LAB_TOMCAT_OK

@@ -1,0 +1,7 @@
+# Example only. Replace with your actual expected account and owner alias.
+expected_account_id = "REPLACE_WITH_12_DIGIT_ACCOUNT"
+region              = "ap-northeast-2"
+lab_name            = "scanner-p2audit-UNIQUE"
+owner               = "REPLACE_OWNER_ALIAS"
+vpc_cidr            = "10.206.0.0/16"
+# Keep phase out of the private tfvars; pass -var=phase=before/after explicitly.

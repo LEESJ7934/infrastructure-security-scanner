@@ -49,6 +49,16 @@ flowchart TD
 | Day4 | OPNsense 조회·실제 패킷 시험, PF 스냅샷·로그 연계, 수동 증적 | [실습 종료 기록](docs/day4-completion.md) |
 | Day5 | 결과 통합, 경로 제한·해시 검증, 전후 비교, 동일 스냅샷의 JSON/PDF | [최종 보고서](docs/day5-final-report.md) · [증적 인덱스](docs/day5-evidence-index.md) · [재점검 비교](docs/day5-comparison.md) |
 
+## Phase2 확장
+
+Windows Server LAB/STRICT, Linux 기반 Router/Switch, Nginx/Tomcat,
+Linux/MySQL 확장 및 AWS P1 8개 진단·읽기 전용 수집·독립 LAB 구성 코드를 추가했습니다.
+공통 판정 엔진과 JSON/PDF·증적·재점검 모델을 재사용하며 기존 결과를 덮어쓰지 않습니다.
+
+[최종 통합 범위와 제한사항](docs/phase2-final-integration.md)을 참고하세요.
+**Suricata IDS/IPS는 이번 최종 통합 보고서의 검증 대상에서 제외**하며 기존 코드와
+역사적 Day3 기록은 보존합니다. 아래 Day5 수치는 기존 기록으로서 변경하지 않습니다.
+
 ## 실제 검증 결과와 한계
 
 아래 수치는 **기존 로컬 증적 기반 Day5 보고서**의 결과이며 새로운 장비 실시간 진단이 아닙니다. 원본 보고서·일부 로컬 입력은 공개 저장소에 포함하지 않습니다.

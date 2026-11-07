@@ -1,0 +1,11 @@
+<Server port="-1">
+<Service name="Catalina">
+<Connector port="8080" protocol="HTTP/1.1" server="lab" xpoweredBy="false" />
+<Engine name="Catalina" defaultHost="localhost">
+<Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="false" deployOnStartup="true">
+<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />
+<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" prefix="lab_access" suffix=".log" rotatable="false" pattern="%r %s" buffered="false" enabled="true" />
+</Host>
+</Engine>
+</Service>
+</Server>

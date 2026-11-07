@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "account_id": "123456789012",
+  "partition": "aws",
+  "regions": [
+    "ap-northeast-2"
+  ],
+  "services": [
+    "iam",
+    "ec2",
+    "cloudtrail",
+    "logs"
+  ],
+  "resources": {
+    "iam": [
+      "123456789012",
+      "arn:aws:iam::123456789012:role/phase2-lab",
+      "arn:aws:iam::123456789012:policy/phase2-lab-readonly"
+    ],
+    "ec2": [
+      "vpc-001",
+      "subnet-001",
+      "sg-001",
+      "acl-001",
+      "eni-001",
+      "rtb-001",
+      "igw-001",
+      "fl-001"
+    ],
+    "cloudtrail": [
+      "arn:aws:cloudtrail:ap-northeast-2:123456789012:trail/phase2-lab"
+    ],
+    "logs": [
+      "arn:aws:logs:ap-northeast-2:123456789012:log-group:phase2-lab"
+    ]
+  },
+  "role_allowed_actions": [
+    "ec2:DescribeInstances",
+    "s3:GetObject"
+  ],
+  "role_allowed_resources": [
+    "arn:aws:s3:::phase2-lab-demo/*"
+  ],
+  "nacl_matrix": [
+    {
+      "source_ip": "198.51.100.10",
+      "destination_port": 22,
+      "return_port": 55000,
+      "expected": "BLOCK"
+    },
+    {
+      "source_ip": "10.20.1.10",
+      "destination_port": 22,
+      "return_port": 55000,
+      "expected": "ALLOW"
+    }
+  ]
+}

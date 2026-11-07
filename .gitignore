@@ -42,3 +42,11 @@ evidence/
 
 # Local MySQL backups can contain sensitive database records
 backup/
+
+# Final integration: keep operator plans and lock metadata private
+.terraform.lock.hcl
+*.tfplan
+*.plan.json
+*.state.json
+*.outputs.json
+*.receipt.json
