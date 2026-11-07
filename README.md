@@ -2,8 +2,6 @@
 
 [![CI](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/workflows/ci.yml)
 
-**취약한 설정을 찾는 것에서 끝내지 않고, 판정 근거·개선 대책·같은 대상의 재점검 결과를 설명하는 인프라 기술진단 포트폴리오입니다.**
-
 서버·네트워크·DBMS·WEB/WAS·보안장비 5개 분야와 AWS를 대상으로, 승인 범위를 정하고 설정을 읽어 내부 LAB 기준으로 판단한 뒤 JSON/PDF와 증적 참조로 전달합니다. 실제 고객사나 운영환경의 진단·컨설팅 수행 경험, KISA 공식 인증을 주장하지 않습니다.
 
 ## 팀 프로젝트와 개인 확장
@@ -105,11 +103,3 @@ Linux와 MySQL을 합한 Phase2 **10건**은 별도 Replay LAB의 결과입니�
 - 보안장비: [OPNsense](docs/day4-opnsense.md) · [FW-04 PF](docs/day4-pf-snapshots.md) · [FW-05 로그](docs/day4-fw05-log-rule-evidence.md)
 - AWS: [오프라인](docs/phase2-aws-offline.md) · [읽기 전용 수집](docs/phase2-aws-collection.md) · [범위 스키마](docs/phase2-aws-scope-v2.md) · [독립 Terraform LAB](infra/aws/phase2-audit-lab/README.md)
 - 기존 코드: [scanner](scanner/) · [analysis](analysis/) · [Linux SSH](config_audit/collectors/linux_ssh.py) · [MySQL](config_audit/collectors/mysql_config.py) · [ModSecurity](config_audit/collectors/modsecurity.py) · [AWS 인벤토리](cloud_security/aws_inventory.py) · [SG 분석](cloud_security/aws_sg_analyzer.py)
-
-| 개발 단계 | 개인 확장 기록 |
-|---|---|
-| Day1 | [공통 설정 진단 엔진](docs/progress/DAY1.md) |
-| Day2 | [Linux/MySQL 최초 4개 실습](docs/progress/DAY2.md) |
-| Day3 | [IDS/WAF 역사적 개발 기록](docs/progress/DAY3.md). IDS는 현재 성과 제외 |
-| Day4 | [OPNsense 종료 기록](docs/day4-completion.md) |
-| Day5 | [오프라인 통합·증적·재점검·보고서](docs/day5-final-report.md) |
