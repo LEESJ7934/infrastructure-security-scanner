@@ -75,7 +75,7 @@ def nginx_values(raw):
     def normalized(text):
         return re.sub(r"\s+", " ", re.sub(r"#[^\n]*", "", text)).strip()
     for stage in ("before", "after"):
-        template = (ROOT / "lab/phase2-web-was" / stage / "nginx.conf").read_text(encoding="utf-8")
+        template = (ROOT / "lab/web-was-lab" / stage / "nginx.conf").read_text(encoding="utf-8")
         if normalized(raw) == normalized(template):
             good = stage == "after"
             return {"autoindex_disabled": good, "tokens_hidden": good,
@@ -334,7 +334,7 @@ def collect_docker():
 def synthetic_bundle(stage):
     """Explicit test data derived from templates, never a live VM verdict."""
     require(stage in {"before", "after"}, "synthetic_stage_invalid")
-    base = ROOT / "lab/phase2-web-was" / stage
+    base = ROOT / "lab/web-was-lab" / stage
     nginx = (base / "nginx.conf").read_text(encoding="utf-8")
     tomcat = (base / "server.xml").read_text(encoding="utf-8")
     values = {"nginx": nginx_values(nginx), "tomcat": tomcat_values(tomcat,

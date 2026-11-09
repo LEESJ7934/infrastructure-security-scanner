@@ -5,8 +5,8 @@
 ## 변경 파일과 보존 범위
 
 - 추가 `config_audit/collectors/opnsense_log_rules.py`: 저장 로그·PF·시간/시험 맥락을 대조하고 기존 evaluate()로 별도 FW-05 증적 판정.
-- 수정 `scripts/run_day4_audit.py`: 선택적인 FW-05 입력과 분리된 결과 출력.
-- 추가 `tests/test_day4_log_rule_evidence.py`: 합성 데이터 unittest 23개.
+- 수정 `scripts/run_opnsense_lab_audit.py`: 선택적인 FW-05 입력과 분리된 결과 출력.
+- 추가 `tests/test_opnsense_log_rule_evidence.py`: 합성 데이터 unittest 23개.
 - 추가 본 문서, 수정 `docs/opnsense-audit.md`.
 
 기존 API 수집기와 limit=20, IncompleteRead 처리, TLS/CA 검증, FW-01~04/FW-06 판정, 수동 증적 판정기는 변경하지 않았다. 실제 API/방화벽/계정 권한을 건드리지 않았으며 commit/push도 하지 않았다. 실제 로그·PF·manual.json은 읽기만 했고 수정하거나 Git에 추가하지 않았다.
@@ -61,7 +61,7 @@ snapshot_test_continuity_unverified
 
 ```powershell
 Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
-.\.venv\Scripts\python.exe -B -m scripts.run_day4_audit `
+.\.venv\Scripts\python.exe -B -m scripts.run_opnsense_lab_audit `
   --fw05-log-evidence '.\evidence\day4\fw05-wan-tcp22.json' `
   --fw05-log-sha256 cde64f0b88f55739c63c2530f59e8bfa75998c6277ab11265334089414ee44f1 `
   --fw05-test-start '2026-11-05T17:53:39' `
@@ -103,7 +103,7 @@ before_at ≤ 시험 시작 ≤ 시험 끝 ≤ after_at, before_at ≤ PF 수집
 신규 unittest 23개: 충분한 합성 context의 한정 PASS, 기존 evaluate() 호출, rid/순번/의미 매칭, 숫자만 일치하는 경우 거부, Action·튜플·출발 포트·시간·시간대 불일치, -00:00의 unknown offset 처리, 과거 규칙 세대 변경, 파일 변조/누락/잘못된 JSON, 중복 rid, label과 PF default-deny 형태 불일치, 비밀/경로 비출력, 오프라인 무통신, live 로그 수집과 ID 403 독립 처리를 검증했다. 실제 장비 로그를 테스트 fixture로 Git에 넣지 않았다.
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day4_log_rule_evidence tests.test_day4_pf_evidence tests.test_day4_audit tests.test_day4_manual_evidence -v
+.\.venv\Scripts\python.exe -B -m unittest tests.test_opnsense_log_rule_evidence tests.test_opnsense_pf_evidence tests.test_opnsense_lab_audit tests.test_opnsense_manual_evidence -v
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

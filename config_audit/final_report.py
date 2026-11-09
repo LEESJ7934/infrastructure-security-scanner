@@ -145,7 +145,7 @@ def _catalog(policy):
 
 
 def _extras():
-    bindings = [EvidenceBinding("lab/day3/artifacts/" + name, day=3, snapshot_id="day3-final",
+    bindings = [EvidenceBinding("lab/ids-waf-lab/artifacts/" + name, day=3, snapshot_id="day3-final",
                                 role="unassigned_local_artifact") for name in ("day3.pcap", "suricata-eve.json", "suricata-fast.log")]
     for name, check, channel in (("fw04-active-rules.txt", "FW-04", "pf"),
                                  ("fw04-active-rules-detail.txt", "FW-04", "pf"), ("fw04-rules.tar", "FW-04", "pf"),

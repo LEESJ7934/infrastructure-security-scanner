@@ -22,7 +22,7 @@ from .reporting import OfflineReport, SENSITIVE
 
 STATES = ("VERIFIED", "MISMATCH", "MISSING", "NOT_VERIFIED", "EXTERNAL_REFERENCE", "INVALID_REFERENCE")
 ALLOWED_FILES = ("logs/day2-before.json", "logs/day2-after.json", "logs/day3-final.json")
-ALLOWED_TREES = ("lab/day3/artifacts", "evidence/day4")
+ALLOWED_TREES = ("lab/ids-waf-lab/artifacts", "evidence/day4")
 CHANNELS = {"automatic", "manual", "pf", "log_analysis", "snapshot_input", "local_artifact"}
 MAX_BINDINGS = 16384
 MAX_FILE_BYTES = 64 * 1024 * 1024

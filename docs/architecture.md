@@ -311,7 +311,7 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 ## 13. 관련 자료
 
 - [프로젝트 개요](../README.md)
-- [검증 범위와 결과](portfolio-evidence-mapping.md)
+- [검증 범위와 결과](audit-evidence-mapping.md)
 - 소스 코드 및 설정 근거: `../sql/`, `../asset_management/`, `../analysis/`, `../verification/`, `../infra/aws/terraform/`
 
 ## 14. AWS 자산·설정 점검 확장

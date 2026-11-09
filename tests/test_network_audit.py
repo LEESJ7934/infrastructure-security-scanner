@@ -13,7 +13,7 @@ from config_audit.collectors import network_devices as net
 from scripts.run_network_audit import main
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("lab_network_normalizer", ROOT / "lab/phase2-network/collect.py")
+spec = importlib.util.spec_from_file_location("lab_network_normalizer", ROOT / "lab/network-device-lab/collect.py")
 normalizer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(normalizer)
 
@@ -166,7 +166,7 @@ class NetworkAuditTests(unittest.TestCase):
         self.assertIsNone(normalizer.guard(data)["input_policy"])
 
     def test_compose_isolation_contract(self):
-        doc=json.loads((ROOT/"lab/phase2-network/compose.json").read_text())
+        doc=json.loads((ROOT/"lab/network-device-lab/compose.json").read_text())
         self.assertEqual(len(doc["services"]),3)
         for service in doc["services"].values():
             self.assertNotIn("ports",service);self.assertNotIn("volumes",service)

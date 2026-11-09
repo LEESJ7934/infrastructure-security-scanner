@@ -64,15 +64,15 @@ class WebWasAuditTests(unittest.TestCase):
         self.assertEqual(w.audit(self.after, synthetic=True)["results"][4]["status"], "NEEDS_REVIEW")
 
     def test_unknown_nginx_include_not_inferred(self):
-        raw = (w.ROOT / "lab/phase2-web-was/after/nginx.conf").read_text()
+        raw = (w.ROOT / "lab/web-was-lab/after/nginx.conf").read_text()
         self.assertTrue(all(v is None for v in w.nginx_values(raw + "\ninclude /tmp/other.conf;").values()))
 
     def test_nginx_missing_directive_not_assumed_default(self):
-        raw = (w.ROOT / "lab/phase2-web-was/after/nginx.conf").read_text().replace("server_tokens off;", "")
+        raw = (w.ROOT / "lab/web-was-lab/after/nginx.conf").read_text().replace("server_tokens off;", "")
         self.assertTrue(all(v is None for v in w.nginx_values(raw).values()))
 
     def test_tomcat_missing_autodeploy_not_assumed_safe(self):
-        raw = (w.ROOT / "lab/phase2-web-was/after/server.xml").read_text().replace('autoDeploy="false"', '')
+        raw = (w.ROOT / "lab/web-was-lab/after/server.xml").read_text().replace('autoDeploy="false"', '')
         self.assertIsNone(w.tomcat_values(raw, {})["autodeploy_disabled"])
 
     def test_tomcat_malformed_and_entity_rejected(self):
@@ -80,11 +80,11 @@ class WebWasAuditTests(unittest.TestCase):
             with self.subTest(raw=raw), self.assertRaises(w.WebInputError): w.tomcat_values(raw, {})
 
     def test_unknown_context_does_not_pass(self):
-        raw = (w.ROOT / "lab/phase2-web-was/after/server.xml").read_text().replace("</Host>", '<Context path="/manager" /></Host>')
+        raw = (w.ROOT / "lab/web-was-lab/after/server.xml").read_text().replace("</Host>", '<Context path="/manager" /></Host>')
         self.assertTrue(all(v is None for v in w.tomcat_values(raw, {}).values()))
 
     def test_default_apps_inventory_has_to_be_complete(self):
-        raw = (w.ROOT / "lab/phase2-web-was/after/server.xml").read_text()
+        raw = (w.ROOT / "lab/web-was-lab/after/server.xml").read_text()
         self.assertIsNone(w.tomcat_values(raw, {"manager": False})["default_apps_absent"])
 
     def test_json_missing_and_invalid(self):
@@ -171,7 +171,7 @@ class WebWasAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(w.WebInputError, "remote_docker_rejected"): w.docker_scope()
 
     def test_compose_isolation_and_stages(self):
-        compose = json.loads((w.ROOT / "lab/phase2-web-was/compose.json").read_text())
+        compose = json.loads((w.ROOT / "lab/web-was-lab/compose.json").read_text())
         self.assertEqual(compose["name"], w.PROJECT)
         self.assertTrue(compose["networks"]["backend"]["internal"])
         for service in compose["services"].values():
@@ -180,7 +180,7 @@ class WebWasAuditTests(unittest.TestCase):
             self.assertTrue(service["read_only"])
             self.assertNotIn("privileged", service)
         for name in ("nginx", "tomcat"):
-            raw = (w.ROOT / f"lab/phase2-web-was/start-{name}.sh").read_bytes()
+            raw = (w.ROOT / f"lab/web-was-lab/start-{name}.sh").read_bytes()
             self.assertNotIn(b"\r", raw)
 
     def test_pdf_synthetic_label_and_eight_checks(self):
@@ -192,7 +192,7 @@ class WebWasAuditTests(unittest.TestCase):
         for check in w.CHECKS: self.assertIn(check, text)
 
     def simulated_live(self, stage="after", broken_startup=False, failed_http=False):
-        base = w.ROOT / "lab/phase2-web-was" / stage
+        base = w.ROOT / "lab/web-was-lab" / stage
         configs = {"nginx": (base / "nginx.conf").read_text(), "tomcat": (base / "server.xml").read_text()}
         nodes = {p: {"Id": p, "Image": "sha256:" + "a" * 64, "State": {"StartedAt": "2020-01-01T00:00:00Z"}} for p in w.VERSIONS}
         def query(args):

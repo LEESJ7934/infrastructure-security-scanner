@@ -16,7 +16,7 @@ from config_audit.collectors.network_devices import NetworkInputError
 from scripts.run_network_packets import main
 
 ROOT=Path(__file__).resolve().parents[1]
-spec=importlib.util.spec_from_file_location('packet_header_decoder',ROOT/'lab/phase2-packet/capture.py')
+spec=importlib.util.spec_from_file_location('packet_header_decoder',ROOT/'lab/network-packet-lab/capture.py')
 capture=importlib.util.module_from_spec(spec);spec.loader.exec_module(capture)
 
 
@@ -112,7 +112,7 @@ class PacketTests(unittest.TestCase):
         self.assertEqual(packets.forward_rules(doc,packets.PROFILES['fabric'])['status'],'NEEDS_REVIEW')
 
     def test_shared_fabric_isolated_no_privileged_host_or_ports(self):
-        doc=json.loads((ROOT/'lab/phase2-packet/compose.json').read_text())
+        doc=json.loads((ROOT/'lab/network-packet-lab/compose.json').read_text())
         self.assertEqual(doc['name'],'scanner-p2pkt');self.assertTrue(doc['networks']['fabric']['internal'])
         self.assertEqual(doc['networks']['fabric']['ipam']['config'][0]['subnet'],'10.204.0.0/16')
         for name,service in doc['services'].items():

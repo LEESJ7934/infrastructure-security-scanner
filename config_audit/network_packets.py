@@ -137,7 +137,7 @@ def path_points(events, source, destination):
 
 class Capture:
     def __init__(self, args, name, source, destination):
-        program=(Path(__file__).resolve().parents[1]/"lab/phase2-packet/capture.py").read_text(encoding='utf-8')
+        program=(Path(__file__).resolve().parents[1]/"lab/network-packet-lab/capture.py").read_text(encoding='utf-8')
         self.process=subprocess.Popen(args+["exec","-i",name,"python3","-u","-c",program,source,destination],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,encoding='utf-8')
         with ThreadPoolExecutor(max_workers=1) as pool:
             ready=pool.submit(self.process.stdout.readline,4096)

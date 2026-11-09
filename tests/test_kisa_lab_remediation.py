@@ -27,7 +27,7 @@ def linux_row(mode):
 
 class KisaRemediationConfigurationTests(unittest.TestCase):
     def test_hardened_linux_replay_sets_0400_shadow(self):
-        src = (ROOT / "lab/phase2-linux-mysql/start-linux.py").read_text(encoding="utf-8")
+        src = (ROOT / "lab/linux-mysql-retest/start-linux.py").read_text(encoding="utf-8")
         self.assertIn("stage == 'before' else 0o400", src)
         self.assertTrue(linux_predicate("LINUX-LAB-003", linux_row(0o400)["results"][0]["observed_value"]))
         self.assertEqual(review_linux(linux_row(0o400))[0]["kisa_recommendation_result"], "PASS")

@@ -251,7 +251,7 @@ class AwsAuditLabTests(unittest.TestCase):
         doc,audit=live.collect(scope,targets,expected_account=ACCOUNT,allowed_regions=['ap-northeast-2'],factory=live.mock_factory(script))
         self.assertIn('ENI_filtered_outside_explicit_resource_scope',audit['warnings']);self.assertFalse(doc['sections']['VPC-01']['pagination']['complete'])
     def test_terraform_source_has_no_data_modules_or_compute(self):
-        root=Path(__file__).parents[1]/'infra/aws/phase2-audit-lab';text='\n'.join(p.read_text() for p in root.glob('*.tf'))
+        root=Path(__file__).parents[1]/'infra/aws/security-audit-lab';text='\n'.join(p.read_text() for p in root.glob('*.tf'))
         for forbidden in ['resource "aws_instance"','resource "aws_nat_gateway"','resource "aws_eip"','resource "aws_default_','data "','module "','import {','local-exec','remote-exec']:
             self.assertNotIn(forbidden,text)
         self.assertIn('phase2-audit-lab.tfstate',text);self.assertIn('allowed_account_ids',text)

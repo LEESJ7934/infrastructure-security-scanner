@@ -4,13 +4,13 @@
 
 서버·네트워크·DBMS·WEB/WAS·보안장비 5개 분야와 AWS를 대상으로, 승인 범위를 정하고 설정을 읽어 내부 LAB 기준으로 판단한 뒤 JSON/PDF와 증적 참조로 전달합니다. 실제 고객사나 운영환경의 진단·컨설팅 수행 경험, KISA 공식 인증을 주장하지 않습니다.
 
-**KISA 2026 선정 범위:** 공식 PDF 873쪽을 대조해 16개 항목을 고정했습니다. 기존 Linux/Windows 6개에 실제 WEB/WAS 3개·MySQL 3개·독립 AWS CA-07을 추가해 **13개 실측 PASS(81.25%)**, S-06/S-07/CA-09는 실제 부분 수집 후 **NEEDS_REVIEW 3개**입니다. 100% 완료를 주장하지 않습니다. [공식 매핑·자산](docs/kisa-2026-selection-freeze.md), [실측 증적·미완료 결과](docs/kisa-2026-final-scope-result.md), [자동 재수집·남은 조건](docs/kisa-2026-external-followup.md), [면접 사례](docs/kisa-2026-interview.md)를 제공합니다. 이전 6/16 기록과 원본 실행 시각은 history에 보존했습니다.
+**KISA 2026 선정 범위:** 공식 PDF 873쪽을 대조해 16개 항목을 고정했습니다. 기존 Linux/Windows 6개에 실제 WEB/WAS 3개·MySQL 3개·독립 AWS CA-07을 추가해 **13개 실측 PASS(81.25%)**, S-06/S-07/CA-09는 실제 부분 수집 후 **NEEDS_REVIEW 3개**입니다. 100% 완료를 주장하지 않습니다. [공식 매핑·자산](docs/kisa-2026-selection-freeze.md), [실측 증적·미완료 결과](docs/kisa-2026-final-scope-result.md), [자동 재수집·남은 조건](docs/kisa-2026-external-followup.md), [대표 진단 사례](docs/kisa-2026-case-studies.md)를 제공합니다. 이전 6/16 기록과 원본 실행 시각은 history에 보존했습니다.
 
 ## 팀 프로젝트와 개인 확장
 
 - **팀 프로젝트 기반(2025.12~2026.01):** 포트·서비스 식별, CVE 후보, DB 저장, 위험평가 및 보고서 흐름을 출발점으로 사용했습니다. 기존 팀 기능 전체를 개인 단독 개발로 설명하지 않습니다.
 - **개인 후속 확장(2026.10~11):** 공통 설정 진단 엔진과 대상별 수집·판정, 증적 관리, 재점검 비교, JSON/PDF 보고서를 개발하고 격리 실습을 진행했습니다. 자동·수동 확인과 합성·실제 관찰 결과를 구분합니다.
-- 대상별 진단항목·수행 근거·검증 한계: [진단 항목별 검증 근거](docs/portfolio-evidence-mapping.md).
+- 대상별 진단항목·수행 근거·검증 한계: [진단 항목별 검증 근거](docs/audit-evidence-mapping.md).
 
 ## 기술진단 절차
 
@@ -38,7 +38,7 @@ flowchart LR
 | 보안장비 — ModSecurity | 엔진·감사·본문·CRS 설정 및 GET/PUT와 감사 이벤트 상관분석 | WAF 6개 PASS 요약 존재. 원시 HTTP/감사 로그가 없어 현재 파일만으로 실제 차단을 독립 재확인할 수 없음 |
 | 추가 — AWS | IAM/SG/VPC/NACL/CloudTrail/Flow Logs P1 8개. Scope 제한 읽기 전용 수집·정규화 | 독립 LAB 4건 FAIL→PASS. CT-01 FAIL, IAM-03 NEEDS_REVIEW 유지. 설정 판정이며 패킷 차단·로그 전달 증명 아님 |
 
-**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 이전 IPS 전용 실험은 NFQUEUE 인라인 차단 검증을 완료하지 못했으므로, 현재 범위와 무관한 IPS 전용 구현·테스트·LAB 파일을 정리했습니다. 기존 실험 기록은 Git 커밋 이력에서 확인할 수 있습니다. 다른 Day3 IDS/WAF 실습 파일은 과거 실험과 보고서 재현 근거로 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 적용 범위와 근거](docs/portfolio-evidence-mapping.md)에 있습니다.
+**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 이전 IPS 전용 실험은 NFQUEUE 인라인 차단 검증을 완료하지 못했으므로, 현재 범위와 무관한 IPS 전용 구현·테스트·LAB 파일을 정리했습니다. 기존 실험 기록은 Git 커밋 이력에서 확인할 수 있습니다. 다른 Day3 IDS/WAF 실습 파일은 과거 실험과 보고서 재현 근거로 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/audit-evidence-mapping.md), 구현 경계는 [최종 적용 범위와 근거](docs/audit-evidence-mapping.md)에 있습니다.
 
 ## 대표 취약 설정 → 개선 → 재점검
 
@@ -60,13 +60,13 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - AWS 독립 LAB: SG-01/NACL-01/VPC-01/FL-01 FAIL→PASS, 개선 관찰 4건. CT-01과 IAM-03은 미해결로 남깁니다.
 - OPNsense: WAN→방화벽 TCP 443/22 및 LAN→WAN ICMP의 **수동 시험 범위**에 한정합니다.
 
-모든 수치는 **기존 로컬 자료 대조**에 근거하며 2026-11-07 문서 대조 시 장비를 새로 조회한 결과는 아닙니다. [근거 매핑의 증적 목록](docs/portfolio-evidence-mapping.md#증적-및-보고서-목록)에 실제 파일 경로와 없는 자료를 구분했습니다.
+모든 수치는 **기존 로컬 자료 대조**에 근거하며 2026-11-07 문서 대조 시 장비를 새로 조회한 결과는 아닙니다. [근거 매핑의 증적 목록](docs/audit-evidence-mapping.md#증적-및-보고서-목록)에 실제 파일 경로와 없는 자료를 구분했습니다.
 
 ## JSON/PDF와 공개 샘플
 
 공통 모델, 증적 경로 제한·SHA-256, 명시적 before/after 관계, 판정 채널·범위·시각을 보고서에 연결합니다. 해시 일치는 **현재 파일 무결성**이며 수집 출처의 진위 인증이나 완전성 증명이 아닙니다. 재점검 개선 관찰도 조치의 인과관계 전체를 증명하지 않습니다.
 
-- [공개 합성 PDF](examples/day5-demo/sample-integrated-report.pdf) · [합성 JSON](examples/day5-demo/sample-integrated-report.json) · [샘플 설명](examples/day5-demo/README.md)
+- [공개 합성 PDF](examples/integrated-report-sample/sample-integrated-report.pdf) · [합성 JSON](examples/integrated-report-sample/sample-integrated-report.json) · [샘플 설명](examples/integrated-report-sample/README.md)
 - [통합 보고서 구조](docs/integrated-report.md) · [증적 인덱스](docs/evidence-integrity.md) · [재점검 비교](docs/remediation-comparison.md)
 
 실제 `logs/`, `reports/`, `evidence/`, AWS 계정/자산 Scope와 Terraform state·개인 변수는 공개 샘플이 아닙니다. 링크가 아닌 로컬 경로로만 설명하며 원본을 Git에 추가하지 않습니다. 초기 통합 보고서의 25개 시점별 레코드는 별도 과거 기록이며 후속 실습의 개선 성과를 포함한 합계가 아닙니다.
@@ -78,7 +78,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - AWS LAB 정리는 완료되지 않았습니다. 현재 자원·비용은 별도 인증/조회가 필요하며 기존 state·증적을 보존합니다.
 - Git 최종 통합 기준(2026-11-07, Windows/Python 3.12.10, `99c8f10`): 핵심 **322개 통과**, 전체 **1,300개 통과 / 1개 실패**. 기존 WSL `/bin/bash` 오류를 성공으로 처리하지 않습니다.
 - 2026-11-09 파일 전수 정리 검증(PR #9): GitHub CI에서 **1,288개 테스트 중 1,266개 성공·22개 건너뜀·실패 0개**를 확인했습니다. 건너뛴 항목은 이 저장소에 포함되지 않은 로컬 Day2/Day3 저장 증적이 필요한 테스트입니다. Python 컴파일·비밀정보 검사도 성공했지만, 실제 장비 동작이나 미제공 증적의 재검증 완료를 뜻하지 않습니다. [실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42596973037).
-- 330/381/694개 등의 과거 수치는 당시 단계·환경의 기록입니다. 현재 CI 성공 여부나 새 실행 결과로 대신 사용하지 않습니다. 테스트 실행별 기록은 [테스트 기준표](docs/portfolio-evidence-mapping.md#테스트-기록과-기준)에 구분합니다.
+- 330/381/694개 등의 과거 수치는 당시 단계·환경의 기록입니다. 현재 CI 성공 여부나 새 실행 결과로 대신 사용하지 않습니다. 테스트 실행별 기록은 [테스트 기준표](docs/audit-evidence-mapping.md#테스트-기록과-기준)에 구분합니다.
 
 ## 오프라인 실행·재현
 
@@ -89,7 +89,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p "test_*.py"
 
 # 공개 합성 자료: 실제 점검 결과나 VERIFIED 증적을 만들지 않음
-.\.venv\Scripts\python.exe -B -m scripts.generate_day5_sample
+.\.venv\Scripts\python.exe -B -m scripts.generate_report_sample
 
 # 명시적인 로컬 입력이 별도로 있을 때만 기존 저장 결과를 오프라인 통합
 .\.venv\Scripts\python.exe -B -m scripts.run_integrated_report
@@ -106,16 +106,16 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 
 ## 상세 문서와 코드
 
-- [검증 기록](docs/portfolio-evidence-mapping.md#테스트-기록과-기준) · [아키텍처](docs/architecture.md) · [진단 항목별 검증 근거](docs/portfolio-evidence-mapping.md)
-- 서버: [Linux/MySQL 실습](docs/phase2-linux-mysql-recovery.md) · [Windows](docs/phase2-windows-server.md)
-- 네트워크: [설정 진단](docs/phase2-network-devices.md) · [패킷 경유](docs/phase2-network-packets.md)
-- WEB/WAS: [Nginx/Tomcat](docs/phase2-web-was.md)
+- [검증 기록](docs/audit-evidence-mapping.md#테스트-기록과-기준) · [아키텍처](docs/architecture.md) · [진단 항목별 검증 근거](docs/audit-evidence-mapping.md)
+- 서버: [Linux/MySQL 실습](docs/linux-mysql-retest.md) · [Windows](docs/windows-server-audit.md)
+- 네트워크: [설정 진단](docs/network-device-audit.md) · [패킷 경유](docs/network-packet-validation.md)
+- WEB/WAS: [Nginx/Tomcat](docs/web-was-audit.md)
 - 보안장비: [OPNsense](docs/opnsense-audit.md) · [FW-04 PF](docs/opnsense-pf-snapshots.md) · [FW-05 로그](docs/opnsense-log-rule-evidence.md)
-- AWS: [오프라인](docs/phase2-aws-offline.md) · [읽기 전용 수집](docs/phase2-aws-collection.md) · [범위 스키마](docs/phase2-aws-scope-v2.md) · [독립 Terraform LAB](infra/aws/phase2-audit-lab/README.md)
+- AWS: [오프라인](docs/aws-offline-audit.md) · [읽기 전용 수집](docs/aws-live-collection.md) · [범위 스키마](docs/aws-scope-validation.md) · [독립 Terraform LAB](infra/aws/security-audit-lab/README.md)
 - 기존 코드: [scanner](scanner/) · [analysis](analysis/) · [Linux SSH](config_audit/collectors/linux_ssh.py) · [MySQL](config_audit/collectors/mysql_config.py) · [ModSecurity](config_audit/collectors/modsecurity.py) · [AWS 인벤토리](cloud_security/aws_inventory.py) · [SG 분석](cloud_security/aws_sg_analyzer.py)
 
 ## 문서 및 커밋 관리
 
-- 현재 프로젝트 범위와 결과는 이 README, [검증 근거](docs/portfolio-evidence-mapping.md), [KISA 선정 결과](docs/kisa-2026-final-scope-result.md)를 우선 기준으로 봅니다. 과거 단계 문서는 당시 기록이며 현재 검증 완료 범위를 대신하지 않습니다.
+- 현재 프로젝트 범위와 결과는 이 README, [검증 근거](docs/audit-evidence-mapping.md), [KISA 선정 결과](docs/kisa-2026-final-scope-result.md)를 우선 기준으로 봅니다. 과거 단계 문서는 당시 기록이며 현재 검증 완료 범위를 대신하지 않습니다.
 - 문서 중복 생성 방지, 증적 보존, 링크 확인과 한국어 커밋 메시지 형식은 [작업 규칙](AGENTS.md)을 따릅니다.
 - 이후 커밋 제목은 `유형: 변경 대상과 목적` 형식으로 작성합니다. 예: `문서: 증적 링크와 최종 결과 설명 정리`. 기존 공개 커밋은 이력 보존을 위해 재작성하지 않습니다.

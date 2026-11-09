@@ -4,7 +4,7 @@
 
 ## 구현과 결과 분리
 
-`config_audit/collectors/opnsense_pf.py`가 파일만 읽어 PF 규칙을 분석한다. 외부 명령·SSH·API를 실행하지 않는다. `scripts/run_day4_audit.py`의 선택 옵션으로 연결했으며, 상태 판정은 기존 `config_audit.engine.evaluate()`를 사용한다. 기존 OPNsense API 수집기, FW-01~06 자동 판정 및 수동 증적 검증기는 변경하지 않았다.
+`config_audit/collectors/opnsense_pf.py`가 파일만 읽어 PF 규칙을 분석한다. 외부 명령·SSH·API를 실행하지 않는다. `scripts/run_opnsense_lab_audit.py`의 선택 옵션으로 연결했으며, 상태 판정은 기존 `config_audit.engine.evaluate()`를 사용한다. 기존 OPNsense API 수집기, FW-01~06 자동 판정 및 수동 증적 검증기는 변경하지 않았다.
 
 FW-04의 기존 `status`, `automatic_status`, `api_results`, `manual_verification`은 유지하고, 별도 `pf_snapshot`에 스냅샷 분석 결과를 기록한다. API 403이 발생한 실행에서 스냅샷이 제한 범위 PASS여도 기존 자동 ERROR와 HTTP 403은 지워지지 않는다. 수동 PASS 역시 자동 결과를 대체하지 않는다.
 
@@ -16,7 +16,7 @@ FW-04의 기존 `status`, `automatic_status`, `api_results`, `manual_verificatio
 
 ```powershell
 Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
-.\.venv\Scripts\python.exe -B -m scripts.run_day4_audit `
+.\.venv\Scripts\python.exe -B -m scripts.run_opnsense_lab_audit `
   --pf-rules-evidence '.\evidence\day4\fw04-active-rules.txt' `
   --pf-rules-detail '.\evidence\day4\fw04-active-rules-detail.txt' `
   --pf-rules-archive '.\evidence\day4\fw04-rules.tar' `
@@ -28,7 +28,7 @@ Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
 파일 하나만 분석할 수도 있다.
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m scripts.run_day4_audit `
+.\.venv\Scripts\python.exe -B -m scripts.run_opnsense_lab_audit `
   --pf-rules-evidence '.\evidence\day4\fw04-active-rules.txt' `
   --pf-rules-sha256 6efaac2b285f0b677da6d018eedf40b598814eba7d11dc6c50504979d3d7719a
 ```
@@ -116,10 +116,10 @@ GUI↔PF 식별자 연결은 운영자가 읽기 전용으로 확보한 규칙 �
 
 ## 테스트
 
-추가한 `tests/test_day4_pf_evidence.py`는 합성 PF 데이터만 사용한 unittest 25개다. 실제 장비/원본 tar를 테스트 fixture로 저장하지 않았다. 정상 제한 범위 PASS, 누락/부분 수집, 상위 Quick 허용·하위 차단, non-Quick 순서, 문법 오류, 미지원 구문, 앵커·테이블·동적 주소, 인터페이스 부정/그룹/IPv6, 빈 파일, 해시 및 상세 출력 불일치, tar 무결성·경로 탈출, 비밀 비출력, API 403 독립 보존 및 오프라인 무통신을 검증했다.
+추가한 `tests/test_opnsense_pf_evidence.py`는 합성 PF 데이터만 사용한 unittest 25개다. 실제 장비/원본 tar를 테스트 fixture로 저장하지 않았다. 정상 제한 범위 PASS, 누락/부분 수집, 상위 Quick 허용·하위 차단, non-Quick 순서, 문법 오류, 미지원 구문, 앵커·테이블·동적 주소, 인터페이스 부정/그룹/IPv6, 빈 파일, 해시 및 상세 출력 불일치, tar 무결성·경로 탈출, 비밀 비출력, API 403 독립 보존 및 오프라인 무통신을 검증했다.
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day4_pf_evidence tests.test_day4_audit tests.test_day4_manual_evidence -v
+.\.venv\Scripts\python.exe -B -m unittest tests.test_opnsense_pf_evidence tests.test_opnsense_lab_audit tests.test_opnsense_manual_evidence -v
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

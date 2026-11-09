@@ -94,7 +94,7 @@ JSON 직렬화 가능한 공통 모델이며 보고서 생성 시각은 그대�
 신뢰할 프로젝트 루트 내부에서도 다음 경로만 허용한다.
 
 - 단일 파일: `logs/day2-before.json`, `logs/day2-after.json`, `logs/day3-final.json`
-- 증적 트리: `lab/day3/artifacts/`, `evidence/day4/`
+- 증적 트리: `lab/ids-waf-lab/artifacts/`, `evidence/day4/`
 
 허용 트리는 탐색 요청을 뜻하지 않는다. 입력에서 명시한 파일만 읽는다.
 `.env*`, `.git`, SSH 키 이름, 개인키 확장자, 자격증명·Secret·Token 파일
