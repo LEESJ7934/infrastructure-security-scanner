@@ -45,7 +45,7 @@ for p in files:
         try:
             content=(ROOT/p).read_text("utf-8")
         except UnicodeDecodeError:continue
-        if p not in md and any(old in content for old in removed):
+        if p not in md and p != "scripts/_temp_markdown_link_audit.py" and any(old in content for old in removed):
             direct_refs.append([p,"stale_deleted_document_name"])
 print("MD_TOTAL",len(md),"MD_LINKS_CHECKED",count)
 print("BROKEN_RELATIVE_LINKS",broken)
