@@ -17,7 +17,7 @@ from pypdf import PdfReader
 from api.report_pdf import render_day5_report_pdf, render_report_pdf
 from config_audit.final_report import (FILES, INPUTS, FinalReportError, build_final_snapshot,
                                        content_sha256, generate_final_report, scrub)
-from scripts.run_day5_report import main
+from scripts.run_integrated_report import main
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -257,12 +257,12 @@ class FinalReportBoundaryTests(unittest.TestCase):
 
     def test_cli_success_and_partial_exit_codes(self):
         for status,code in (('COMPLETE_WITH_LIMITATIONS',0),('PARTIAL',2)):
-            with patch('scripts.run_day5_report.generate_final_report',return_value={'completion_status':status}),redirect_stdout(StringIO()):
+            with patch('scripts.run_integrated_report.generate_final_report',return_value={'completion_status':status}),redirect_stdout(StringIO()):
                 self.assertEqual(main([]),code)
 
     def test_cli_error_does_not_echo_credentials(self):
         buffer=StringIO()
-        with patch('scripts.run_day5_report.generate_final_report',side_effect=ValueError('API_SECRET=FAKE_LEAK')),redirect_stderr(buffer):
+        with patch('scripts.run_integrated_report.generate_final_report',side_effect=ValueError('API_SECRET=FAKE_LEAK')),redirect_stderr(buffer):
             self.assertEqual(main([]),1)
         self.assertNotIn('FAKE_LEAK',buffer.getvalue())
 

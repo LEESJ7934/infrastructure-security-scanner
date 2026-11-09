@@ -94,7 +94,7 @@ def render(snapshot, output_path, *, sample=False):
                    **({'invariant': 1} if sample else {}))
     doc.addPageTemplates(PageTemplate(id="Day5", frames=[Frame(42, 52, usable, height-94,
                                                                leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)], onPage=frame))
-    story += [Spacer(1, 74), p("SAMPLE / 합성 데이터 / 실제 점검 결과 아님" if sample else "INFRASTRUCTURE SECURITY / DAY 5", subheading), Spacer(1, 24),
+    story += [Spacer(1, 74), p("SAMPLE / 합성 데이터 / 실제 점검 결과 아님" if sample else "INFRASTRUCTURE SECURITY / INTEGRATED AUDIT", subheading), Spacer(1, 24),
               p("통합 인프라 보안\n취약점 진단\n결과보고서", title),
               HRFlowable(width="100%", thickness=2, color=TEAL, spaceAfter=20),
               p("Linux · MySQL · Suricata · ModSecurity · OPNsense", subheading),

@@ -1,4 +1,4 @@
-"""Generate Day5 local JSON/PDF artifacts; no VM, DB, API or collector calls."""
+"""Generate offline integrated JSON/PDF artifacts; no VM, DB, API or collector calls."""
 
 import argparse
 import json
