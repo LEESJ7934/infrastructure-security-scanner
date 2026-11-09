@@ -118,10 +118,10 @@ if (-not [IO.Directory]::Exists($parent)) {
     throw 'KISA_LAB_OUTPUT_DIRECTORY_NOT_FOUND'
 }
 $bytes = New-Object System.Text.UTF8Encoding($false)
-$stream = New-Object System.IO.FileStream($full, [System.IO.FileMode]::CreateNew,
+$stream = [System.IO.File]::Open($full, [System.IO.FileMode]::CreateNew,
     [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
 try {
-    $writer = New-Object System.IO.StreamWriter($stream, $bytes)
+    $writer = [System.IO.StreamWriter]::new($stream, $bytes)
     try { $writer.Write($json) ; $writer.Flush() }
     finally { $writer.Dispose() }
 }
