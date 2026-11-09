@@ -166,7 +166,7 @@ IP/포트별 관리 접근 노출을 제한하되 자동 정책 변경은 하지
 
 ### ModSecurity
 
-- 구현/기준: [modsecurity.py](../config_audit/collectors/modsecurity.py), [Day3 실행기](../scripts/run_day3_audit.py), [역사적 기록](progress/DAY3.md).
+- 구현/기준: [modsecurity.py](../config_audit/collectors/modsecurity.py), [Day3 실행기](../scripts/run_day3_audit.py), [역사적 기록](../lab/day3/README.md#과거-day3-실습-개발검증-기록).
 - WAF-01 SecRuleEngine On, WAF-02 SecAuditEngine RelevantOnly, WAF-03 JSON 감사 로그,
   WAF-04 요청 본문 검사 On, WAF-05 CRS 로드/차단 수준 1·inbound 임계 5,
   WAF-06 GET 200·PUT 403·동일 요청 ID/URI의 규칙 911100/949110 감사 이벤트를 확인하는 코드가 있다.
@@ -273,7 +273,7 @@ CI 배지는 동적 상태이며 이 로컬 기록이 새 GitHub Actions 성공�
 
 ## 초기 팀 프로젝트·격리 실습 검증 기록 (2026-10-20, 과거 자료)
 
-다음 기록은 2026-10-20 무렵의 초기 팀 프로젝트 및 격리 실습 관찰이다. 현재 KISA 16개 항목 판정 및 2026-11-09 CI와 별개이며, 운영 환경의 진단·인증 완료를 뜻하지 않는다. 이전 별도 `docs/validation.md`에 있던 고유 결과와 증적 링크를 통합했다.
+다음 기록은 2026-10-20 무렵의 초기 팀 프로젝트 및 격리 실습 관찰이다. 현재 KISA 16개 항목 판정 및 2026-11-09 CI와 별개이며, 운영 환경의 진단·인증 완료를 뜻하지 않는다. 기존 분리된 검증 문서의 고유 결과와 증적 링크를 통합했다.
 
 ### 1. 과거 자동 테스트와 CI
 
