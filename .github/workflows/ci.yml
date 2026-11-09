@@ -30,6 +30,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m compileall -q asset_management scanner db scripts analysis verification api cloud_security config_audit tests
+      - name: 전체 저장소 파일·참조 정적 감사
+        run: python scripts/_temporary_repository_audit.py
 
   secrets:
     # Independent of test/compile results: never suppress this check after a failure.
