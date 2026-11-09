@@ -30,6 +30,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m compileall -q asset_management scanner db scripts analysis verification api cloud_security config_audit tests
+      - name: Markdown 문서 전체 상대 링크 확인
+        run: python scripts/_temp_markdown_link_audit.py
 
   secrets:
     # Independent of test/compile results: never suppress this check after a failure.
