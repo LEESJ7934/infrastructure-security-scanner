@@ -1,48 +1,78 @@
-# KISA 2026 선정 범위 최종 진단 결과
+# KISA 2026 선정 범위 실제 LAB 재점검 결과
 
-선정 16개 중 **실제 실측 PASS 6개(37.5%)**, NOT_TESTED 10개. 전체 100% 목표는 미달성이다. 이 문서는 서로 다른 일회용 Linux/Windows LAB의 증적 대장이며 하나의 동시 스냅샷이 아니다. 고객사 프로젝트·주요정보통신기반시설 전체 진단·인증 완료를 뜻하지 않는다.
+**선정 16개 중 실측 PASS 13개(81.25%), NEEDS_REVIEW 3개. 100% 목표는 아직 미달성이다.** NOT_TESTED 0은 모두 전체 검증됐다는 뜻이 아니다. OPNsense 2개와 CA-09는 실제 부분 수집 후 미충족 조건이 남아 검토 필요다.
 
-## 판단과 증적
+## 기준·범위·원본 보존
 
-873쪽 공식 PDF를 직접 대조한 매핑·자산·기준은 [동결 범위](kisa-2026-selection-freeze.md), 구조화 결과는 [JSON 증적 대장](kisa-2026-final-scope-result.json)에 있다. 자동입력에 VERIFIED_LAB를 선언해 PASS를 늘리는 기능은 없다. 아래 VERIFIED_LAB는 GitHub 실행 성공, 해당 단계의 assertions, 원시 JSON, 내려받은 ZIP 해시를 검토한 대장 표기다. 오프라인 재판정의 실측 집계 0과 구분한다.
+공식 PDF 873쪽의 ID·정식 명칭·페이지·권고 기준과 분모 16개는 [동결 범위](kisa-2026-selection-freeze.md)대로 유지했다. 웹 항목은 Nginx와 Tomcat 모두 충족해야 1개 PASS다. VTY·Linux 방화벽을 혼동하지 않으며 고객사 수행·공식 인증·KISA 전체 준수를 주장하지 않는다.
 
-| 항목 | 조치 전 | 조치 후 | 최종 | 원시 수집 시각(UTC) |
+기존 6개 PASS 행의 관찰값·수집 시각·실행/아티팩트 링크는 변경하지 않았다. [6/16 원본 JSON](history/kisa-2026-6of16.json)과 [당시 결과 문서](history/kisa-2026-6of16.md)를 보존했다. 최신 [구조화 대장](kisa-2026-final-scope-result.json)은 서로 다른 환경·시각의 검토된 증적 대장이며 동시 스냅샷이 아니다. 저장자료 판정의 PASS나 SYNTHETIC 테스트를 VERIFIED_LAB으로 승격하지 않는다.
+
+## 공식 항목별 결과
+
+| ID | 자산 | 최종 | 실제 수집 시각(원문 UTC) | 핵심 근거/한계 |
 |---|---|---|---|---|
-| U-01 | PermitRootLogin yes | no; TCP 22만 관찰; LAB의 Include/Match 없음 확인 | PASS | 2026-11-09T07:38:26.600807+00:00 |
-| U-18 | root 소유 0666 | root 소유 정규 파일 0400, 링크 아님 | PASS | 같은 Linux 수집 |
-| W-02 | RID 501 비활성 | 비활성 재확인(기존 PASS) | PASS | 2026-11-09T07:37:42.9252312+00:00 |
-| W-04 | 임계값 10 | 5, secedit 재수집 | PASS | 같은 Windows 수집 |
-| W-08 | 잠금/초기화 10/10분 | 60/60분, secedit 재수집 | PASS | 같은 Windows 수집 |
-| W-64 | 유효 프로필 3개 활성 | ActiveStore 3개 활성 재확인(기존 PASS) | PASS | 같은 Windows 수집 |
+| U-01 | linux | PASS | 2026-11-09T07:38:26.600807+00:00 | 기존 단순 SSH 템플릿 yes→no, 해당 컨테이너 범위 |
+| U-18 | linux | PASS | 2026-11-09T07:38:26.600807+00:00 | 기존 root 정규 파일 0666→0400, 링크 아님 |
+| W-02 | windows | PASS | 2026-11-09T07:37:42.9252312+00:00 | 기존 RID501 비활성 재확인 |
+| W-04 | windows | PASS | 2026-11-09T07:37:42.9252312+00:00 | 기존 secedit 임계값 10→5 |
+| W-08 | windows | PASS | 2026-11-09T07:37:42.9252312+00:00 | 기존 secedit 잠금/초기화 10/10→60/60분 |
+| W-64 | windows | PASS | 2026-11-09T07:37:42.9252312+00:00 | 기존 ActiveStore 3개 프로필 활성 재확인 |
+| WEB-04 | nginx, tomcat | PASS | 2026-11-09T08:33:05.385990+00:00 | 두 제품의 설정·실제 파일 목록·디렉터리 HTTP, FAIL→PASS |
+| WEB-07 | nginx, tomcat | PASS | 2026-11-09T08:33:05.385990+00:00 | 두 제품의 실제 배포 루트 불필요 파일 제거 및 HTTP 404 |
+| WEB-16 | nginx, tomcat | PASS | 2026-11-09T08:33:05.385990+00:00 | 두 제품 정상 200/오류 404 응답·헤더와 유효 설정 |
+| D-02 | mysql | PASS | 2026-11-09T08:32:48.003334+00:00 | 전체 계정 10→7, 용도 명세와 시스템/역할 잠금 확인 |
+| D-04 | mysql | PASS | 2026-11-09T08:32:48.003334+00:00 | 정적/동적 권한·역할/프록시 상속 확장, 불필요 SUPER 제거 |
+| D-10 | mysql | PASS | 2026-11-09T08:32:48.003334+00:00 | 허용 IP TCP·실제 SELECT 성공; 비허용 IP TCP timeout 및 nft drop counter |
+| S-06 | opnsense | NEEDS_REVIEW | 2026-11-09T08:35:43.794108+00:00 | 인증된 인터페이스 API 성공, 규칙/ID API 403; 별도 비인가 출발지 미검증 |
+| S-07 | opnsense | NEEDS_REVIEW | 2026-11-09T08:35:43.794108+00:00 | CA/IP SAN 검증된 TLS 1.3, HTTP→HTTPS 301; 관리 채널 전체 설정 미확보 |
+| CA-07 | aws | PASS | 2026-11-09T08:35:38.691178+00:00 | 독립 내부전용 VPC 전체 조회: 서브넷 1, ENI 0, 공인 IP/직접 IGW 경로 없음 |
+| CA-09 | aws | NEEDS_REVIEW | 2026-11-09T08:35:38.691178+00:00 | SG 2/NACL 2 전체 조회; 규칙별 필요성 승인·정기 검토 이력 미입증 |
 
-한국 시간: Linux 2026-11-09 16:38:26, Windows 16:37:42. Windows 조치 전 별도 시각은 원본에 없으므로 만들지 않았다. Guest·방화벽을 FAIL→PASS 사례로 표현하지 않는다.
+## WEB/MySQL 실제 개선·재점검
 
-## 검증된 실제 실행
+[성공 실행 42586652707](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707)에서 별도 WEB/MySQL job이 모두 성공했다. 각 그룹의 before FAIL 3→after PASS 3을 assertion으로 검증했고, 다른 13개를 해당 job에서 PASS로 만들지 않았다.
 
-- [Linux U-01/U-18 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520040): before FAIL 2 → after PASS 2, 나머지 14 NOT_TESTED. 기존 내부 Linux/MySQL 10 PASS와 KISA 공식 10 PASS는 다르다. [원시 JSON 아티팩트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520040/artifacts/13656249112). ZIP SHA-256 `2f08a504230b825b15532986dec9b11450afbcc67a7f2a9ba1ecdad750c049fd`.
-- [Windows 4개 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062): standalone Server 2022의 실제 정책·Guest·ActiveStore 확인, 나머지 12 NOT_TESTED. [원시 JSON 아티팩트](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062/artifacts/13657425113). ZIP SHA-256 `b9721d328e044bc05454d599f2bf88b1b365f0496c180ac78c541506c19e34db`.
-- 원시 파일의 수집 시각과 원본 상태는 변경하지 않는다. 공개 저장소에는 비밀이 없는 선택 필드의 요약·참조만 두고 원본 파일 전체는 비공개 보관한다. 새 아티팩트는 90일 보존이며 만료 전 개인 보관 필요. 해시는 파일 동일성 근거이고 단독으로 실제 출처를 인증하지 않는다.
-- 과거 실행 42574765798(U-18), 42575461694(W-04/W-08) 및 과거 0640/10/30 기록은 이전 문서에 그대로 남긴다.
+- [WEB 원시 아티팩트 13659516646](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659516646): ZIP SHA-256 `e42012cb85f73e5dad6db999541dae9a8d36be9a51711b443f9c6d7564710d2a`. Nginx/Tomcat 실제 파일 목록·정상/오류/목록/백업/docs/examples HTTP 상태·헤더·본문과 설정이 있다. after 배포 파일은 Nginx 1개, Tomcat 3개로 고정된 필요 파일 목록과 일치했다. 범위는 해당 일회용 LAB의 모든 배포 루트/컨텍스트이며 운영 사이트 전체가 아니다.
+- [MySQL 원시 아티팩트 13659527937](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659527937): ZIP SHA-256 `42691c89752886ab3d1811d749563e51268de1591c732ecc38cc6ee60ccf7dcc`. 계정·권한 SQL 결과와 쿼리, 역할/프록시 그래프, 서로 다른 실제 클라이언트, 전체 nft JSON을 보존했다. 허용 출발지 `172.30.96.20`은 TCP와 테이블 SELECT 성공, 비인가 `.30`은 exit 124 timeout이며 대응 drop counter가 증가했다. MySQL Host도 지정 IP로 제한했다. 암호·해시는 수집하지 않았다.
 
-## 미완료 10개
+전후 수집은 같은 일회용 프로젝트의 자산·버전에서 수행했다. 웹은 취약/개선 이미지를 재구성했고, MySQL은 실행 중인 서버의 불필요 계정·권한을 개선하고 해당 네임스페이스 ingress를 제한했다. 기존 사용자 컨테이너·호스트 방화벽·원본 자료는 변경하지 않았다. 초기 수집/판정 오류가 있던 실행은 성공 증거로 사용하지 않았고 수정 후 실제 재실행했다.
 
-| 항목 | 상태 | 완료에 필요한 원시 증거 |
-|---|---|---|
-| WEB-04 | NOT_TESTED | Nginx/Tomcat 전체 선정 location·servlet 설정과 실제 디렉터리 HTTP 시험 |
-| WEB-07 | NOT_TESTED | 두 제품의 배포경로 전체 파일 목록·필요성 검토, HTTP 부재 시험 |
-| WEB-16 | NOT_TESTED | 두 제품의 유효 설정 및 정상/오류 응답 헤더·본문 |
-| D-02 | NOT_TESTED | 전체 계정 목록과 계정별 필요성·잠금 검토 |
-| D-04 | NOT_TESTED | 전체 글로벌/동적 권한, 역할 상속·프록시·mandatory roles 및 인가 목록 |
-| D-10 | NOT_TESTED | 전체 Host·방화벽 정책과 인가/비인가 실제 연결 시험 |
-| S-06 | NOT_TESTED | 관리경로 전체 설정과 인가/비인가 IP 접속·PF/로그 상관 |
-| S-07 | NOT_TESTED | 관리 TLS/SSH 실연결, 인증서/호스트키·평문 관리 노출 검토 |
-| CA-07 | NOT_TESTED | 독립 LAB subnet/route/instance 공인주소 전체 정합성 검토 |
-| CA-09 | NOT_TESTED | SG/NACL 전체 정책 및 실제 날짜의 주기적 검토 기록 |
+## AWS 실제 조회와 판단 한계
 
-로컬 Docker 엔진은 미실행이며 이 작업에서 기존 OPNsense/독립 AWS 접속 범위와 원시 증거를 확보하지 못했다. 기존 내부 PASS를 공식 선정항목 PASS로 재명명하지 않았다. 추가 후보 7개는 핵심 16개 미완료이므로 보류. VTY와 Linux 방화벽을 동일시하지 않는다.
+CLI 로그인 갱신 후 STS가 기존 승인 계정과 일치하는 것을 확인했다. 기본 VPC 스코프와 과거 독립 LAB 스코프를 구분하고 **독립 LAB**에서 최종 CA-07/09 수집을 수행했다. 새 리소스 생성, Terraform apply, IAM/SG/NACL/라우트 수정은 하지 않았다.
 
-## 구현·검증·기여
+CA-07은 기존 독립 **private-only VPC** 범위의 PASS다. 전체 subnet/route association/ENI를 조회했고, 내부 서브넷 1개·라우트 테이블 2개·ENI 0개를 확인했다. 내부 자원과 공개 자원 혼용이 없고 자동 공인 IP와 인터넷 직접 경로가 없다. 공개 workload·NAT·실제 패킷 통신·계정 전체 VPC 검증은 아니다. 이전 공식 CA-07 before 측정이 없어 FAIL→PASS로 표현하지 않는다.
 
-정규화 판정 16개, 새 실제 수집 경로 Linux 2개/Windows 4개. 다른 분야는 기존 수집기와 수동 검토 계약을 연결하는 구현이며 전체 자동 수집 완료가 아니다. 새 테스트 12개와 기존 회귀를 합쳐 로컬 1,328개 실행, 실패 0, 환경 의존 skip 22개. 비밀정보 검사·diff 공백 검사 통과. 원격 CI는 PR에서 별도 확인한다.
+CA-09는 실제 SG 2개/NACL 2개(기본 정책 포함)를 조회하고 현재 기술 검토 기록을 남겼다. **2026-11-06의 before/after 구성 자료나 이번 세션의 반복 재수집을 정기 검토 회차로 바꾸지 않았다.** 규칙별 목적 승인과 주기적 검토 이력이 입증되지 않아 NEEDS_REVIEW다. 기존 CT-01 FAIL과 IAM-03 NEEDS_REVIEW는 별도 내부 범위에서 그대로 보존된다.
 
-Codex는 코드·문서 수정, 커밋·PR, 자동 Actions 실습 및 증적 대조를 수행했다. 사용자의 기존 수동 실습은 기존 문서 출처 그대로다. 사용자가 이번 명령을 직접 수행했다고 주장하지 않는다. 면접 설명은 [대표 사례 자료](kisa-2026-interview.md), 남은 실행은 [재점검 절차](kisa-2026-retest-runbook.md).
+AWS 원시는 개인 계정·자산 식별자를 포함하므로 Git에 올리지 않았다. 사용자 전달물 `KISA-2026-AWS-live.zip`에 원시 metadata·실제 요청 ID/시각·관찰·판정·정책 검토 기록·해시 manifest를 비공개 보존한다. 해시만으로 출처를 인증하지 않으며 이번 실행에서는 실제 TLS SDK 호출과 STS 소유자 대조를 수행했다.
+
+## OPNsense 실제 연결과 미완료 원인
+
+사용자가 기존 VM을 시작한 후, 보존된 LAB CA로 **IP SAN과 인증서 체인이 검증된 TLS 1.3** 연결을 실제 확인했다. HTTP는 비밀번호 로그인 폼 없이 HTTPS로 301 리디렉션했다. 사용자가 지정한 기존 non-root auditor API 키는 메모리에서만 사용했고 키/Secret은 로그·Git·결과에 내보내지 않았다. 현재 인터페이스 API는 성공했지만 규칙/규칙 ID API는 **403 api_forbidden**이었다.
+
+S-06은 전체 유효 관리 접근 정책·PF 규칙과 독립 비인가 출발지 시험의 상관 증거가 부족하다. S-07은 확인된 LAN HTTPS 외 관리 서비스/인터페이스·평문 채널 전체의 설정 인벤토리가 부족하다. 따라서 둘 다 NEEDS_REVIEW이며 API 403은 원시 오류 그대로 남긴다. TCP timeout만으로 서비스가 꺼졌거나 접근통제가 완성됐다고 하지 않았다. 장비 설정·키·API 권한은 변경하지 않았다.
+
+`KISA-2026-OPNsense-live.zip`에 TLS/HTTP/인증 API 응답·시각·판정·manifest를 비공개 보존했다. 브라우저 자동화는 현재 URL 확인을 보장하지 못해 종료됐으며, 브라우저 보안 경고를 우회하지 않았다. 이후 작업은 기존 CLI/읽기 전용 API로 수행했다.
+
+## 최종 집계·남은 작업
+
+| 상태 | 개수 |
+|---|---|
+| PASS | 13 |
+| FAIL | 0 |
+| NEEDS_REVIEW | 3 |
+| NOT_TESTED | 0 |
+| NOT_APPLICABLE | 0 |
+| ERROR | 0 |
+
+API 단위 오류 403이 없다는 뜻이 아니라, 해당 항목은 실제 부분 증거가 있어 **항목 수준 NEEDS_REVIEW**로 남겼다는 의미다. 3개를 PASS에 합산하지 않는다.
+
+- S-06: 최소 읽기 권한의 실제 규칙 조회 또는 현재 콘솔 PF 원본, 인가·독립 비인가 출발지의 실제 접속 및 로그 상관 필요.
+- S-07: 현재 제품 버전·관리 인터페이스/서비스 전체 설정, 평문 관리 채널 부재와 관찰 연결 경로 대조 필요.
+- CA-09: 전체 규칙의 실제 필요성 검토·담당/주기와 과거 수행 이력 필요. 오늘 한 차례를 여러 회차로 만들지 않는다.
+
+단일 실행 수집은 `scripts/run_kisa_remaining_local.ps1`, VM 콘솔의 읽기 전용 묶음은 `scripts/collect_opnsense_selected.sh`로 준비했다. 상세는 [후속 실행·증적 마감 절차](kisa-2026-external-followup.md).
+
+Codex는 코드·자동 실행·원시 증적 대조와 보고서/PR을 수행했다. 사용자는 AWS 로그인 갱신, 기존 VM 시작과 키 파일 위치 제공을 했다. 사용자가 새 HTTP/SQL 진단 명령을 직접 수행했다고 기술하지 않는다.

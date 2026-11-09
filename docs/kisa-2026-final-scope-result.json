@@ -1,19 +1,19 @@
 {
   "profile": "KISA-2026-SELECTED-1.0",
   "report_kind": "REVIEWED_CROSS_ENVIRONMENT_EVIDENCE_LEDGER",
-  "verification_basis": "Successful workflow job assertions plus downloaded raw JSON; downloaded ZIP digests matched GitHub artifact metadata. Not a simultaneous live snapshot.",
-  "implementation_commit": "2e75ca567f56dea727868207a178e229e37495c0",
+  "verification_basis": "Successful actual WEB/MySQL workflow jobs plus downloaded raw artifacts and GitHub ZIP digests; direct read-only STS-matched AWS inventory; CA-verified real OPNsense transport and authenticated interface API. Partial/error conditions are not promoted.",
+  "implementation_commit": "c39ce02f12668919e02ac387ac6eee06802ffe2d",
   "scope_denominator": 16,
   "summary": {
-    "PASS": 6,
+    "PASS": 13,
     "FAIL": 0,
-    "NEEDS_REVIEW": 0,
-    "NOT_TESTED": 10,
+    "NEEDS_REVIEW": 3,
+    "NOT_TESTED": 0,
     "NOT_APPLICABLE": 0,
     "ERROR": 0
   },
-  "verified_lab_pass": 6,
-  "verified_lab_pass_percent": 37.5,
+  "verified_lab_pass": 13,
+  "verified_lab_pass_percent": 81.25,
   "guide_sha256": "44fe393981b244147be6af7423d99dc15633c089fad0bcb296cbe2371dde812d",
   "results": [
     {
@@ -251,12 +251,93 @@
         "nginx",
         "tomcat"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "nginx": {
+          "criterion": {
+            "effective_config_listing_disabled": false,
+            "http_listing_absent": false,
+            "locations_inventory_complete": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 5
+        },
+        "tomcat": {
+          "criterion": {
+            "effective_config_listing_disabled": false,
+            "http_listing_absent": false,
+            "locations_inventory_complete": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 1087
+        }
+      },
+      "after": {
+        "nginx": {
+          "criterion": {
+            "effective_config_listing_disabled": true,
+            "http_listing_absent": true,
+            "locations_inventory_complete": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 403,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 1
+        },
+        "tomcat": {
+          "criterion": {
+            "effective_config_listing_disabled": true,
+            "http_listing_absent": true,
+            "locations_inventory_complete": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 404,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 3
+        }
+      },
+      "collected_at": "2026-11-09T08:33:05.385990+00:00",
+      "limitation": "All fixed deployed roots/contexts of the disposable Nginx/Tomcat LAB only. Real HTTP 200 health and 403/404 directory/removed-path responses; no production-site or arbitrary config grammar claim.",
+      "product_version": "Nginx 1.30.6 / Tomcat 10.1.61",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:45.135701+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659516646,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659516646",
+      "raw_files": [
+        "before/web-live-raw.json",
+        "after/web-live-raw.json",
+        "before/observations.json",
+        "after/observations.json"
+      ],
+      "raw_after_sha256": "841d1fc34dd2b616baf868bb065ac345f0367921c699264fc641f18fed7a48a0",
+      "artifact_zip_sha256": "e42012cb85f73e5dad6db999541dae9a8d36be9a51711b443f9c6d7564710d2a"
     },
     {
       "kisa_id": "WEB-07",
@@ -266,12 +347,93 @@
         "nginx",
         "tomcat"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "nginx": {
+          "criterion": {
+            "filesystem_inventory_complete": true,
+            "unnecessary_files_absent": false,
+            "http_unnecessary_paths_absent": false
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 5
+        },
+        "tomcat": {
+          "criterion": {
+            "filesystem_inventory_complete": true,
+            "unnecessary_files_absent": false,
+            "http_unnecessary_paths_absent": false
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 1087
+        }
+      },
+      "after": {
+        "nginx": {
+          "criterion": {
+            "filesystem_inventory_complete": true,
+            "unnecessary_files_absent": true,
+            "http_unnecessary_paths_absent": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 403,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 1
+        },
+        "tomcat": {
+          "criterion": {
+            "filesystem_inventory_complete": true,
+            "unnecessary_files_absent": true,
+            "http_unnecessary_paths_absent": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 404,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 3
+        }
+      },
+      "collected_at": "2026-11-09T08:33:05.385990+00:00",
+      "limitation": "All fixed deployed roots/contexts of the disposable Nginx/Tomcat LAB only. Real HTTP 200 health and 403/404 directory/removed-path responses; no production-site or arbitrary config grammar claim.",
+      "product_version": "Nginx 1.30.6 / Tomcat 10.1.61",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:45.135701+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659516646,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659516646",
+      "raw_files": [
+        "before/web-live-raw.json",
+        "after/web-live-raw.json",
+        "before/observations.json",
+        "after/observations.json"
+      ],
+      "raw_after_sha256": "841d1fc34dd2b616baf868bb065ac345f0367921c699264fc641f18fed7a48a0",
+      "artifact_zip_sha256": "e42012cb85f73e5dad6db999541dae9a8d36be9a51711b443f9c6d7564710d2a"
     },
     {
       "kisa_id": "WEB-16",
@@ -281,12 +443,93 @@
         "nginx",
         "tomcat"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "nginx": {
+          "criterion": {
+            "effective_config_minimized": false,
+            "normal_response_minimized": false,
+            "error_response_minimized": false
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 5
+        },
+        "tomcat": {
+          "criterion": {
+            "effective_config_minimized": false,
+            "normal_response_minimized": false,
+            "error_response_minimized": false
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 200,
+            "backup": 200,
+            "docs": 403,
+            "examples": 403
+          },
+          "file_count": 1087
+        }
+      },
+      "after": {
+        "nginx": {
+          "criterion": {
+            "effective_config_minimized": true,
+            "normal_response_minimized": true,
+            "error_response_minimized": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 403,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 1
+        },
+        "tomcat": {
+          "criterion": {
+            "effective_config_minimized": true,
+            "normal_response_minimized": true,
+            "error_response_minimized": true
+          },
+          "http": {
+            "normal": 200,
+            "error": 404,
+            "directory": 404,
+            "backup": 404,
+            "docs": 404,
+            "examples": 404
+          },
+          "file_count": 3
+        }
+      },
+      "collected_at": "2026-11-09T08:33:05.385990+00:00",
+      "limitation": "All fixed deployed roots/contexts of the disposable Nginx/Tomcat LAB only. Real HTTP 200 health and 403/404 directory/removed-path responses; no production-site or arbitrary config grammar claim.",
+      "product_version": "Nginx 1.30.6 / Tomcat 10.1.61",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:45.135701+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659516646,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659516646",
+      "raw_files": [
+        "before/web-live-raw.json",
+        "after/web-live-raw.json",
+        "before/observations.json",
+        "after/observations.json"
+      ],
+      "raw_after_sha256": "841d1fc34dd2b616baf868bb065ac345f0367921c699264fc641f18fed7a48a0",
+      "artifact_zip_sha256": "e42012cb85f73e5dad6db999541dae9a8d36be9a51711b443f9c6d7564710d2a"
     },
     {
       "kisa_id": "D-02",
@@ -295,12 +538,71 @@
       "assets": [
         "mysql"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "criterion": {
+          "account_inventory_complete": true,
+          "account_purposes_reviewed": false,
+          "unnecessary_unlocked_accounts_absent": false
+        },
+        "account_count": 10,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": true,
+            "sql_select_succeeded": false,
+            "returncode": 0
+          }
+        }
+      },
+      "after": {
+        "criterion": {
+          "account_inventory_complete": true,
+          "account_purposes_reviewed": true,
+          "unnecessary_unlocked_accounts_absent": true
+        },
+        "account_count": 7,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": false,
+            "sql_select_succeeded": false,
+            "returncode": 124
+          }
+        }
+      },
+      "collected_at": "2026-11-09T08:32:48.003334+00:00",
+      "limitation": "Fixed isolated MySQL LAB purpose inventory, global/dynamic privileges and transitive role/proxy graph. Actual allowed-source SELECT succeeded and other-source TCP timed out with matching nft drop counter. Docker namespace policy is not a host firewall or production DB claim.",
+      "product_version": "8.4.13",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:43.174368+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659527937,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659527937",
+      "raw_files": [
+        "before/mysql-live-raw.json",
+        "after/mysql-live-raw.json",
+        "before/role-analysis.json",
+        "after/role-analysis.json"
+      ],
+      "raw_after_sha256": "aec1a43a678d2fa087864906e74fa48dc713cadf77516edea25386edba7534bb",
+      "artifact_zip_sha256": "42691c89752886ab3d1811d749563e51268de1591c732ecc38cc6ee60ccf7dcc"
     },
     {
       "kisa_id": "D-04",
@@ -309,12 +611,73 @@
       "assets": [
         "mysql"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "criterion": {
+          "privilege_inventory_complete": true,
+          "role_and_proxy_expansion_complete": true,
+          "admin_purposes_reviewed": false,
+          "unauthorized_admin_privileges_absent": false
+        },
+        "account_count": 10,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": true,
+            "sql_select_succeeded": false,
+            "returncode": 0
+          }
+        }
+      },
+      "after": {
+        "criterion": {
+          "privilege_inventory_complete": true,
+          "role_and_proxy_expansion_complete": true,
+          "admin_purposes_reviewed": true,
+          "unauthorized_admin_privileges_absent": true
+        },
+        "account_count": 7,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": false,
+            "sql_select_succeeded": false,
+            "returncode": 124
+          }
+        }
+      },
+      "collected_at": "2026-11-09T08:32:48.003334+00:00",
+      "limitation": "Fixed isolated MySQL LAB purpose inventory, global/dynamic privileges and transitive role/proxy graph. Actual allowed-source SELECT succeeded and other-source TCP timed out with matching nft drop counter. Docker namespace policy is not a host firewall or production DB claim.",
+      "product_version": "8.4.13",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:43.174368+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659527937,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659527937",
+      "raw_files": [
+        "before/mysql-live-raw.json",
+        "after/mysql-live-raw.json",
+        "before/role-analysis.json",
+        "after/role-analysis.json"
+      ],
+      "raw_after_sha256": "aec1a43a678d2fa087864906e74fa48dc713cadf77516edea25386edba7534bb",
+      "artifact_zip_sha256": "42691c89752886ab3d1811d749563e51268de1591c732ecc38cc6ee60ccf7dcc"
     },
     {
       "kisa_id": "D-10",
@@ -323,12 +686,75 @@
       "assets": [
         "mysql"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "criterion": {
+          "account_host_inventory_complete": true,
+          "designated_ip_policy_only": false,
+          "allowed_source_connected": true,
+          "unauthorized_source_denied": false,
+          "network_policy_inventory_complete": true
+        },
+        "account_count": 10,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": true,
+            "sql_select_succeeded": false,
+            "returncode": 0
+          }
+        }
+      },
+      "after": {
+        "criterion": {
+          "account_host_inventory_complete": true,
+          "designated_ip_policy_only": true,
+          "allowed_source_connected": true,
+          "unauthorized_source_denied": true,
+          "network_policy_inventory_complete": true
+        },
+        "account_count": 7,
+        "role_edges": 1,
+        "probe_summary": {
+          "allowed": {
+            "source_ip": "172.30.96.20",
+            "tcp_connected": true,
+            "sql_select_succeeded": true,
+            "returncode": 0
+          },
+          "denied": {
+            "source_ip": "172.30.96.30",
+            "tcp_connected": false,
+            "sql_select_succeeded": false,
+            "returncode": 124
+          }
+        }
+      },
+      "collected_at": "2026-11-09T08:32:48.003334+00:00",
+      "limitation": "Fixed isolated MySQL LAB purpose inventory, global/dynamic privileges and transitive role/proxy graph. Actual allowed-source SELECT succeeded and other-source TCP timed out with matching nft drop counter. Docker namespace policy is not a host firewall or production DB claim.",
+      "product_version": "8.4.13",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "before_collected_at": "2026-11-09T08:32:43.174368+00:00",
+      "run_id": 42586652707,
+      "artifact_id": 13659527937,
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42586652707/artifacts/13659527937",
+      "raw_files": [
+        "before/mysql-live-raw.json",
+        "after/mysql-live-raw.json",
+        "before/role-analysis.json",
+        "after/role-analysis.json"
+      ],
+      "raw_after_sha256": "aec1a43a678d2fa087864906e74fa48dc713cadf77516edea25386edba7534bb",
+      "artifact_zip_sha256": "42691c89752886ab3d1811d749563e51268de1591c732ecc38cc6ee60ccf7dcc"
     },
     {
       "kisa_id": "S-06",
@@ -337,12 +763,36 @@
       "assets": [
         "opnsense"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
+      "status": "NEEDS_REVIEW",
+      "source_kind": "LIVE_PARTIAL_LAB",
       "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "after": {
+        "criterion": {
+          "management_policy_inventory_complete": null,
+          "designated_sources_only": null,
+          "allowed_source_connected": true,
+          "unauthorized_source_denied": null,
+          "probe_policy_correlation_complete": null
+        },
+        "tls_protocol": "TLSv1.3",
+        "certificate_verified": true,
+        "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
+        "http_redirect_status": 301,
+        "interface_rows_collected": 5,
+        "rules_api_http_status": 403,
+        "independent_unauthorized_source_test": "NOT_TESTED"
+      },
+      "collected_at": "2026-11-09T08:35:43.794108+00:00",
+      "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
+      "product_version": null,
+      "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
+      "raw_files": [
+        "opnsense-management-raw.json",
+        "assessment.json",
+        "execution-manifest.json"
+      ],
+      "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
+      "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
     },
     {
       "kisa_id": "S-07",
@@ -351,12 +801,35 @@
       "assets": [
         "opnsense"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
+      "status": "NEEDS_REVIEW",
+      "source_kind": "LIVE_PARTIAL_LAB",
       "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "after": {
+        "criterion": {
+          "management_channels_inventory_complete": null,
+          "encrypted_handshake_observed": true,
+          "plaintext_management_disabled": null,
+          "certificate_or_hostkey_reviewed": true
+        },
+        "tls_protocol": "TLSv1.3",
+        "certificate_verified": true,
+        "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
+        "http_redirect_status": 301,
+        "interface_rows_collected": 5,
+        "rules_api_http_status": 403,
+        "independent_unauthorized_source_test": "NOT_TESTED"
+      },
+      "collected_at": "2026-11-09T08:35:43.794108+00:00",
+      "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
+      "product_version": null,
+      "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
+      "raw_files": [
+        "opnsense-management-raw.json",
+        "assessment.json",
+        "execution-manifest.json"
+      ],
+      "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
+      "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
     },
     {
       "kisa_id": "CA-07",
@@ -365,12 +838,47 @@
       "assets": [
         "aws"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
-      "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "before": {
+        "official_before_not_measured": true,
+        "no_AWS_configuration_changes": true
+      },
+      "after": {
+        "criterion": {
+          "subnet_resource_inventory_complete": true,
+          "effective_routes_reviewed": true,
+          "public_private_resources_separated": true,
+          "private_public_address_exposure_absent": true
+        },
+        "inventory_counts": {
+          "subnets": 1,
+          "route_tables": 2,
+          "network_interfaces": 0,
+          "security_groups": 2,
+          "network_acls": 2
+        },
+        "public_workloads_present": false,
+        "private_subnet_public_ip_enabled": false,
+        "private_direct_IGW_route_present": false
+      },
+      "collected_at": "2026-11-09T08:35:38.691178+00:00",
+      "limitation": "Existing private-only isolated VPC: one internal subnet, no ENI/public workload, no public IP or direct IGW route. Resource separation is configuration-only; public workload, NAT, packet reachability and whole-account coverage are not claimed. AWS changes: none.",
+      "product_version": "EC2 API 2016-11-15",
+      "before_status": "NOT_TESTED",
+      "transition": "NEWLY_VERIFIED_NO_REMEDIATION",
+      "before_collected_at": null,
+      "run_id": "LOCAL_AWS_READ_ONLY",
+      "artifact_id": null,
+      "evidence_url": "private-artifact:KISA-2026-AWS-live.zip",
+      "raw_files": [
+        "aws-selected-raw.json",
+        "assessment.json",
+        "policy-review.json",
+        "execution-manifest.json"
+      ],
+      "raw_after_sha256": "83080face20dc48cb279937d7c33d198155520093669171f00009c183ac14e3b",
+      "artifact_zip_sha256": "e0ab35ba842bb2ebe9f4db5aa6bfdbed42838edf11047f54af6c466db60165a2"
     },
     {
       "kisa_id": "CA-09",
@@ -379,19 +887,48 @@
       "assets": [
         "aws"
       ],
-      "status": "NOT_TESTED",
-      "source_kind": "NOT_TESTED",
+      "status": "NEEDS_REVIEW",
+      "source_kind": "LIVE_PARTIAL_LAB",
       "before": null,
-      "after": null,
-      "collected_at": null,
-      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+      "after": {
+        "criterion": {
+          "policy_inventory_complete": true,
+          "unnecessary_rules_absent": null,
+          "management_sources_restricted": true,
+          "periodic_review_records_present": null
+        },
+        "security_groups_collected": 2,
+        "network_acls_collected": 2,
+        "current_technical_review_recorded": true,
+        "periodic_history_proven": false,
+        "complete_rule_purpose_approvals_proven": false
+      },
+      "collected_at": "2026-11-09T08:35:38.691178+00:00",
+      "limitation": "Actual current full SG/NACL inventory and one technical review were recorded. The 2026-11-06 configuration baseline and repeated samples in this session are not represented as recurring policy reviews. Periodic history and complete rule purposes remain unproven.",
+      "product_version": "EC2 API 2016-11-15",
+      "evidence_url": "private-artifact:KISA-2026-AWS-live.zip",
+      "raw_files": [
+        "aws-selected-raw.json",
+        "policy-review.json"
+      ],
+      "raw_after_sha256": "83080face20dc48cb279937d7c33d198155520093669171f00009c183ac14e3b",
+      "artifact_zip_sha256": "e0ab35ba842bb2ebe9f4db5aa6bfdbed42838edf11047f54af6c466db60165a2"
     }
   ],
   "limitations": [
-    "No claim of KISA-wide coverage or customer engagement.",
-    "10 full criteria remain unmeasured.",
-    "Prior CloudTrail FAIL and IAM/firewall review states remain in historical reports.",
-    "Raw evidence retained in GitHub Actions for 90 days; download privately before expiry.",
-    "Generated code and automated Actions tests do not establish that the user personally operated the LAB."
-  ]
+    "13/16(81.25%); the 100% target has not been achieved.",
+    "S-06/S-07/CA-09 remain NEEDS_REVIEW with actual partial evidence and explicit API 403/history gaps.",
+    "CA-07 is a private-only existing isolated VPC with no ENI or public workload; no AWS configuration change or packet-test claim.",
+    "Previous six PASS rows and original timestamps/run/artifact references are unchanged.",
+    "No customer engagement, certification or full KISA coverage claim. No synthetic test is counted as a measurement.",
+    "AWS/OPNsense raw configuration evidence is retained privately in output ZIPs, not committed to the public repository."
+  ],
+  "scope_description": "일회용 Linux/Windows/WEB/MySQL 및 실제 개인 AWS/OPNsense의 서로 다른 시각·환경을 구분한 증적 대장이다.",
+  "implementation_scope_note": "16개 정규화 판정과 실제 대상별 수집 경로를 제공한다. 실측 PASS는 13개이며 S-06/S-07/CA-09 전체 조건은 검토 필요다. 기존 6개 실행 원본은 history에 보존했다.",
+  "validation_note": "전체 로컬 회귀 1,339개 실행: 성공 1,317개, 실패 0개, 기존 환경 의존 skip 22개. 최종 원격 CI 및 main 병합 결과는 PR #6와 별도 마감 기록에서 확인한다.",
+  "pull_request_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/pull/6",
+  "historical_six": {
+    "path": "docs/history/kisa-2026-6of16.json",
+    "sha256": "8bb9781eabeae6bfb6480785b4e9c6f7588d30ee2ae8760f7642ba89e8abef82"
+  }
 }
