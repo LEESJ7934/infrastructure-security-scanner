@@ -1,0 +1,73 @@
+name: KISA U-18 격리 Replay LAB 실측
+
+on:
+  push:
+    branches:
+      - feature/kisa-ciip-2025-selected-review
+  pull_request:
+    paths:
+      - "config_audit/**"
+      - "lab/phase2-linux-mysql/**"
+      - "scripts/compare_kisa_ciip.py"
+      - ".github/workflows/kisa-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-u18-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python dependencies
+        run: python -m pip install -r requirements.txt -r requirements-reporting-test.txt
+      - name: Build and run isolated before LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          export LINUX_MYSQL_STAGE=before
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json build
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json up -d --no-build --wait --wait-timeout 180
+          mkdir -p "$RUNNER_TEMP/kisa-evidence"
+          python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --output "$RUNNER_TEMP/kisa-evidence/before.json"
+      - name: Apply hardened after-stage and retest
+        shell: bash
+        run: |
+          set -euo pipefail
+          export LINUX_MYSQL_STAGE=after
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json build linux
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 120 linux
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json exec -T mysql bash /opt/lab/harden-mysql.sh
+          python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --baseline-json "$RUNNER_TEMP/kisa-evidence/before.json" --output "$RUNNER_TEMP/kisa-evidence/after.json"
+          python -m scripts.compare_kisa_ciip --linux-report "$RUNNER_TEMP/kisa-evidence/after.json" > "$RUNNER_TEMP/kisa-evidence/kisa-u18.json"
+          python - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "kisa-evidence"
+          report = json.loads((root / "after.json").read_text())
+          result = json.loads((root / "kisa-u18.json").read_text())
+          u18 = [r for r in result["results"] if r["kisa_id"] == "U-18"]
+          assert len(u18) == 1, "U-18 comparison missing"
+          assert u18[0]["kisa_recommendation_result"] == "PASS", "KISA U-18 is not PASS"
+          assert u18[0]["observation"]["mode"] == 0o400, "shadow mode was not collected as 0400"
+          assert report["origin"] == "local_container_readonly", "synthetic observations rejected"
+          assert report["summary"].get("PASS") == 10, "the replay's ten local checks did not PASS"
+          print("KISA U-18 observed PASS in isolated container; local LAB checks PASS=10")
+          PY
+      - name: Upload isolated replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kisa-u18-isolated-replay
+          path: ${{ runner.temp }}/kisa-evidence/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Tear down isolated containers
+        if: always()
+        shell: bash
+        run: |
+          docker compose -f lab/phase2-linux-mysql/compose.replay.json down --remove-orphans || true
