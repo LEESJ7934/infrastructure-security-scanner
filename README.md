@@ -99,6 +99,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - [KISA 2025-12-24 선택 항목(U-18, W-04, W-08) 별도 재판정 및 사용법](docs/kisa-ciip-2025-selected-review.md)
 - 이 비교는 저장된 기존 LAB 보고서에 대한 **읽기 전용** 평가이며 전체 KISA 항목 준수나 운영장비 재진단이 아닙니다.
 - 기존 LAB PASS를 보존하고, 동일 관찰값에 대한 KISA 권고 비교 결과를 별도 기록합니다.
+- **2026-11-09 신규 격리 실측:** GitHub Actions Linux Replay의 KISA **U-18 PASS**, 일회용 Windows Server 2022의 KISA **W-04/W-08 PASS**를 확인했습니다. ([Linux 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42574765798), [Windows 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42575461694)). **전체 KISA 기술진단 기준 PASS나 로컬 개인 VM 재검증 완료를 뜻하지 않습니다.**
 
 ## 상세 문서와 코드
 
