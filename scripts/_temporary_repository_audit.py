@@ -116,3 +116,15 @@ for path in paths:
                               "basename_refs":len(refs[path]),"binary":path not in textual},ensure_ascii=False))
 print("FULL_FILE_INVENTORY_END")
 print("=== REPOSITORY AUDIT END ===")
+
+
+print("DEPRECATED_IPS_REFERENCES")
+for token in ("suricata_ips", "ips_execution", "run_suricata_ips", "phase2-ips", "phase2-suricata-ips"):
+    hits = [path for path, text in textual.items()
+            if token in text and path != "scripts/_temporary_repository_audit.py"]
+    print("IPSTOKEN", token, json.dumps(hits, ensure_ascii=False))
+print("CUSTOM_CONFIG_REFERENCES")
+for token in ("app_config.yaml", "logging.conf", "scanner_config.yaml", "scope.aws.legacy.json"):
+    hits = [path for path, text in textual.items()
+            if token in text and path != "scripts/_temporary_repository_audit.py"]
+    print("CONFIGTOKEN", token, json.dumps(hits, ensure_ascii=False))
