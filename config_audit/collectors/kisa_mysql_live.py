@@ -43,9 +43,10 @@ def scope():
         if (labels.get('com.docker.compose.project') != PROJECT or labels.get('com.docker.compose.service') != service
                 or obj['State']['Running'] is not True or host.get('Privileged')
                 or host.get('PidMode') == 'host' or host.get('IpcMode') == 'host'
-                or any((host.get('PortBindings') or {}).values())
-                or any(m.get('Type') != 'tmpfs' for m in obj.get('Mounts',[]))):
-            raise ValueError('foreign_or_unsafe_selected_mysql_container')
+                or any((host.get('PortBindings') or {}).values())):
+            raise ValueError(service+'_foreign_or_unsafe_selected_mysql_container')
+        if any(m.get('Type') != 'tmpfs' for m in obj.get('Mounts',[])):
+            raise ValueError(service+'_non_tmpfs_mount_rejected')
         expected_caps = {'NET_ADMIN'} if service=='gate' else {'CHOWN','DAC_OVERRIDE','FOWNER','SETUID','SETGID'} if service=='mysql' else set()
         caps = {c.removeprefix('CAP_') for c in host.get('CapAdd') or []}
         dropped = {c.removeprefix('CAP_') for c in host.get('CapDrop') or []}

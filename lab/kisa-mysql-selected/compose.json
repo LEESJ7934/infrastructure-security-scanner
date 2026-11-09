@@ -23,13 +23,13 @@
     "allowed": {
       "image":"scanner-kisa-mysql-server:local", "entrypoint":["bash","-c","exec sleep infinity"],
       "cap_drop":["ALL"], "security_opt":["no-new-privileges:true"],
-      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m"],
+      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m","/var/lib/mysql:rw,noexec,nosuid,size=1m"],
       "networks":{"isolated":{"ipv4_address":"172.30.96.20"}}, "mem_limit":"96m", "pids_limit":48
     },
     "denied": {
       "image":"scanner-kisa-mysql-server:local", "entrypoint":["bash","-c","exec sleep infinity"],
       "cap_drop":["ALL"], "security_opt":["no-new-privileges:true"],
-      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m"],
+      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m","/var/lib/mysql:rw,noexec,nosuid,size=1m"],
       "networks":{"isolated":{"ipv4_address":"172.30.96.30"}}, "mem_limit":"96m", "pids_limit":48
     }
   },
