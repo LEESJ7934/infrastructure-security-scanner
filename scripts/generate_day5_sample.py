@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from api.day5_report_pdf import render
+from api.integrated_report_pdf import render
 from config_audit.comparison import SnapshotRelation, compare_snapshots
 from config_audit.evidence_index import STATES, attach_evidence_index, report_bindings
 from config_audit.final_report import canonical, content_sha256

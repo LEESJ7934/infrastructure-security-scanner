@@ -1,4 +1,4 @@
-# Day5 5단계: 오프라인 최종 JSON/PDF 보고서
+# 오프라인 통합 JSON/PDF 보고서
 
 > 역사적 Day5 구현·산출물 설명이다. 현재 Phase2 성과와 테스트의 기준은
 > [포트폴리오 근거 매핑](portfolio-evidence-mapping.md)이다. 아래 Day3 입력과
@@ -11,7 +11,7 @@
 프로젝트 루트의 Windows PowerShell에서 실행한다.
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m scripts.run_day5_report
+.\.venv\Scripts\python.exe -B -m scripts.run_integrated_report
 ```
 
 기본 출력은 `reports/day5/`이며 명시적으로 다른 `reports/` 하위 디렉터리를
@@ -30,11 +30,11 @@ VM, Docker, SSH, API, DB, 외부 명령어를 실행하지 않는다. 기존 DB 
 
 - `config_audit.final_report`: 명시된 로컬 입력의 안전한 읽기, 공통 모델,
   증적 인덱스, 전후 비교, 설명 근거와 집계를 한 번 구성한다.
-- `api.day5_report_pdf`: 별도 Day5 스키마의 A4 한글 PDF 렌더러.
+- `api.integrated_report_pdf`: 별도 Day5 스키마의 A4 한글 PDF 렌더러.
 - `api.report_pdf.render_day5_report_pdf`: 새 렌더러로의 얇은 진입점이다.
   기존 `render_report_pdf`는 그대로 유지한다. 기존 한글 폰트 등록, 색상,
   텍스트 이스케이프와 ReportLab 표 스타일을 재사용한다.
-- `scripts.run_day5_report`: 오프라인 생성 전용 CLI.
+- `scripts.run_integrated_report`: 오프라인 생성 전용 CLI.
 
 기존 `reporting.py`, `evidence_index.py`, `comparison.py`를 재사용한다.
 컬렉터와 평가 엔진을 실행하거나 원래 판정을 다시 계산하지 않는다.
@@ -139,8 +139,8 @@ NEEDS_REVIEW와 FW-06 수동 PASS를 유지하며 전체 유효 규칙집합과 
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-reporting-test.txt
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_final_report
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_report tests.test_day5_evidence tests.test_day5_comparison tests.test_day5_final_report
+.\.venv\Scripts\python.exe -B -m unittest tests.test_integrated_report
+.\.venv\Scripts\python.exe -B -m unittest tests.test_offline_reporting tests.test_evidence_integrity tests.test_remediation_comparison tests.test_integrated_report
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

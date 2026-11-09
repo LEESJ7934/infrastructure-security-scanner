@@ -8,7 +8,7 @@
 
 ## Windows 작업 보존
 
-기존 Windows 공개 후보 14개 파일을 비밀정보 패턴 검사 및 staged 파일 검토 후 로컬 checkpoint로 보존했다. 실제 개인 증적/보고서와 상세 일지는 포함하지 않았다. 기존 상세 docs/phase2-windows-server.md는 미stage 상태로 보존한다. 공개 기술 설명은 docs/phase2-windows-server-public.md에 별도로 작성했다. 원본과 개인 자료의 명시적 파일 목록은 Git 외부 로컬 백업에서 SHA-256으로 대조했다. `.env`, 키, VM 이미지, 원본 설정 백업을 Git에 넣지 않았다. 원격 push/main 병합은 하지 않았다.
+기존 Windows 공개 후보 14개 파일을 비밀정보 패턴 검사 및 staged 파일 검토 후 로컬 checkpoint로 보존했다. 실제 개인 증적/보고서와 상세 일지는 포함하지 않았다. 당시 상세 Windows 기록과 공개 요약본은 분리 관리했으나, 현재 공개된 상세 설명은 `docs/phase2-windows-server.md`로 일원화했다. 이전 별도 요약 파일은 Git 이력에서 확인할 수 있다. 원본과 개인 자료의 명시적 파일 목록은 Git 외부 로컬 백업에서 SHA-256으로 대조했다. `.env`, 키, VM 이미지, 원본 설정 백업을 Git에 넣지 않았다. 원격 push/main 병합은 하지 않았다.
 
 ## 선택한 환경과 한계
 

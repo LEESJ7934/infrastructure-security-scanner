@@ -1,4 +1,4 @@
-# Day5 2단계: 저장 결과의 오프라인 통합
+# 저장 결과의 오프라인 통합
 
 `config_audit.reporting`은 저장된 결과를 변환하는 Python 모듈이다.
 Collector, `evaluate()`, DB, 외부 명령어를 호출하지 않는다. 최종 출력 CLI,
@@ -101,7 +101,7 @@ Day2/3 `logs/`는 Git에서 제외된 로컬 입력이다. 다른 체크아웃�
 ## 테스트
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_report
+.\.venv\Scripts\python.exe -B -m unittest tests.test_offline_reporting
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

@@ -19,7 +19,7 @@ from reportlab.platypus import (HRFlowable, LongTable, Paragraph, SimpleDocTempl
 
 def render_day5_report_pdf(snapshot, output_path):
     """Separate offline audit schema; never invoke the DB report assembly path."""
-    from api.day5_report_pdf import render
+    from api.integrated_report_pdf import render
     return render(snapshot, output_path)
 
 NAVY = colors.HexColor("#182B44")

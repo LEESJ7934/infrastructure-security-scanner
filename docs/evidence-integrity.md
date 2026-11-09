@@ -1,4 +1,4 @@
-# Day5 3단계: 증적 인덱스와 SHA-256 무결성 검사
+# 증적 인덱스 및 SHA-256 무결성 검사
 
 `config_audit.evidence_index`는 공통 보고서 모델의 증적 참조와 명시적으로
 추가한 파일만 읽는다. 디렉터리 자동 탐색, 진단 재평가, 외부 명령 실행,
@@ -134,7 +134,7 @@ FW-02/03 수동 PASS, FW-04/05 수동 NEEDS_REVIEW, FW-06 수동 PASS를
 ## 테스트와 다음 단계
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_evidence tests.test_day5_report
+.\.venv\Scripts\python.exe -B -m unittest tests.test_evidence_integrity tests.test_offline_reporting
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

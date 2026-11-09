@@ -67,7 +67,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 공통 모델, 증적 경로 제한·SHA-256, 명시적 before/after 관계, 판정 채널·범위·시각을 보고서에 연결합니다. 해시 일치는 **현재 파일 무결성**이며 수집 출처의 진위 인증이나 완전성 증명이 아닙니다. 재점검 개선 관찰도 조치의 인과관계 전체를 증명하지 않습니다.
 
 - [공개 합성 PDF](examples/day5-demo/sample-integrated-report.pdf) · [합성 JSON](examples/day5-demo/sample-integrated-report.json) · [샘플 설명](examples/day5-demo/README.md)
-- [통합 보고서 구조](docs/day5-final-report.md) · [증적 인덱스](docs/day5-evidence-index.md) · [재점검 비교](docs/day5-comparison.md)
+- [통합 보고서 구조](docs/integrated-report.md) · [증적 인덱스](docs/evidence-integrity.md) · [재점검 비교](docs/remediation-comparison.md)
 
 실제 `logs/`, `reports/`, `evidence/`, AWS 계정/자산 Scope와 Terraform state·개인 변수는 공개 샘플이 아닙니다. 링크가 아닌 로컬 경로로만 설명하며 원본을 Git에 추가하지 않습니다. 초기 통합 보고서의 25개 시점별 레코드는 별도 과거 기록이며 후속 실습의 개선 성과를 포함한 합계가 아닙니다.
 
@@ -91,10 +91,10 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 .\.venv\Scripts\python.exe -B -m scripts.generate_day5_sample
 
 # 명시적인 로컬 입력이 별도로 있을 때만 기존 저장 결과를 오프라인 통합
-.\.venv\Scripts\python.exe -B -m scripts.run_day5_report
+.\.venv\Scripts\python.exe -B -m scripts.run_integrated_report
 ```
 
-실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 2026-11-07 문서 검증 과정에서는 VM·Docker·SSH·DB·AWS를 실행하지 않았습니다. 샘플 생성과 Day5 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
+실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 2026-11-07 문서 검증 과정에서는 VM·Docker·SSH·DB·AWS를 실행하지 않았습니다. 샘플 생성과 오프라인 통합 보고서 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
 
 ## KISA 공식 가이드 권고 기준과 내부 LAB 판정 구분
 
@@ -109,7 +109,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - 서버: [Linux/MySQL 실습](docs/phase2-linux-mysql-recovery.md) · [Windows](docs/phase2-windows-server.md)
 - 네트워크: [설정 진단](docs/phase2-network-devices.md) · [패킷 경유](docs/phase2-network-packets.md)
 - WEB/WAS: [Nginx/Tomcat](docs/phase2-web-was.md)
-- 보안장비: [OPNsense](docs/day4-opnsense.md) · [FW-04 PF](docs/day4-pf-snapshots.md) · [FW-05 로그](docs/day4-fw05-log-rule-evidence.md)
+- 보안장비: [OPNsense](docs/opnsense-audit.md) · [FW-04 PF](docs/opnsense-pf-snapshots.md) · [FW-05 로그](docs/opnsense-log-rule-evidence.md)
 - AWS: [오프라인](docs/phase2-aws-offline.md) · [읽기 전용 수집](docs/phase2-aws-collection.md) · [범위 스키마](docs/phase2-aws-scope-v2.md) · [독립 Terraform LAB](infra/aws/phase2-audit-lab/README.md)
 - 기존 코드: [scanner](scanner/) · [analysis](analysis/) · [Linux SSH](config_audit/collectors/linux_ssh.py) · [MySQL](config_audit/collectors/mysql_config.py) · [ModSecurity](config_audit/collectors/modsecurity.py) · [AWS 인벤토리](cloud_security/aws_inventory.py) · [SG 분석](cloud_security/aws_sg_analyzer.py)
 
