@@ -201,7 +201,7 @@ def load(path):
 def predicate(check, value):
     if check in {'LINUX-LAB-001', 'LINUX-LAB-002'}: return None if value == 'unrecognized' else value == 'no'
     if check == 'LINUX-LAB-003':
-        return all(v['regular'] and not v['symlink'] and v['uid'] == 0 and v['group_approved'] and v['mode'] in ({0o600, 0o640} if v['path'] == '/etc/shadow' else {0o600, 0o644}) for v in value)
+        return all(v['regular'] and not v['symlink'] and v['uid'] == 0 and v['group_approved'] and v['mode'] in ({0o400, 0o600, 0o640} if v['path'] == '/etc/shadow' else {0o600, 0o644}) for v in value)
     if check == 'LINUX-LAB-004': return not value
     if check == 'LINUX-LAB-005': return all(value.values())
     if check in {'MYSQL-LAB-001', 'MYSQL-LAB-002', 'MYSQL-LAB-003'}: return value == 0
