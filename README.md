@@ -38,7 +38,7 @@ flowchart LR
 | 보안장비 — ModSecurity | 엔진·감사·본문·CRS 설정 및 GET/PUT와 감사 이벤트 상관분석 | WAF 6개 PASS 요약 존재. 원시 HTTP/감사 로그가 없어 현재 파일만으로 실제 차단을 독립 재확인할 수 없음 |
 | 추가 — AWS | IAM/SG/VPC/NACL/CloudTrail/Flow Logs P1 8개. Scope 제한 읽기 전용 수집·정규화 | 독립 LAB 4건 FAIL→PASS. CT-01 FAIL, IAM-03 NEEDS_REVIEW 유지. 설정 판정이며 패킷 차단·로그 전달 증명 아님 |
 
-**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 기존 코드·테스트·기존 개발 기록은 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
+**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 이전 IPS 전용 실험은 NFQUEUE 인라인 차단 검증을 완료하지 못했으므로, 현재 범위와 무관한 IPS 전용 구현·테스트·LAB 파일을 정리했습니다. 기존 실험 기록은 Git 커밋 이력에서 확인할 수 있습니다. 다른 Day3 IDS/WAF 실습 파일은 과거 실험과 보고서 재현 근거로 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
 
 ## 대표 취약 설정 → 개선 → 재점검
 
@@ -77,6 +77,7 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - 설정 확인, 패킷 경로, 수동 확인, 자동 판정을 분리합니다. 미지원 Switch 기능과 미완료 감사·로그/규칙 연계는 숨기지 않습니다.
 - AWS LAB 정리는 완료되지 않았습니다. 현재 자원·비용은 별도 인증/조회가 필요하며 기존 state·증적을 보존합니다.
 - Git 최종 통합 기준(2026-11-07, Windows/Python 3.12.10, `99c8f10`): 핵심 **322개 통과**, 전체 **1,300개 통과 / 1개 실패**. 기존 WSL `/bin/bash` 오류를 성공으로 처리하지 않습니다.
+- 2026-11-09 파일 전수 정리 검증(PR #9): GitHub CI에서 **1,288개 테스트 중 1,266개 성공·22개 건너뜀·실패 0개**를 확인했습니다. 건너뛴 항목은 이 저장소에 포함되지 않은 로컬 Day2/Day3 저장 증적이 필요한 테스트입니다. Python 컴파일·비밀정보 검사도 성공했지만, 실제 장비 동작이나 미제공 증적의 재검증 완료를 뜻하지 않습니다. [실행 기록](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42596973037).
 - 330/381/694개 등의 과거 수치는 당시 단계·환경의 기록입니다. 현재 CI 성공 여부나 새 실행 결과로 대신 사용하지 않습니다. 테스트 실행별 기록은 [테스트 기준표](docs/portfolio-evidence-mapping.md#테스트-기록과-기준)에 구분합니다.
 
 ## 오프라인 실행·재현
