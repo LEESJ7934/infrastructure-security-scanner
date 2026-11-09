@@ -1,0 +1,118 @@
+"""Temporary inventory audit: inspect every Git-tracked file without executing the scanner."""
+from __future__ import annotations
+
+import ast
+from collections import Counter, defaultdict
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+ROOT = Path(__file__).resolve().parents[1]
+paths = [p.decode("utf-8") for p in subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).split(b"\0") if p]
+contents = {}
+textual = {}
+for name in paths:
+    data = (ROOT / name).read_bytes()
+    contents[name] = data
+    if b"\0" not in data:
+        try:
+            textual[name] = data.decode("utf-8")
+        except UnicodeDecodeError:
+            pass
+
+# Explicit relative/full-path references and basename references are independent evidence.
+basenames = Counter(Path(name).name for name in paths)
+pmodules = {
+    name[:-3].replace("/", ".").removesuffix(".__init__"): name
+    for name in paths if name.endswith(".py")
+}
+refs = defaultdict(set)
+module_refs = defaultdict(set)
+literal_mentions = defaultdict(set)
+for src, text in textual.items():
+    if src.endswith(".py"):
+        try:
+            tree = ast.parse(text, filename=src)
+        except SyntaxError:
+            print(f"PARSE_ERROR {src}")
+            continue
+        src_parts = src.split("/")[:-1]
+        for node in ast.walk(tree):
+            mods = []
+            if isinstance(node, ast.Import):
+                mods = [n.name for n in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                if node.level:
+                    prefix = src_parts[:max(0, len(src_parts) - node.level + 1)]
+                    fullname = ".".join(prefix + (node.module.split(".") if node.module else []))
+                else:
+                    fullname = node.module or ""
+                mods = [fullname, *[fullname + "." + a.name for a in node.names]]
+            for mod in mods:
+                for m in [mod, *[".".join(mod.split(".")[:i]) for i in range(1, len(mod.split(".")))]]:
+                    if m in pmodules and pmodules[m] != src:
+                        module_refs[pmodules[m]].add(src)
+    for path in paths:
+        if src == path:
+            continue
+        # Literal repository-root-relative file/directory path occurrence.
+        if "/" in path and path in text:
+            literal_mentions[path].add(src)
+        # Unique basename is a weak signal, not dependency proof.
+        name = Path(path).name
+        if len(name) >= 6 and basenames[name] == 1 and name in text:
+            refs[path].add(src)
+
+duplicates = defaultdict(list)
+for path, data in contents.items():
+    duplicates[hashlib.sha256(data).hexdigest()].append(path)
+duplicates = [g for g in duplicates.values() if len(g) > 1]
+prefixes = Counter(path.split("/")[0] if "/" in path else "(root)" for path in paths)
+review = []
+for path in paths:
+    if not path.endswith(".py"):
+        continue
+    if path.endswith("/__init__.py"):
+        continue
+    if path.startswith("tests/") or path.startswith("scripts/"):
+        continue
+    if path.startswith("lab/") or path.startswith("infra/"):
+        continue
+    if path.startswith("config_audit/") or path.startswith("scanner/") or path.startswith("api/") or path.startswith("analysis/") or path.startswith("db/") or path.startswith("cloud_security/") or path.startswith("verification/") or path.startswith("asset_management/"):
+        if not module_refs[path] and not literal_mentions[path] and not refs[path]:
+            review.append(path)
+review.sort()
+suspects = [
+    "config/scope.aws.legacy.json", "db/clear_tables.py", "tests/test.py",
+    "scanner/probes.py", "scanner/version_parser.py", "analysis/fingerprint_parser.py",
+    "api/generate_final_report.py"
+]
+
+print("=== REPOSITORY AUDIT BEGIN ===")
+print("TRACKED_COUNT", len(paths), "TEXT_COUNT", len(textual), "BINARY_COUNT", len(paths)-len(textual))
+print("PREFIX_COUNTS", json.dumps(prefixes, sort_keys=True))
+print("DUPLICATE_CONTENT_GROUPS", json.dumps(duplicates, ensure_ascii=False))
+print("ZERO_STATIC_REFERENCES_PY", json.dumps(review, ensure_ascii=False))
+print("FOCUSED_CANDIDATES")
+for name in suspects:
+    if name in contents:
+        print("CANDIDATE", name, "bytes",len(contents[name]),
+              "module",len(module_refs[name]),"literal",len(literal_mentions[name]),
+              "basename",len(refs[name]),
+              "sources",json.dumps(sorted(module_refs[name] | literal_mentions[name] | refs[name])[:25],ensure_ascii=False))
+print("FULL_FILE_INVENTORY_START")
+for path in paths:
+    category = ("documentation" if path.endswith(".md") else
+                "test" if path.startswith("tests/") else
+                "evidence" if path.startswith("evidence/") else
+                "lab" if path.startswith("lab/") else
+                "infrastructure" if path.startswith("infra/") else
+                "workflow" if path.startswith(".github/") else
+                "code" if path.endswith((".py",".ps1",".sh")) else "configuration_or_artifact")
+    print("FILE",json.dumps({"path":path,"category":category,"size":len(contents[path]),
+                              "module_refs":len(module_refs[path]),"literal_refs":len(literal_mentions[path]),
+                              "basename_refs":len(refs[path]),"binary":path not in textual},ensure_ascii=False))
+print("FULL_FILE_INVENTORY_END")
+print("=== REPOSITORY AUDIT END ===")
