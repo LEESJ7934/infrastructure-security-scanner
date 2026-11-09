@@ -68,7 +68,7 @@ def write_pdf(report, destination):
         p('Codex가 코드·문서 작성과 자동 Actions 실습을 수행했다. 사용자가 직접 수행한 실습 이력과 혼동하지 않는다. 합성 테스트의 성공은 실측 PASS가 아니다.'),
         p(report.get('validation_note','전체 로컬 회귀 1,328개 실행: 실패 0, 기존 환경 의존 skip 22개. 최신 원격 CI 및 main 병합 결과는 PR #5와 별도 최종 전달 기록에서 확인한다.')),
         p(report.get('pull_request_url','https://github.com/LEESJ7934/infrastructure-security-scanner/pull/5')),
-        p('실행 절차: docs/kisa-2026-retest-runbook.md / 면접 16개 사례: docs/kisa-2026-interview.md')]
+        p('실행 절차: docs/kisa-2026-retest-runbook.md / 면접 16개 사례: docs/kisa-2026-case-studies.md')]
     for limitation in report['limitations']:
         story.append(p(limitation))
     def footer(canvas, doc):

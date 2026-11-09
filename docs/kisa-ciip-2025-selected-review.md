@@ -72,8 +72,8 @@ W-04는 `0`이 계정 잠금 미사용을 뜻할 수 있으므로 0~5가 아닌 
 
 ```powershell
 $env:LINUX_MYSQL_STAGE = 'after'
-docker compose -f .\lab\phase2-linux-mysql\compose.replay.json build linux
-docker compose -f .\lab\phase2-linux-mysql\compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 60 linux
+docker compose -f .\lab\linux-mysql-retest\compose.replay.json build linux
+docker compose -f .\lab\linux-mysql-retest\compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 60 linux
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 New-Item -ItemType Directory -Force .\logs\phase2-linux-mysql-replay | Out-Null

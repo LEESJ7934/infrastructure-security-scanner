@@ -28,7 +28,7 @@ Get-ChildItem -LiteralPath $evidence -File | Get-FileHash -Algorithm SHA256
 
 ```powershell
 docker context show
-docker compose -f .\lab\phase2-linux-mysql\compose.replay.json ps
+docker compose -f .\lab\linux-mysql-retest\compose.replay.json ps
 # 기존 문서 kisa-ciip-2025-selected-review.md의 before/after 구성 절차 사용
 .\.venv\Scripts\python.exe -m scripts.run_linux_mysql_audit --execute --lab-profile replay --output (Join-Path $evidence 'linux-after.json')
 .\.venv\Scripts\python.exe -m scripts.collect_kisa_linux_selected --report (Join-Path $evidence 'linux-after.json') --output (Join-Path $evidence 'linux-selected-after.json')
@@ -55,7 +55,7 @@ before에서도 별도 이름으로 같은 수집을 수행한다. `/etc/shadow`
 기존 Docker LAB을 재사용한다. 아래 수집은 읽기 전용이며 컨테이너 생성·삭제·강제 재생성을 하지 않는다.
 
 ```powershell
-docker compose -f .\lab\phase2-web-was\compose.json ps
+docker compose -f .\lab\web-was-lab\compose.json ps
 .\.venv\Scripts\python.exe -m scripts.run_web_was_audit --execute --output (Join-Path $evidence 'web-was.json') --pdf (Join-Path $evidence 'web-was.pdf')
 ```
 
@@ -85,10 +85,10 @@ SELECT @@GLOBAL.mandatory_roles;
 
 ## OPNsense S-06/S-07
 
-기존 승인된 로컬 설정 파일과 수동 시험 자료가 있을 때 `scripts.run_day4_audit --execute`를 재사용한다. 관리 HTTPS 인증서 검증을 우회하지 않는다. 설정 파일의 실제 값·API 키는 공개하지 않는다.
+기존 승인된 로컬 설정 파일과 수동 시험 자료가 있을 때 `scripts.run_opnsense_lab_audit --execute`를 재사용한다. 관리 HTTPS 인증서 검증을 우회하지 않는다. 설정 파일의 실제 값·API 키는 공개하지 않는다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.run_day4_audit --help
+.\.venv\Scripts\python.exe -m scripts.run_opnsense_lab_audit --help
 # 승인된 관리경로/출발지에서만 실제 주소로 대체
 Test-NetConnection <LAB_MANAGEMENT_IP> -Port 443
 curl.exe --cacert <LAB_CA_FILE> -I https://<LAB_MANAGEMENT_HOST>/

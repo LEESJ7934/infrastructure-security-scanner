@@ -128,7 +128,7 @@ def load_bundle(path):
 
 def normalize_guard(document):
     """One canonical parser, shared with the container, loaded without running it."""
-    source = Path(__file__).resolve().parents[2] / "lab/phase2-network/collect.py"
+    source = Path(__file__).resolve().parents[2] / "lab/network-device-lab/collect.py"
     spec = importlib.util.spec_from_file_location("network_guard_normalizer", source)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

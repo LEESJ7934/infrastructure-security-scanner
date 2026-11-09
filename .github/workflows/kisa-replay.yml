@@ -7,7 +7,7 @@ on:
   pull_request:
     paths:
       - "config_audit/**"
-      - "lab/phase2-linux-mysql/**"
+      - "lab/linux-mysql-retest/**"
       - "scripts/compare_kisa_ciip.py"
       - "scripts/collect_kisa_linux_selected.py"
       - "rules/kisa-2026-selected.json"
@@ -33,8 +33,8 @@ jobs:
         run: |
           set -euo pipefail
           export LINUX_MYSQL_STAGE=before
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json build
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json up -d --no-build --wait --wait-timeout 180
+          docker compose -f lab/linux-mysql-retest/compose.replay.json build
+          docker compose -f lab/linux-mysql-retest/compose.replay.json up -d --no-build --wait --wait-timeout 180
           mkdir -p "$RUNNER_TEMP/kisa-evidence"
           python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --output "$RUNNER_TEMP/kisa-evidence/before.json"
           python -m scripts.collect_kisa_linux_selected --report "$RUNNER_TEMP/kisa-evidence/before.json" --output "$RUNNER_TEMP/kisa-evidence/selected-before.json"
@@ -43,9 +43,9 @@ jobs:
         run: |
           set -euo pipefail
           export LINUX_MYSQL_STAGE=after
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json build linux
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 120 linux
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json exec -T mysql bash /opt/lab/harden-mysql.sh
+          docker compose -f lab/linux-mysql-retest/compose.replay.json build linux
+          docker compose -f lab/linux-mysql-retest/compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 120 linux
+          docker compose -f lab/linux-mysql-retest/compose.replay.json exec -T mysql bash /opt/lab/harden-mysql.sh
           python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --baseline-json "$RUNNER_TEMP/kisa-evidence/before.json" --output "$RUNNER_TEMP/kisa-evidence/after.json"
           python -m scripts.compare_kisa_ciip --linux-report "$RUNNER_TEMP/kisa-evidence/after.json" > "$RUNNER_TEMP/kisa-evidence/kisa-u18.json"
           python -m scripts.collect_kisa_linux_selected --report "$RUNNER_TEMP/kisa-evidence/after.json" --output "$RUNNER_TEMP/kisa-evidence/selected-after.json"
@@ -79,4 +79,4 @@ jobs:
         if: always()
         shell: bash
         run: |
-          docker compose -f lab/phase2-linux-mysql/compose.replay.json down --remove-orphans || true
+          docker compose -f lab/linux-mysql-retest/compose.replay.json down --remove-orphans || true

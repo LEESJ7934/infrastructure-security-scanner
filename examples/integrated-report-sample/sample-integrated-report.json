@@ -1,0 +1,2617 @@
+{
+  "schema_version": "day5-offline-final/1",
+  "report_id": "sample-de0d784723fcf9f60df4",
+  "report_version": "SAMPLE-1",
+  "generated_at": "2026-01-03T00:00:00+00:00",
+  "mode": "SAMPLE_SYNTHETIC_ONLY",
+  "completion_status": "SAMPLE_NOT_AUDITED",
+  "sample_context": {
+    "synthetic": true,
+    "notice": "SAMPLE / 합성 데이터 / 실제 점검 결과 아님",
+    "timestamps_are_illustrative": true,
+    "operator": "SAMPLE-OPERATOR",
+    "asset_addresses": {
+      "DEMO-LINUX-01": "192.0.2.10",
+      "DEMO-MYSQL-01": "192.0.2.20",
+      "DEMO-IDS-01": "198.51.100.10",
+      "DEMO-WAF-01": "198.51.100.20",
+      "DEMO-FW-01": "203.0.113.1"
+    },
+    "illustrative_label_counts": {
+      "PASS": 8,
+      "FAIL": 3,
+      "NEEDS_REVIEW": 2
+    }
+  },
+  "inputs": [
+    {
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "input_kind": "results",
+      "import_status": "SYNTHETIC_NOT_COLLECTED"
+    },
+    {
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "input_kind": "results",
+      "import_status": "SYNTHETIC_NOT_COLLECTED"
+    },
+    {
+      "snapshot_id": "day3-final",
+      "day": 3,
+      "input_kind": "results",
+      "import_status": "SYNTHETIC_NOT_COLLECTED"
+    },
+    {
+      "snapshot_id": "day4-manual",
+      "day": 4,
+      "input_kind": "manual",
+      "import_status": "SYNTHETIC_NOT_COLLECTED"
+    }
+  ],
+  "synthetic_inputs": [
+    {
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "input_kind": "results",
+      "document": {
+        "ubuntu": {
+          "settings": {},
+          "checks": [
+            {
+              "asset_id": "DEMO-LINUX-01",
+              "check_id": "LAB-SSH-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt"
+            },
+            {
+              "asset_id": "DEMO-LINUX-01",
+              "check_id": "LAB-SSH-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt"
+            }
+          ]
+        },
+        "mysql": {
+          "settings": {},
+          "checks": [
+            {
+              "asset_id": "DEMO-MYSQL-01",
+              "check_id": "LAB-MYSQL-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt"
+            },
+            {
+              "asset_id": "DEMO-MYSQL-01",
+              "check_id": "LAB-MYSQL-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "input_kind": "results",
+      "document": {
+        "ubuntu": {
+          "settings": {},
+          "checks": [
+            {
+              "asset_id": "DEMO-LINUX-01",
+              "check_id": "LAB-SSH-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt"
+            },
+            {
+              "asset_id": "DEMO-LINUX-01",
+              "check_id": "LAB-SSH-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt"
+            }
+          ]
+        },
+        "mysql": {
+          "settings": {},
+          "checks": [
+            {
+              "asset_id": "DEMO-MYSQL-01",
+              "check_id": "LAB-MYSQL-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt"
+            },
+            {
+              "asset_id": "DEMO-MYSQL-01",
+              "check_id": "LAB-MYSQL-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "snapshot_id": "day3-final",
+      "day": 3,
+      "input_kind": "results",
+      "document": {
+        "results": [
+          {
+            "asset_id": "DEMO-IDS-01",
+            "check_id": "IDS-01",
+            "rule_version": "sample-1",
+            "status": "NOT_TESTED",
+            "execution_id": "SAMPLE-NOT-EXECUTED",
+            "checked_at": "2026-01-01T00:00:00+00:00",
+            "reason": "SAMPLE: 실제 검사 미실행",
+            "scope": "SYNTHETIC_EXAMPLE_ONLY",
+            "diagnostic_source": "SAMPLE-FIXTURE",
+            "verification_method": "not_executed_synthetic_example",
+            "evidence_reference": "sample://not-collected/DEMO-IDS-01/IDS-01.txt"
+          },
+          {
+            "asset_id": "DEMO-WAF-01",
+            "check_id": "WAF-01",
+            "rule_version": "sample-1",
+            "status": "NOT_TESTED",
+            "execution_id": "SAMPLE-NOT-EXECUTED",
+            "checked_at": "2026-01-01T00:00:00+00:00",
+            "reason": "SAMPLE: 실제 검사 미실행",
+            "scope": "SYNTHETIC_EXAMPLE_ONLY",
+            "diagnostic_source": "SAMPLE-FIXTURE",
+            "verification_method": "not_executed_synthetic_example",
+            "evidence_reference": "sample://not-collected/DEMO-WAF-01/WAF-01.txt"
+          }
+        ]
+      }
+    },
+    {
+      "snapshot_id": "day4-manual",
+      "day": 4,
+      "input_kind": "manual",
+      "document": {
+        "schema_version": 1,
+        "asset_id": "DEMO-FW-01",
+        "checks": [
+          {
+            "check_id": "FW-04",
+            "reported_status": "NOT_TESTED",
+            "verified_at": null,
+            "scope": "SYNTHETIC_EXAMPLE_ONLY",
+            "sources": [
+              {
+                "kind": "synthetic_reference",
+                "path": "sample://not-collected/DEMO-FW-01/FW-04.txt"
+              }
+            ],
+            "tests": []
+          },
+          {
+            "check_id": "FW-05",
+            "reported_status": "NOT_TESTED",
+            "verified_at": null,
+            "scope": "SYNTHETIC_EXAMPLE_ONLY",
+            "sources": [
+              {
+                "kind": "synthetic_reference",
+                "path": "sample://not-collected/DEMO-FW-01/FW-05.txt"
+              }
+            ],
+            "tests": []
+          },
+          {
+            "check_id": "FW-06",
+            "reported_status": "NOT_TESTED",
+            "verified_at": null,
+            "scope": "SYNTHETIC_EXAMPLE_ONLY",
+            "sources": [
+              {
+                "kind": "synthetic_reference",
+                "path": "sample://not-collected/DEMO-FW-01/FW-06.txt"
+              }
+            ],
+            "tests": []
+          }
+        ]
+      }
+    }
+  ],
+  "diagnostics": {
+    "schema_version": 1,
+    "generated_at": "2026-01-03T00:00:00+00:00",
+    "reanalysis_at": null,
+    "mode": "offline_import_only",
+    "limitations": [
+      "no_checks_reevaluated",
+      "only_indexed_paths_checked_integrity_not_authenticity",
+      "manual_claims_do_not_override_automatic_results"
+    ],
+    "evidence_index": {
+      "schema_version": 1,
+      "verified_at": null,
+      "entries": [
+        {
+          "asset_id": "DEMO-LINUX-01",
+          "check_id": "LAB-SSH-001",
+          "day": 2,
+          "snapshot_id": "day2-after",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-6f68ae51b226dee79525"
+        },
+        {
+          "asset_id": "DEMO-LINUX-01",
+          "check_id": "LAB-SSH-002",
+          "day": 2,
+          "snapshot_id": "day2-after",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-81bed10ba0e93e2e03dc"
+        },
+        {
+          "asset_id": "DEMO-MYSQL-01",
+          "check_id": "LAB-MYSQL-001",
+          "day": 2,
+          "snapshot_id": "day2-after",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-2ade2c0fc23bcc2703ec"
+        },
+        {
+          "asset_id": "DEMO-MYSQL-01",
+          "check_id": "LAB-MYSQL-002",
+          "day": 2,
+          "snapshot_id": "day2-after",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-eccb6e633bc822ff97ec"
+        },
+        {
+          "asset_id": "DEMO-LINUX-01",
+          "check_id": "LAB-SSH-001",
+          "day": 2,
+          "snapshot_id": "day2-before",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-73482eb533b45a648249"
+        },
+        {
+          "asset_id": "DEMO-LINUX-01",
+          "check_id": "LAB-SSH-002",
+          "day": 2,
+          "snapshot_id": "day2-before",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-9929f44938e2962f7c5a"
+        },
+        {
+          "asset_id": "DEMO-MYSQL-01",
+          "check_id": "LAB-MYSQL-001",
+          "day": 2,
+          "snapshot_id": "day2-before",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-2e400b723616e3ff87e1"
+        },
+        {
+          "asset_id": "DEMO-MYSQL-01",
+          "check_id": "LAB-MYSQL-002",
+          "day": 2,
+          "snapshot_id": "day2-before",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-74711299150c96b38435"
+        },
+        {
+          "asset_id": "DEMO-IDS-01",
+          "check_id": "IDS-01",
+          "day": 3,
+          "snapshot_id": "day3-final",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-IDS-01/IDS-01.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-af469b96cdc67883a0d1"
+        },
+        {
+          "asset_id": "DEMO-WAF-01",
+          "check_id": "WAF-01",
+          "day": 3,
+          "snapshot_id": "day3-final",
+          "channel": "automatic",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": "sample-1",
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-WAF-01/WAF-01.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-4ca896b433e144fbb56d"
+        },
+        {
+          "asset_id": "DEMO-FW-01",
+          "check_id": "FW-04",
+          "day": 4,
+          "snapshot_id": "day4-manual",
+          "channel": "manual",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": null,
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-FW-01/FW-04.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-2c412d4acdd9b1cc3852"
+        },
+        {
+          "asset_id": "DEMO-FW-01",
+          "check_id": "FW-05",
+          "day": 4,
+          "snapshot_id": "day4-manual",
+          "channel": "manual",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": null,
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-FW-01/FW-05.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-a11ccd1f2249ca8c6384"
+        },
+        {
+          "asset_id": "DEMO-FW-01",
+          "check_id": "FW-06",
+          "day": 4,
+          "snapshot_id": "day4-manual",
+          "channel": "manual",
+          "relative_to": null,
+          "expected_sha256": null,
+          "expected_hash_source": null,
+          "rule_version": null,
+          "role": "evidence_reference",
+          "original_reference": "sample://not-collected/DEMO-FW-01/FW-06.txt",
+          "local_path": null,
+          "exists": null,
+          "actual_sha256": null,
+          "status": "EXTERNAL_REFERENCE",
+          "hash_comparison": "NOT_COMPARED",
+          "size_bytes": null,
+          "verified_at": null,
+          "error": null,
+          "limitations": [
+            "SAMPLE: fictitious reference; no file verification performed"
+          ],
+          "evidence_id": "sample-ev-91905b93c2fc0691acb6"
+        }
+      ],
+      "counts": {
+        "VERIFIED": 0,
+        "MISMATCH": 0,
+        "MISSING": 0,
+        "NOT_VERIFIED": 0,
+        "EXTERNAL_REFERENCE": 13,
+        "INVALID_REFERENCE": 0
+      },
+      "unique_local_files": 0,
+      "duplicate_bindings_removed": 0,
+      "limitations": [
+        "SAMPLE: no actual evidence collected or verified"
+      ]
+    },
+    "evidence_sources": [],
+    "snapshots": [
+      {
+        "snapshot_id": "day2-before",
+        "day": 2,
+        "source": "sample://inputs/day2-before.json",
+        "input_kind": "results",
+        "results": [
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-001",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-SSH-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-73482eb533b45a648249"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-002",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-SSH-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-9929f44938e2962f7c5a"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-001",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-MYSQL-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-2e400b723616e3ff87e1"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-002",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-MYSQL-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-74711299150c96b38435"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          "raw_settings_excluded_collection_separate_from_verdict"
+        ],
+        "collection": {
+          "ubuntu": {},
+          "mysql": {}
+        },
+        "import_status": "LOADED"
+      },
+      {
+        "snapshot_id": "day2-after",
+        "day": 2,
+        "source": "sample://inputs/day2-after.json",
+        "input_kind": "results",
+        "results": [
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-001",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-SSH-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-6f68ae51b226dee79525"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-002",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-SSH-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-81bed10ba0e93e2e03dc"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-001",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-MYSQL-001",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-2ade2c0fc23bcc2703ec"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-002",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "LAB-MYSQL-002",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-02T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-eccb6e633bc822ff97ec"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          "raw_settings_excluded_collection_separate_from_verdict"
+        ],
+        "collection": {
+          "ubuntu": {},
+          "mysql": {}
+        },
+        "import_status": "LOADED"
+      },
+      {
+        "snapshot_id": "day3-final",
+        "day": 3,
+        "source": "sample://inputs/day3-final.json",
+        "input_kind": "results",
+        "results": [
+          {
+            "asset_id": "DEMO-IDS-01",
+            "check_id": "IDS-01",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "IDS-01",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-IDS-01/IDS-01.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-af469b96cdc67883a0d1"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-WAF-01",
+            "check_id": "WAF-01",
+            "rule_version": "sample-1",
+            "automatic": {
+              "check_id": "WAF-01",
+              "rule_version": "sample-1",
+              "status": "NOT_TESTED",
+              "execution_id": "SAMPLE-NOT-EXECUTED",
+              "checked_at": "2026-01-01T00:00:00+00:00",
+              "reason": "SAMPLE: 실제 검사 미실행",
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "diagnostic_source": "SAMPLE-FIXTURE",
+              "verification_method": "not_executed_synthetic_example",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-WAF-01/WAF-01.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "import_validation": "STRUCTURE_ONLY"
+            },
+            "manual": null,
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "automatic": [
+                "sample-ev-4ca896b433e144fbb56d"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [],
+        "collection": {},
+        "import_status": "LOADED"
+      },
+      {
+        "snapshot_id": "day4-manual",
+        "day": 4,
+        "source": "sample://inputs/day4-manual.json",
+        "input_kind": "manual",
+        "results": [
+          {
+            "asset_id": "DEMO-FW-01",
+            "check_id": "FW-04",
+            "rule_version": null,
+            "automatic": null,
+            "manual": {
+              "check_id": "FW-04",
+              "reported_status": "NOT_TESTED",
+              "verified_at": null,
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-FW-01/FW-04.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED",
+                  "kind": "synthetic_reference"
+                }
+              ],
+              "tests": [],
+              "import_validation": "STRUCTURE_ONLY",
+              "status": "NOT_TESTED",
+              "status_origin": "operator_reported_not_revalidated"
+            },
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "manual": [
+                "sample-ev-2c412d4acdd9b1cc3852"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-FW-01",
+            "check_id": "FW-05",
+            "rule_version": null,
+            "automatic": null,
+            "manual": {
+              "check_id": "FW-05",
+              "reported_status": "NOT_TESTED",
+              "verified_at": null,
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-FW-01/FW-05.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED",
+                  "kind": "synthetic_reference"
+                }
+              ],
+              "tests": [],
+              "import_validation": "STRUCTURE_ONLY",
+              "status": "NOT_TESTED",
+              "status_origin": "operator_reported_not_revalidated"
+            },
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "manual": [
+                "sample-ev-a11ccd1f2249ca8c6384"
+              ]
+            }
+          },
+          {
+            "asset_id": "DEMO-FW-01",
+            "check_id": "FW-06",
+            "rule_version": null,
+            "automatic": null,
+            "manual": {
+              "check_id": "FW-06",
+              "reported_status": "NOT_TESTED",
+              "verified_at": null,
+              "scope": "SYNTHETIC_EXAMPLE_ONLY",
+              "evidence_references": [
+                {
+                  "reference": "sample://not-collected/DEMO-FW-01/FW-06.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED",
+                  "kind": "synthetic_reference"
+                }
+              ],
+              "tests": [],
+              "import_validation": "STRUCTURE_ONLY",
+              "status": "NOT_TESTED",
+              "status_origin": "operator_reported_not_revalidated"
+            },
+            "analyses": {},
+            "risk": null,
+            "recommendation": null,
+            "evidence_index_ids": {
+              "manual": [
+                "sample-ev-91905b93c2fc0691acb6"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          "automatic_results_not_supplied",
+          "manual_claims_not_revalidated",
+          "pf_and_log_analysis_results_not_supplied"
+        ],
+        "collection": {},
+        "import_status": "LOADED"
+      }
+    ]
+  },
+  "comparison": {
+    "schema_version": 1,
+    "source_report_generated_at": "2026-01-03T00:00:00+00:00",
+    "generated_at": "2026-01-03T00:00:00+00:00",
+    "evidence_verified_at": null,
+    "pairs": [
+      {
+        "before_snapshot_id": "day2-before",
+        "after_snapshot_id": "day2-after",
+        "before_source_file": "sample://inputs/day2-before.json",
+        "after_source_file": "sample://inputs/day2-after.json",
+        "before_channel": "automatic",
+        "after_channel": "automatic",
+        "relation_status": "VALID",
+        "issues": [],
+        "results": [
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-001",
+            "before_snapshot_id": "day2-before",
+            "after_snapshot_id": "day2-after",
+            "before_status": "NOT_TESTED",
+            "after_status": "NOT_TESTED",
+            "comparison_result": "UNVERIFIABLE",
+            "observed_change": null,
+            "recorded_transition": {
+              "before": "NOT_TESTED",
+              "after": "NOT_TESTED"
+            },
+            "comparability": {
+              "status": "UNVERIFIABLE",
+              "metadata_status": "COMPARABLE",
+              "checks": {
+                "channel": "MATCH",
+                "source_format": "MATCH",
+                "scope": "MATCH",
+                "diagnostic_source": "MATCH",
+                "verification_method": "MATCH",
+                "rule_version": "MATCH",
+                "diagnostic_time": "MATCH",
+                "asset_id": "MATCH"
+              },
+              "compatibility_review_evidence_id": null,
+              "baseline_coverage_evidence_id": null
+            },
+            "before_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-73482eb533b45a648249",
+                  "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "after_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-6f68ae51b226dee79525",
+                  "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "verification_method": {
+              "before_channel": "automatic",
+              "after_channel": "automatic",
+              "before": "not_executed_synthetic_example",
+              "after": "not_executed_synthetic_example"
+            },
+            "rule_version": {
+              "before": "sample-1",
+              "after": "sample-1"
+            },
+            "scope": {
+              "before": "SYNTHETIC_EXAMPLE_ONLY",
+              "after": "SYNTHETIC_EXAMPLE_ONLY"
+            },
+            "diagnostic_source": {
+              "before": "SAMPLE-FIXTURE",
+              "after": "SAMPLE-FIXTURE"
+            },
+            "diagnostic_time": {
+              "before": "2026-01-01T00:00:00+00:00",
+              "after": "2026-01-02T00:00:00+00:00",
+              "before_basis": "diagnostic_time",
+              "after_basis": "diagnostic_time",
+              "before_reviewed_at": null,
+              "after_reviewed_at": null
+            },
+            "candidate_counts": {
+              "before": 1,
+              "after": 1
+            },
+            "unmet_conditions": [
+              "after_diagnostic_status_not_comparable",
+              "after_no_readable_local_evidence",
+              "before_diagnostic_status_not_comparable",
+              "before_no_readable_local_evidence"
+            ],
+            "limitations": [
+              "after_external_evidence_not_locally_verified",
+              "before_external_evidence_not_locally_verified",
+              "evidence_index_is_a_prior_verification_snapshot_files_not_reopened",
+              "hash_integrity_does_not_prove_authenticity_or_collection_completeness",
+              "recorded_transitions_do_not_establish_remediation_causality",
+              "remediation_history_not_provided_or_verified"
+            ],
+            "remediation_history_confirmed": false
+          },
+          {
+            "asset_id": "DEMO-LINUX-01",
+            "check_id": "LAB-SSH-002",
+            "before_snapshot_id": "day2-before",
+            "after_snapshot_id": "day2-after",
+            "before_status": "NOT_TESTED",
+            "after_status": "NOT_TESTED",
+            "comparison_result": "UNVERIFIABLE",
+            "observed_change": null,
+            "recorded_transition": {
+              "before": "NOT_TESTED",
+              "after": "NOT_TESTED"
+            },
+            "comparability": {
+              "status": "UNVERIFIABLE",
+              "metadata_status": "COMPARABLE",
+              "checks": {
+                "channel": "MATCH",
+                "source_format": "MATCH",
+                "scope": "MATCH",
+                "diagnostic_source": "MATCH",
+                "verification_method": "MATCH",
+                "rule_version": "MATCH",
+                "diagnostic_time": "MATCH",
+                "asset_id": "MATCH"
+              },
+              "compatibility_review_evidence_id": null,
+              "baseline_coverage_evidence_id": null
+            },
+            "before_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-9929f44938e2962f7c5a",
+                  "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "after_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-81bed10ba0e93e2e03dc",
+                  "original_reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "verification_method": {
+              "before_channel": "automatic",
+              "after_channel": "automatic",
+              "before": "not_executed_synthetic_example",
+              "after": "not_executed_synthetic_example"
+            },
+            "rule_version": {
+              "before": "sample-1",
+              "after": "sample-1"
+            },
+            "scope": {
+              "before": "SYNTHETIC_EXAMPLE_ONLY",
+              "after": "SYNTHETIC_EXAMPLE_ONLY"
+            },
+            "diagnostic_source": {
+              "before": "SAMPLE-FIXTURE",
+              "after": "SAMPLE-FIXTURE"
+            },
+            "diagnostic_time": {
+              "before": "2026-01-01T00:00:00+00:00",
+              "after": "2026-01-02T00:00:00+00:00",
+              "before_basis": "diagnostic_time",
+              "after_basis": "diagnostic_time",
+              "before_reviewed_at": null,
+              "after_reviewed_at": null
+            },
+            "candidate_counts": {
+              "before": 1,
+              "after": 1
+            },
+            "unmet_conditions": [
+              "after_diagnostic_status_not_comparable",
+              "after_no_readable_local_evidence",
+              "before_diagnostic_status_not_comparable",
+              "before_no_readable_local_evidence"
+            ],
+            "limitations": [
+              "after_external_evidence_not_locally_verified",
+              "before_external_evidence_not_locally_verified",
+              "evidence_index_is_a_prior_verification_snapshot_files_not_reopened",
+              "hash_integrity_does_not_prove_authenticity_or_collection_completeness",
+              "recorded_transitions_do_not_establish_remediation_causality",
+              "remediation_history_not_provided_or_verified"
+            ],
+            "remediation_history_confirmed": false
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-001",
+            "before_snapshot_id": "day2-before",
+            "after_snapshot_id": "day2-after",
+            "before_status": "NOT_TESTED",
+            "after_status": "NOT_TESTED",
+            "comparison_result": "UNVERIFIABLE",
+            "observed_change": null,
+            "recorded_transition": {
+              "before": "NOT_TESTED",
+              "after": "NOT_TESTED"
+            },
+            "comparability": {
+              "status": "UNVERIFIABLE",
+              "metadata_status": "COMPARABLE",
+              "checks": {
+                "channel": "MATCH",
+                "source_format": "MATCH",
+                "scope": "MATCH",
+                "diagnostic_source": "MATCH",
+                "verification_method": "MATCH",
+                "rule_version": "MATCH",
+                "diagnostic_time": "MATCH",
+                "asset_id": "MATCH"
+              },
+              "compatibility_review_evidence_id": null,
+              "baseline_coverage_evidence_id": null
+            },
+            "before_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-2e400b723616e3ff87e1",
+                  "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "after_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-2ade2c0fc23bcc2703ec",
+                  "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "verification_method": {
+              "before_channel": "automatic",
+              "after_channel": "automatic",
+              "before": "not_executed_synthetic_example",
+              "after": "not_executed_synthetic_example"
+            },
+            "rule_version": {
+              "before": "sample-1",
+              "after": "sample-1"
+            },
+            "scope": {
+              "before": "SYNTHETIC_EXAMPLE_ONLY",
+              "after": "SYNTHETIC_EXAMPLE_ONLY"
+            },
+            "diagnostic_source": {
+              "before": "SAMPLE-FIXTURE",
+              "after": "SAMPLE-FIXTURE"
+            },
+            "diagnostic_time": {
+              "before": "2026-01-01T00:00:00+00:00",
+              "after": "2026-01-02T00:00:00+00:00",
+              "before_basis": "diagnostic_time",
+              "after_basis": "diagnostic_time",
+              "before_reviewed_at": null,
+              "after_reviewed_at": null
+            },
+            "candidate_counts": {
+              "before": 1,
+              "after": 1
+            },
+            "unmet_conditions": [
+              "after_diagnostic_status_not_comparable",
+              "after_no_readable_local_evidence",
+              "before_diagnostic_status_not_comparable",
+              "before_no_readable_local_evidence"
+            ],
+            "limitations": [
+              "after_external_evidence_not_locally_verified",
+              "before_external_evidence_not_locally_verified",
+              "evidence_index_is_a_prior_verification_snapshot_files_not_reopened",
+              "hash_integrity_does_not_prove_authenticity_or_collection_completeness",
+              "recorded_transitions_do_not_establish_remediation_causality",
+              "remediation_history_not_provided_or_verified"
+            ],
+            "remediation_history_confirmed": false
+          },
+          {
+            "asset_id": "DEMO-MYSQL-01",
+            "check_id": "LAB-MYSQL-002",
+            "before_snapshot_id": "day2-before",
+            "after_snapshot_id": "day2-after",
+            "before_status": "NOT_TESTED",
+            "after_status": "NOT_TESTED",
+            "comparison_result": "UNVERIFIABLE",
+            "observed_change": null,
+            "recorded_transition": {
+              "before": "NOT_TESTED",
+              "after": "NOT_TESTED"
+            },
+            "comparability": {
+              "status": "UNVERIFIABLE",
+              "metadata_status": "COMPARABLE",
+              "checks": {
+                "channel": "MATCH",
+                "source_format": "MATCH",
+                "scope": "MATCH",
+                "diagnostic_source": "MATCH",
+                "verification_method": "MATCH",
+                "rule_version": "MATCH",
+                "diagnostic_time": "MATCH",
+                "asset_id": "MATCH"
+              },
+              "compatibility_review_evidence_id": null,
+              "baseline_coverage_evidence_id": null
+            },
+            "before_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-74711299150c96b38435",
+                  "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "after_evidence": {
+              "references": [
+                {
+                  "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "relative_to": null,
+                  "verification": "NOT_VERIFIED"
+                }
+              ],
+              "entries": [
+                {
+                  "evidence_id": "sample-ev-eccb6e633bc822ff97ec",
+                  "original_reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+                  "local_path": null,
+                  "exists": null,
+                  "status": "EXTERNAL_REFERENCE",
+                  "actual_sha256": null,
+                  "expected_sha256": null,
+                  "hash_comparison": "NOT_COMPARED",
+                  "size_bytes": null,
+                  "verified_at": null,
+                  "error": null,
+                  "role": "evidence_reference",
+                  "channel": "automatic"
+                }
+              ],
+              "counts": {
+                "VERIFIED": 0,
+                "MISMATCH": 0,
+                "MISSING": 0,
+                "NOT_VERIFIED": 0,
+                "EXTERNAL_REFERENCE": 1,
+                "INVALID_REFERENCE": 0
+              },
+              "confidence": "UNAVAILABLE",
+              "blocking_issues": [
+                "no_readable_local_evidence"
+              ],
+              "limitations": [
+                "external_evidence_not_locally_verified"
+              ]
+            },
+            "verification_method": {
+              "before_channel": "automatic",
+              "after_channel": "automatic",
+              "before": "not_executed_synthetic_example",
+              "after": "not_executed_synthetic_example"
+            },
+            "rule_version": {
+              "before": "sample-1",
+              "after": "sample-1"
+            },
+            "scope": {
+              "before": "SYNTHETIC_EXAMPLE_ONLY",
+              "after": "SYNTHETIC_EXAMPLE_ONLY"
+            },
+            "diagnostic_source": {
+              "before": "SAMPLE-FIXTURE",
+              "after": "SAMPLE-FIXTURE"
+            },
+            "diagnostic_time": {
+              "before": "2026-01-01T00:00:00+00:00",
+              "after": "2026-01-02T00:00:00+00:00",
+              "before_basis": "diagnostic_time",
+              "after_basis": "diagnostic_time",
+              "before_reviewed_at": null,
+              "after_reviewed_at": null
+            },
+            "candidate_counts": {
+              "before": 1,
+              "after": 1
+            },
+            "unmet_conditions": [
+              "after_diagnostic_status_not_comparable",
+              "after_no_readable_local_evidence",
+              "before_diagnostic_status_not_comparable",
+              "before_no_readable_local_evidence"
+            ],
+            "limitations": [
+              "after_external_evidence_not_locally_verified",
+              "before_external_evidence_not_locally_verified",
+              "evidence_index_is_a_prior_verification_snapshot_files_not_reopened",
+              "hash_integrity_does_not_prove_authenticity_or_collection_completeness",
+              "recorded_transitions_do_not_establish_remediation_causality",
+              "remediation_history_not_provided_or_verified"
+            ],
+            "remediation_history_confirmed": false
+          }
+        ]
+      }
+    ],
+    "unpaired_snapshot_ids": [
+      "day3-final",
+      "day4-manual"
+    ],
+    "summary": {
+      "IMPROVED_OBSERVED": 0,
+      "UNRESOLVED": 0,
+      "REGRESSED": 0,
+      "UNCHANGED_PASS": 0,
+      "NEW_FINDING": 0,
+      "UNVERIFIABLE": 4,
+      "INCOMPARABLE": 0,
+      "MISSING_IN_RETEST": 0
+    },
+    "observed_transition_summary": {
+      "FAIL_TO_PASS": 0,
+      "FAIL_TO_FAIL": 0,
+      "PASS_TO_FAIL": 0,
+      "PASS_TO_PASS": 0
+    },
+    "invalid_relation_count": 0,
+    "limitations": [
+      "recorded_transitions_do_not_establish_remediation_causality",
+      "remediation_history_not_provided_or_verified",
+      "hash_integrity_does_not_prove_authenticity_or_collection_completeness",
+      "evidence_index_is_a_prior_verification_snapshot_files_not_reopened"
+    ],
+    "time_basis": "SYNTHETIC_FIXTURE_CLOCK_NOT_ACTUAL_EXECUTION_TIME"
+  },
+  "details": [
+    {
+      "record_id": "RESULT-001",
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "asset_id": "DEMO-LINUX-01",
+      "check_id": "LAB-SSH-001",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-SSH-001",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-73482eb533b45a648249"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "SSH 빈 비밀번호 정책 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-002",
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "asset_id": "DEMO-LINUX-01",
+      "check_id": "LAB-SSH-002",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-SSH-002",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-9929f44938e2962f7c5a"
+        ]
+      },
+      "illustrative_status": "FAIL",
+      "definition": {
+        "check_name": "SSH 직접 루트 로그인 정책 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-003",
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "asset_id": "DEMO-MYSQL-01",
+      "check_id": "LAB-MYSQL-001",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-MYSQL-001",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-2e400b723616e3ff87e1"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "LOCAL INFILE 설정 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-004",
+      "snapshot_id": "day2-before",
+      "day": 2,
+      "asset_id": "DEMO-MYSQL-01",
+      "check_id": "LAB-MYSQL-002",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-MYSQL-002",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-74711299150c96b38435"
+        ]
+      },
+      "illustrative_status": "FAIL",
+      "definition": {
+        "check_name": "암호화 전송 설정 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-005",
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "asset_id": "DEMO-LINUX-01",
+      "check_id": "LAB-SSH-001",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-SSH-001",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-02T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-001.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-6f68ae51b226dee79525"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "SSH 빈 비밀번호 정책 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-006",
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "asset_id": "DEMO-LINUX-01",
+      "check_id": "LAB-SSH-002",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-SSH-002",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-02T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-LINUX-01/LAB-SSH-002.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-81bed10ba0e93e2e03dc"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "SSH 직접 루트 로그인 정책 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-007",
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "asset_id": "DEMO-MYSQL-01",
+      "check_id": "LAB-MYSQL-001",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-MYSQL-001",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-02T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-001.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-2ade2c0fc23bcc2703ec"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "LOCAL INFILE 설정 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-008",
+      "snapshot_id": "day2-after",
+      "day": 2,
+      "asset_id": "DEMO-MYSQL-01",
+      "check_id": "LAB-MYSQL-002",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "LAB-MYSQL-002",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-02T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-MYSQL-01/LAB-MYSQL-002.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-eccb6e633bc822ff97ec"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "암호화 전송 설정 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-009",
+      "snapshot_id": "day3-final",
+      "day": 3,
+      "asset_id": "DEMO-IDS-01",
+      "check_id": "IDS-01",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "IDS-01",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-IDS-01/IDS-01.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-af469b96cdc67883a0d1"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "IDS 출력 설정 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-010",
+      "snapshot_id": "day3-final",
+      "day": 3,
+      "asset_id": "DEMO-WAF-01",
+      "check_id": "WAF-01",
+      "rule_version": "sample-1",
+      "automatic": {
+        "check_id": "WAF-01",
+        "rule_version": "sample-1",
+        "status": "NOT_TESTED",
+        "execution_id": "SAMPLE-NOT-EXECUTED",
+        "checked_at": "2026-01-01T00:00:00+00:00",
+        "reason": "SAMPLE: 실제 검사 미실행",
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "diagnostic_source": "SAMPLE-FIXTURE",
+        "verification_method": "not_executed_synthetic_example",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-WAF-01/WAF-01.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED"
+          }
+        ],
+        "import_validation": "STRUCTURE_ONLY"
+      },
+      "manual": null,
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "automatic": [
+          "sample-ev-4ca896b433e144fbb56d"
+        ]
+      },
+      "illustrative_status": "FAIL",
+      "definition": {
+        "check_name": "WAF 정책 실행 모드 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-011",
+      "snapshot_id": "day4-manual",
+      "day": 4,
+      "asset_id": "DEMO-FW-01",
+      "check_id": "FW-04",
+      "rule_version": null,
+      "automatic": null,
+      "manual": {
+        "check_id": "FW-04",
+        "reported_status": "NOT_TESTED",
+        "verified_at": null,
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-FW-01/FW-04.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED",
+            "kind": "synthetic_reference"
+          }
+        ],
+        "tests": [],
+        "import_validation": "STRUCTURE_ONLY",
+        "status": "NOT_TESTED",
+        "status_origin": "operator_reported_not_revalidated"
+      },
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "manual": [
+          "sample-ev-2c412d4acdd9b1cc3852"
+        ]
+      },
+      "illustrative_status": "NEEDS_REVIEW",
+      "definition": {
+        "check_name": "방화벽 규칙 범위 검토 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-012",
+      "snapshot_id": "day4-manual",
+      "day": 4,
+      "asset_id": "DEMO-FW-01",
+      "check_id": "FW-05",
+      "rule_version": null,
+      "automatic": null,
+      "manual": {
+        "check_id": "FW-05",
+        "reported_status": "NOT_TESTED",
+        "verified_at": null,
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-FW-01/FW-05.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED",
+            "kind": "synthetic_reference"
+          }
+        ],
+        "tests": [],
+        "import_validation": "STRUCTURE_ONLY",
+        "status": "NOT_TESTED",
+        "status_origin": "operator_reported_not_revalidated"
+      },
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "manual": [
+          "sample-ev-a11ccd1f2249ca8c6384"
+        ]
+      },
+      "illustrative_status": "NEEDS_REVIEW",
+      "definition": {
+        "check_name": "로그와 규칙 연계 검토 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    },
+    {
+      "record_id": "RESULT-013",
+      "snapshot_id": "day4-manual",
+      "day": 4,
+      "asset_id": "DEMO-FW-01",
+      "check_id": "FW-06",
+      "rule_version": null,
+      "automatic": null,
+      "manual": {
+        "check_id": "FW-06",
+        "reported_status": "NOT_TESTED",
+        "verified_at": null,
+        "scope": "SYNTHETIC_EXAMPLE_ONLY",
+        "evidence_references": [
+          {
+            "reference": "sample://not-collected/DEMO-FW-01/FW-06.txt",
+            "relative_to": null,
+            "verification": "NOT_VERIFIED",
+            "kind": "synthetic_reference"
+          }
+        ],
+        "tests": [],
+        "import_validation": "STRUCTURE_ONLY",
+        "status": "NOT_TESTED",
+        "status_origin": "operator_reported_not_revalidated"
+      },
+      "analyses": {},
+      "risk": null,
+      "recommendation": null,
+      "evidence_index_ids": {
+        "manual": [
+          "sample-ev-91905b93c2fc0691acb6"
+        ]
+      },
+      "illustrative_status": "PASS",
+      "definition": {
+        "check_name": "정책 통신 시험 예시",
+        "expected_condition": "합성 UI 설명용 기준; 실제 검사에 적용하지 않음",
+        "source_reference": "scripts/generate_report_sample.py#SYNTHETIC_DEFINITIONS"
+      },
+      "definition_is_matching_rule_version": false,
+      "expected_condition": null,
+      "recommendation_from_definition": null,
+      "observed_value": null,
+      "observed_value_note": "SAMPLE: 실제 관찰·장비 검사 없음",
+      "unknowns": [
+        "실제 상태 미검사",
+        "원본 로그 없음",
+        "독립 기대 해시 없음",
+        "조치 이력 없음"
+      ]
+    }
+  ],
+  "summary": {
+    "asset_count": 5,
+    "record_count": 13,
+    "unique_check_count": 9,
+    "by_snapshot_asset_channel": [
+      {
+        "snapshot_id": "day2-before",
+        "asset_id": "DEMO-LINUX-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 2,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day2-before",
+        "asset_id": "DEMO-MYSQL-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 2,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day2-after",
+        "asset_id": "DEMO-LINUX-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 2,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day2-after",
+        "asset_id": "DEMO-MYSQL-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 2,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day3-final",
+        "asset_id": "DEMO-IDS-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 1,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day3-final",
+        "asset_id": "DEMO-WAF-01",
+        "channel": "automatic",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 1,
+          "ERROR": 0
+        }
+      },
+      {
+        "snapshot_id": "day4-manual",
+        "asset_id": "DEMO-FW-01",
+        "channel": "manual",
+        "status_counts": {
+          "PASS": 0,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 0,
+          "NOT_APPLICABLE": 0,
+          "NOT_TESTED": 3,
+          "ERROR": 0
+        }
+      }
+    ],
+    "selected_view": {
+      "snapshot_ids": [
+        "day2-after",
+        "day3-final",
+        "day4-manual"
+      ],
+      "note": "SAMPLE: 실제 판정은 모두 NOT_TESTED. 예시 라벨은 실제 진단 결과가 아닙니다.",
+      "record_count": 9,
+      "automatic": {
+        "PASS": 0,
+        "FAIL": 0,
+        "NEEDS_REVIEW": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_TESTED": 6,
+        "ERROR": 0
+      },
+      "manual": {
+        "PASS": 0,
+        "FAIL": 0,
+        "NEEDS_REVIEW": 0,
+        "NOT_APPLICABLE": 0,
+        "NOT_TESTED": 3,
+        "ERROR": 0
+      }
+    }
+  },
+  "index_reference_difference": {
+    "note": "SAMPLE: 실제 보고서의 통계와 비교하지 않음"
+  },
+  "limitations": [
+    "SAMPLE / 합성 데이터 / 실제 점검 결과 아님. 예시 라벨을 실제 PASS·FAIL로 해석하지 않습니다.",
+    "모든 자산·문서용 예약 IP·시각·운영자명은 합성 자료입니다.",
+    "증적 URI는 가상의 예시이며 해시나 실제 파일을 검증하지 않았습니다.",
+    "원본 장비 로그·스크린샷·사용자 경로·인증정보를 읽거나 포함하지 않았습니다.",
+    "PDF 재생성은 폰트와 라이브러리 버전에 따라 페이지 수·파일 해시가 달라질 수 있습니다."
+  ],
+  "content_sha256": "02da37382ae09b1c14b9ef4d110e1b22f52f9863aea2d173031d3ba797be4573"
+}

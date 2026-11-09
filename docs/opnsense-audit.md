@@ -17,12 +17,12 @@
 ## A. 추가 파일과 변경 범위
 
 - `config_audit/collectors/opnsense.py`: 조회 전용 API 클라이언트, 인터페이스 응답 어댑터, 로그 스냅샷 검사, 정규화 증거 기반 수집기, 별도 승인 Ping 함수.
-- `scripts/run_day4_audit.py`: 준비 모드, `--execute`, `--ping`, 시나리오 선택, 기존 `evaluate()` 연결 및 안전한 JSON 출력.
-- `tests/test_day4_audit.py`: 기존 Day4 테스트 79개 유지, 로그 요청/응답 보완 9개 추가, 총 88개.
+- `scripts/run_opnsense_lab_audit.py`: 준비 모드, `--execute`, `--ping`, 시나리오 선택, 기존 `evaluate()` 연결 및 안전한 JSON 출력.
+- `tests/test_opnsense_lab_audit.py`: 기존 Day4 테스트 79개 유지, 로그 요청/응답 보완 9개 추가, 총 88개.
 - `docs/opnsense-audit.md`: 본 구현·검증·실행 보고서.
 - `config_audit/manual_evidence.py`: 수동 입력의 엄격한 구조 검사, 로컬 첨부 SHA-256 확인, 자동/수동 결과 분리와 충돌 표시.
-- `examples/day4-manual-evidence.template.json`: 증적 미첨부 상태의 빈 입력 템플릿.
-- `tests/test_day4_manual_evidence.py`: 수동 증적 연계 테스트 26개. 기존 88개 테스트는 변경하지 않았다.
+- `examples/opnsense-manual-evidence.template.json`: 증적 미첨부 상태의 빈 입력 템플릿.
+- `tests/test_opnsense_manual_evidence.py`: 수동 증적 연계 테스트 26개. 기존 88개 테스트는 변경하지 않았다.
 
 기존 Day 1~3 코드, 공통 모델·판정 엔진, 기존 381개 테스트는 변경하지 않았다. 의존성 추가 없이 기존 requests와 표준 라이브러리를 사용한다. Docker 변경, Hyper-V 조작, 실제 방화벽 API 호출, 실제 Ping, Git commit/push는 수행하지 않았다.
 
@@ -105,7 +105,7 @@ FW-04의 다섯 고정 사례:
 
 ## D. 신규 테스트
 
-`.\.venv\Scripts\python.exe -B -m unittest tests.test_day4_log_rule_evidence tests.test_day4_pf_evidence tests.test_day4_audit tests.test_day4_manual_evidence -v`: **162개 전부 통과** (기존 139개 유지 + FW-05 로그 연계 23개).
+`.\.venv\Scripts\python.exe -B -m unittest tests.test_opnsense_log_rule_evidence tests.test_opnsense_pf_evidence tests.test_opnsense_lab_audit tests.test_opnsense_manual_evidence -v`: **162개 전부 통과** (기존 139개 유지 + FW-05 로그 연계 23개).
 
 LAN/WAN IP·마스크·할당·활성 상태, 누락/중복, WAN과 LAN 관리 접속 구분, 허용/차단/불명 시험, Quick·순서·shadowing, 비활성 규칙, host ICMP 예외 범위, 로그 양쪽 action 및 튜플/rid/시간/run 불일치, Ping 미실행, 인증/ACL/TLS/JSON/HTTP 오류, 목적지·경로 주입 차단, CA 필수, 리디렉션/환경 프록시 차단, 안전한 출력, 실제 evaluate() 6회 호출 등을 확인했다.
 
@@ -145,7 +145,7 @@ LAN/WAN IP·마스크·할당·활성 상태, 누락/중복, WAN과 LAN 관리 �
 ```powershell
 Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
 $env:PYTHONIOENCODING = 'utf-8'
-python -B -m scripts.run_day4_audit
+python -B -m scripts.run_opnsense_lab_audit
 ```
 
 프로젝트 의존성이 `.venv`에만 설치되어 있다면 `python` 대신 `.\.venv\Scripts\python.exe`를 사용한다.
@@ -153,7 +153,7 @@ python -B -m scripts.run_day4_audit
 오프라인 테스트:
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day4_audit -v
+.\.venv\Scripts\python.exe -B -m unittest tests.test_opnsense_lab_audit -v
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 
@@ -164,13 +164,13 @@ python -B -m scripts.run_day4_audit
 # 실제 비밀을 명령행 리터럴, 파일, PowerShell 기록이나 Git에 적지 않는다.
 $env:OPNSENSE_API_ACCOUNT = 'audit-reader'
 $env:OPNSENSE_CA_BUNDLE = 'C:\secure\opnsense-lab-ca.pem'
-python -B -m scripts.run_day4_audit --execute
+python -B -m scripts.run_opnsense_lab_audit --execute
 
 # 현재 비활성 Block 상태에 맞는 pass 시나리오
-python -B -m scripts.run_day4_audit --execute --ping --scenario pass
+python -B -m scripts.run_opnsense_lab_audit --execute --ping --scenario pass
 
 # 운영자가 별도로 Block 정책을 준비한 실습에서만 사용
-python -B -m scripts.run_day4_audit --execute --ping --scenario block
+python -B -m scripts.run_opnsense_lab_audit --execute --ping --scenario block
 ```
 
 필수 환경 변수는 `OPNSENSE_API_ACCOUNT`, `OPNSENSE_API_KEY`, `OPNSENSE_API_SECRET`, `OPNSENSE_CA_BUNDLE`이다. 이 문서의 향후 실행 명령은 이번 개발 과정에서 실행하지 않았다.
@@ -190,7 +190,7 @@ python -B -m scripts.run_day4_audit --execute --ping --scenario block
 
 ## I. 선택적 수동 증적 연계
 
-이번 작업에서는 `config_audit/manual_evidence.py`, `examples/day4-manual-evidence.template.json`, `tests/test_day4_manual_evidence.py`를 추가하고 실행 스크립트와 본 문서를 수정했다. OPNsense 수집기 및 FW-01~06 자동 판정 함수는 변경하지 않았다. FW-01 자동 PASS, 로그 GET limit=20, 로그 수집과 ID 매핑 403의 분리는 유지한다.
+이번 작업에서는 `config_audit/manual_evidence.py`, `examples/opnsense-manual-evidence.template.json`, `tests/test_opnsense_manual_evidence.py`를 추가하고 실행 스크립트와 본 문서를 수정했다. OPNsense 수집기 및 FW-01~06 자동 판정 함수는 변경하지 않았다. FW-01 자동 PASS, 로그 GET limit=20, 로그 수집과 ID 매핑 403의 분리는 유지한다.
 
 초기 구현 당시에는 실제 화면·시험 파일이 없어 빈 템플릿만 제공했다. 이후 로컬 `evidence/day4/screenshots/`의 PNG 7개 및 기존 `fw06-ping-allow.txt`를 직접 확인하고, 실제 `evidence/day4/manual.json`을 수정했다. 템플릿은 계속 미작성 상태를 유지한다. 실제 등록 상태는 아래 J절과 같다.
 
@@ -201,16 +201,16 @@ python -B -m scripts.run_day4_audit --execute --ping --scenario block
 ```powershell
 Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
 New-Item -ItemType Directory -Force '.\evidence\day4' | Out-Null
-Copy-Item '.\examples\day4-manual-evidence.template.json' '.\evidence\day4\manual.json'
+Copy-Item '.\examples\opnsense-manual-evidence.template.json' '.\evidence\day4\manual.json'
 # 직접 비식별화한 화면/시험 결과 파일을 evidence/day4/ 아래에 배치한다.
 # 다음 값은 해당 sources 항목의 sha256에 소문자로 입력한다.
 (Get-FileHash '.\evidence\day4\sanitized-test.txt' -Algorithm SHA256).Hash.ToLowerInvariant()
 
 # 오프라인: 수동 파일 검사·첨부만 수행, API/Ping 실행 없음
-python -B -m scripts.run_day4_audit --manual-evidence '.\evidence\day4\manual.json'
+python -B -m scripts.run_opnsense_lab_audit --manual-evidence '.\evidence\day4\manual.json'
 
 # 운영자가 별도로 승인하여 API 조회도 실행할 때만
-python -B -m scripts.run_day4_audit --execute --manual-evidence '.\evidence\day4\manual.json'
+python -B -m scripts.run_opnsense_lab_audit --execute --manual-evidence '.\evidence\day4\manual.json'
 ```
 
 과거 FW-06의 수동 Ping 증거를 첨부하는 데 `--ping`은 필요 없다. `--ping`은 새 Ping을 실행하는 별도 승인 옵션이며 과거 수동 시험을 현재 자동 증거로 바꾸지 않는다. 이번 작업에서 위 실제 장비 실행 명령은 수행하지 않았다.
@@ -313,7 +313,7 @@ FW-04는 tests=[]로 두고 `inspection`에 다음 필수 키를 입력한다. `
 
 ```powershell
 Set-Location 'C:\Projects\infrastructure-security-scanner-clone'
-.\.venv\Scripts\python.exe -B -m scripts.run_day4_audit --manual-evidence '.\evidence\day4\manual.json'
+.\.venv\Scripts\python.exe -B -m scripts.run_opnsense_lab_audit --manual-evidence '.\evidence\day4\manual.json'
 ```
 
 manual_evidence=LOADED이며 위 표와 일치한다. 종료 코드 1은 JSON 로드 실패가 아니라 FW-06 수동 증적 INCOMPLETE 때문이다. restored 시나리오를 채우기 위해 확인되지 않은 4/4 결과를 만들지 않았다. 이번 실행은 --execute 없는 오프라인 검증이므로 자동 상태는 NOT_TESTED이고, 기존 실장비 FW-01 PASS나 FW-04 API 403을 새로 측정했다고 주장하지 않는다. 수집기·자동 판정·API 권한·방화벽 설정은 변경하지 않았다.
@@ -345,12 +345,12 @@ Day4 unittest 114개는 모두 통과했다. 전체 unittest 495개 중 494개�
 
 ## L. FW-04 PF 스냅샷 분석 확장
 
-`config_audit/collectors/opnsense_pf.py`, `tests/test_day4_pf_evidence.py`, `docs/opnsense-pf-snapshots.md`를 추가하고 CLI와 문서를 수정했다. --pf-rules-evidence로 파일만 읽는 오프라인 분석을 선택할 수 있다. 기존 API 상태/403과 수동 상태는 그대로 두고 FW-04의 별도 pf_snapshot에 기존 evaluate()를 이용한 상태를 출력한다.
+`config_audit/collectors/opnsense_pf.py`, `tests/test_opnsense_pf_evidence.py`, `docs/opnsense-pf-snapshots.md`를 추가하고 CLI와 문서를 수정했다. --pf-rules-evidence로 파일만 읽는 오프라인 분석을 선택할 수 있다. 기존 API 상태/403과 수동 상태는 그대로 두고 FW-04의 별도 pf_snapshot에 기존 evaluate()를 이용한 상태를 출력한다.
 
 실제 tar 해시와 member 바이트, 일반/상세 64개 필터 규칙의 순서가 일치했다. 기본 차단·LAN 기본 IPv4 허용·LAN HTTP/HTTPS·WAN 지정 ICMP 구조는 확인했지만 동적 테이블/주소 및 전체 적용 범위가 미검증이므로 실제 PF 결과는 NEEDS_REVIEW다. GUI 실습 Block 비활성 상태와 전체 정책 안전성을 자동 PASS로 만들지 않았다. 명령·상세 범위·무결성 값·필요한 읽기 전용 후속 수집은 `docs/opnsense-pf-snapshots.md`에 기록했다. 원본 PF 증적/수동 JSON, 기존 자동 판정, 방화벽 및 API 권한은 변경하지 않았다.
 
 ## M. FW-05 저장 로그와 실제 규칙 연결
 
-`config_audit/collectors/opnsense_log_rules.py`, `tests/test_day4_log_rule_evidence.py`, `docs/opnsense-log-rule-evidence.md`를 추가하고 CLI/문서를 수정했다. --fw05-log-evidence와 SHA-256, 시험 구간 및 PF 입력으로 파일만 분석한다. live 로그 API/ID 매핑과 로컬 수집/규칙 연결/증적 판정을 분리하며 기존 자동·수동 상태를 덮어쓰지 않는다.
+`config_audit/collectors/opnsense_log_rules.py`, `tests/test_opnsense_log_rule_evidence.py`, `docs/opnsense-log-rule-evidence.md`를 추가하고 CLI/문서를 수정했다. --fw05-log-evidence와 SHA-256, 시험 구간 및 PF 입력으로 파일만 분석한다. live 로그 API/ID 매핑과 로컬 수집/규칙 연결/증적 판정을 분리하며 기존 자동·수동 상태를 덮어쓰지 않는다.
 
 실제 fw05-wan-tcp22.json의 3건은 튜플·block·RID/PF label·상세 @6·벽시계 범위가 일치했다. 단순 rulenr 일치보다 강한 연결 후보이나 로그 timezone 및 시험 시점의 규칙 세대 연속성이 미입증이라 최종 NEEDS_REVIEW다. 이번에 API는 실행하지 않았으며 기존 limit=20, IncompleteRead 및 403 분리는 유지한다. 정확한 실행 명령/부족 조건/context 계약과 검사 결과는 전용 문서에 기록했다. 원본 실제 증적은 수정하거나 Git에 넣지 않았다.

@@ -234,15 +234,15 @@ class LinuxMySQLLabTests(unittest.TestCase):
             with patch.object(lm,'run',side_effect=replies),self.assertRaises(lm.LabInputError):lm.docker_scope()
 
     def test_compose_isolation_ephemeral_secrets_and_no_host_ports(self):
-        compose=json.loads((ROOT/'lab/phase2-linux-mysql/compose.json').read_text())
+        compose=json.loads((ROOT/'lab/linux-mysql-retest/compose.json').read_text())
         self.assertTrue(compose['networks']['isolated']['internal'])
         for s in compose['services'].values():
             self.assertNotIn('ports',s);self.assertNotIn('volumes',s);self.assertNotIn('privileged',s)
             self.assertNotIn('SYS_ADMIN',s['cap_add'])
-        wrapper=(ROOT/'lab/phase2-linux-mysql/start-mysql.sh').read_text()
+        wrapper=(ROOT/'lab/linux-mysql-retest/start-mysql.sh').read_text()
         self.assertIn('openssl rand -hex 32',wrapper)
         self.assertNotIn('MYSQL_RANDOM_ROOT_PASSWORD=',wrapper)
-        for p in (ROOT/'lab/phase2-linux-mysql').glob('*.sh'):self.assertNotIn(b'\r',p.read_bytes())
+        for p in (ROOT/'lab/linux-mysql-retest').glob('*.sh'):self.assertNotIn(b'\r',p.read_bytes())
 
     def test_readonly_queries_no_authentication_hashes_or_mutations(self):
         for q in (lm.SQL_SETTINGS,lm.SQL_ACCOUNTS,lm.SQL_GRANTS):
@@ -340,14 +340,14 @@ class LinuxMySQLLabTests(unittest.TestCase):
         self.assertIn('logical_project_asset_mismatch',result['comparison']['issues'])
 
     def test_replay_compose_does_not_reuse_current_names_or_images(self):
-        compose=json.loads((ROOT/'lab/phase2-linux-mysql/compose.replay.json').read_text())
+        compose=json.loads((ROOT/'lab/linux-mysql-retest/compose.replay.json').read_text())
         self.assertEqual(compose['name'],lm.REPLAY_PROJECT)
         for service in compose['services'].values():
             self.assertTrue(service['image'].startswith(lm.REPLAY_PROJECT+'-'))
             self.assertNotIn('container_name',service);self.assertNotIn('volumes',service);self.assertNotIn('ports',service)
 
     def test_initial_rsyslog_keeps_nonsecurity_action_without_auth_route(self):
-        raw=(ROOT/'lab/phase2-linux-mysql/before/rsyslog.conf').read_text()
+        raw=(ROOT/'lab/linux-mysql-retest/before/rsyslog.conf').read_text()
         self.assertIn('auth,authpriv.* stop',raw)
         self.assertIn('user.* action(type="omfile" file="/var/log/lab-user.log")',raw)
         self.assertNotIn('/var/log/lab-auth.log',raw)
@@ -355,7 +355,7 @@ class LinuxMySQLLabTests(unittest.TestCase):
 
     def test_both_compose_profiles_wait_for_linux_health(self):
         for name in ('compose.json','compose.replay.json'):
-            d=json.loads((ROOT/'lab/phase2-linux-mysql'/name).read_text())
+            d=json.loads((ROOT/'lab/linux-mysql-retest'/name).read_text())
             self.assertEqual(d['services']['linux']['healthcheck']['test'],['CMD','python3','/opt/lab/collect-linux.py','--health'])
 
     def test_missing_baseline_keeps_current_snapshot(self):

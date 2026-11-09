@@ -7,7 +7,7 @@ on:
     paths:
       - 'config_audit/**'
       - 'scripts/collect_kisa_*live.py'
-      - 'lab/phase2-web-was/**'
+      - 'lab/web-was-lab/**'
       - 'lab/kisa-mysql-selected/**'
       - '.github/workflows/kisa-web-mysql-live.yml'
   workflow_dispatch:
@@ -29,9 +29,9 @@ jobs:
         run: |
           set -euo pipefail
           export WEB_WAS_STAGE=before
-          docker compose -f lab/phase2-web-was/compose.json up -d --build
+          docker compose -f lab/web-was-lab/compose.json up -d --build
           for i in $(seq 1 40); do
-            if docker compose -f lab/phase2-web-was/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
+            if docker compose -f lab/web-was-lab/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
             sleep 2
           done
           mkdir -p "$RUNNER_TEMP/kisa-web"
@@ -41,9 +41,9 @@ jobs:
         run: |
           set -euo pipefail
           export WEB_WAS_STAGE=after
-          docker compose -f lab/phase2-web-was/compose.json up -d --build --force-recreate
+          docker compose -f lab/web-was-lab/compose.json up -d --build --force-recreate
           for i in $(seq 1 40); do
-            if docker compose -f lab/phase2-web-was/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
+            if docker compose -f lab/web-was-lab/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
             sleep 2
           done
           python -m scripts.collect_kisa_web_live --output-dir "$RUNNER_TEMP/kisa-web/after"
@@ -64,7 +64,7 @@ jobs:
           retention-days: 90
       - name: Stop only disposable job WEB containers
         if: always()
-        run: docker compose -f lab/phase2-web-was/compose.json down --remove-orphans
+        run: docker compose -f lab/web-was-lab/compose.json down --remove-orphans
 
   mysql-selected-live:
     runs-on: ubuntu-latest

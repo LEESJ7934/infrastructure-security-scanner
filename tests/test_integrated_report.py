@@ -45,7 +45,7 @@ class LocalFinalReportTests(unittest.TestCase):
         for name in ('fw04-active-rules.txt', 'fw04-active-rules-detail.txt', 'fw04-rules.tar',
                      'fw05-wan-tcp22.json', 'fw05-wan-tcp22-retest.json'):
             paths.add(ROOT/'evidence/day4'/name)
-        paths.update(ROOT/'lab/day3/artifacts'/name for name in ('day3.pcap','suricata-eve.json','suricata-fast.log'))
+        paths.update(ROOT/'lab/ids-waf-lab/artifacts'/name for name in ('day3.pcap','suricata-eve.json','suricata-fast.log'))
         cls.original_hashes = {path: digest(path) for path in paths}
         cls.result = generate_final_report(ROOT, cls.output)
         cls.snapshot = json.loads((cls.output/FILES['report']).read_text(encoding='utf-8'))
@@ -135,7 +135,7 @@ class LocalFinalReportTests(unittest.TestCase):
         ssh=next(r for r in self.snapshot['details'] if r['check_id']=='LAB-SSH-002')
         self.assertEqual(ssh['expected_condition'],'PermitRootLogin = no')
         self.assertEqual(ssh['recommendation_from_definition'],'Disable direct SSH root login.')
-        self.assertTrue(ssh['definition']['source_reference'].startswith('scripts/run_day2_audit.py:'))
+        self.assertTrue(ssh['definition']['source_reference'].startswith('scripts/run_linux_mysql_baseline.py:'))
         self.assertTrue(all(r['definition'] for r in self.snapshot['details']))
         self.assertTrue(all(r['risk'] is None and r['observed_value'] is None for r in self.snapshot['details']))
 
