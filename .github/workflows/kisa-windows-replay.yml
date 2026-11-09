@@ -9,6 +9,9 @@ on:
       - "scripts/apply_windows_kisa_lab.ps1"
       - "config_audit/kisa_ciip_review.py"
       - "scripts/compare_kisa_ciip.py"
+      - "scripts/adapt_kisa_windows_selected.py"
+      - "config_audit/kisa_2026.py"
+      - "rules/kisa-2026-selected.json"
       - ".github/workflows/kisa-windows-replay.yml"
   workflow_dispatch:
 
@@ -49,11 +52,22 @@ jobs:
             }
           }
           Write-Output 'KISA W-04 and W-08 observed PASS in isolated Windows Server VM'
+      - name: Evaluate four selected controls from fresh export
+        shell: pwsh
+        run: |
+          $result = Join-Path $env:RUNNER_TEMP 'kisa-selected-windows.json'
+          python -m scripts.adapt_kisa_windows_selected (Join-Path $env:RUNNER_TEMP 'windows-kisa-after.json') | Out-File -LiteralPath $result -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw 'SELECTED_ADAPTER_FAILED' }
+          $data = Get-Content -LiteralPath $result -Raw | ConvertFrom-Json
+          if ($data.summary.PASS -ne 4 -or $data.summary.NOT_TESTED -ne 12) { throw 'FOUR_SELECTED_WINDOWS_CONTROLS_NOT_PASS' }
+          Write-Output 'W-02 W-04 W-08 W-64 freshly collected in isolated Windows Server 2022; other 12 not tested here.'
       - name: Upload KISA Windows policy evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: kisa-windows-standalone-lockout
-          path: ${{ runner.temp }}/windows-kisa-after.json
+          path: |
+            ${{ runner.temp }}/windows-kisa-after.json
+            ${{ runner.temp }}/kisa-selected-windows.json
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 90

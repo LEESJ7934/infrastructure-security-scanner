@@ -9,6 +9,8 @@ on:
       - "config_audit/**"
       - "lab/phase2-linux-mysql/**"
       - "scripts/compare_kisa_ciip.py"
+      - "scripts/collect_kisa_linux_selected.py"
+      - "rules/kisa-2026-selected.json"
       - ".github/workflows/kisa-replay.yml"
   workflow_dispatch:
 
@@ -35,6 +37,7 @@ jobs:
           docker compose -f lab/phase2-linux-mysql/compose.replay.json up -d --no-build --wait --wait-timeout 180
           mkdir -p "$RUNNER_TEMP/kisa-evidence"
           python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --output "$RUNNER_TEMP/kisa-evidence/before.json"
+          python -m scripts.collect_kisa_linux_selected --report "$RUNNER_TEMP/kisa-evidence/before.json" --output "$RUNNER_TEMP/kisa-evidence/selected-before.json"
       - name: Apply hardened after-stage and retest
         shell: bash
         run: |
@@ -45,6 +48,7 @@ jobs:
           docker compose -f lab/phase2-linux-mysql/compose.replay.json exec -T mysql bash /opt/lab/harden-mysql.sh
           python -m scripts.run_linux_mysql_audit --execute --lab-profile replay --baseline-json "$RUNNER_TEMP/kisa-evidence/before.json" --output "$RUNNER_TEMP/kisa-evidence/after.json"
           python -m scripts.compare_kisa_ciip --linux-report "$RUNNER_TEMP/kisa-evidence/after.json" > "$RUNNER_TEMP/kisa-evidence/kisa-u18.json"
+          python -m scripts.collect_kisa_linux_selected --report "$RUNNER_TEMP/kisa-evidence/after.json" --output "$RUNNER_TEMP/kisa-evidence/selected-after.json"
           python - <<'PY'
           import json, os, pathlib
           root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "kisa-evidence"
@@ -56,6 +60,11 @@ jobs:
           assert u18[0]["observation"]["mode"] == 0o400, "shadow mode was not collected as 0400"
           assert report["origin"] == "local_container_readonly", "synthetic observations rejected"
           assert report["summary"].get("PASS") == 10, "the replay's ten local checks did not PASS"
+          before = json.loads((root / "selected-before.json").read_text())["assessment"]
+          after = json.loads((root / "selected-after.json").read_text())["assessment"]
+          assert before["summary"]["FAIL"] == 2, "before U-01/U-18 not both FAIL"
+          assert after["summary"]["PASS"] == 2, "after U-01/U-18 not both PASS"
+          assert after["summary"]["NOT_TESTED"] == 14, "unmeasured items incorrectly promoted"
           print("KISA U-18 observed PASS in isolated container; local LAB checks PASS=10")
           PY
       - name: Upload isolated replay evidence
@@ -65,7 +74,7 @@ jobs:
           name: kisa-u18-isolated-replay
           path: ${{ runner.temp }}/kisa-evidence/*.json
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 90
       - name: Tear down isolated containers
         if: always()
         shell: bash

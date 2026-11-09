@@ -1,0 +1,377 @@
+{
+  "profile": "KISA-2026-SELECTED-1.0",
+  "guide_year": 2026,
+  "guide_pages": 873,
+  "guide_sha256": "44fe393981b244147be6af7423d99dc15633c089fad0bcb296cbe2371dde812d",
+  "guide_url": "https://www.kisa.or.kr/2060204/form?lang_type=KO&postSeq=22",
+  "scope_denominator": 16,
+  "items": [
+    {
+      "id": "U-01",
+      "title": "root 계정 원격 접속 제한",
+      "page": 12,
+      "assets": [
+        "linux"
+      ],
+      "source_lab_ids": [
+        "LINUX-LAB-001"
+      ],
+      "criterion": "All effective root SSH contexts denied; Telnet and other remote terminals absent or deny root.",
+      "remediation": "PermitRootLogin no; verify Match contexts, alternate management and remote terminal inventory.",
+      "evidence_required": [
+        "ssh_root_denied_all_contexts",
+        "other_remote_terminals_root_denied_or_absent",
+        "terminal_inventory_complete"
+      ]
+    },
+    {
+      "id": "U-18",
+      "title": "/etc/shadow 파일 소유자 및 권한 설정",
+      "page": 44,
+      "assets": [
+        "linux"
+      ],
+      "source_lab_ids": [
+        "LINUX-LAB-003"
+      ],
+      "criterion": "root-owned regular non-symlink; mode permits only root read.",
+      "remediation": "chown root /etc/shadow; chmod 400 /etc/shadow.",
+      "evidence_required": [
+        "typed_observation",
+        "original_collection_time",
+        "raw_evidence_reference"
+      ]
+    },
+    {
+      "id": "W-02",
+      "title": "Guest 계정 비활성화",
+      "page": 178,
+      "assets": [
+        "windows"
+      ],
+      "source_lab_ids": [
+        "WIN-LAB-001"
+      ],
+      "criterion": "Built-in SID RID 501 account disabled.",
+      "remediation": "Disable built-in Guest identified by SID, regardless of localized name.",
+      "evidence_required": [
+        "guest_disabled",
+        "sid_501_identified"
+      ]
+    },
+    {
+      "id": "W-04",
+      "title": "계정 잠금 임계값 설정",
+      "page": 180,
+      "assets": [
+        "windows"
+      ],
+      "source_lab_ids": [
+        "WIN-LAB-004"
+      ],
+      "criterion": "Enabled threshold 1-5 attempts (zero means disabled).",
+      "remediation": "net accounts /lockoutthreshold:5",
+      "evidence_required": [
+        "typed_observation",
+        "original_collection_time",
+        "raw_evidence_reference"
+      ]
+    },
+    {
+      "id": "W-08",
+      "title": "계정 잠금 기간 설정",
+      "page": 185,
+      "assets": [
+        "windows"
+      ],
+      "source_lab_ids": [
+        "WIN-LAB-004"
+      ],
+      "criterion": "Enabled lockout, duration and counter reset each >=60 minutes.",
+      "remediation": "net accounts /lockoutduration:60 /lockoutwindow:60",
+      "evidence_required": [
+        "typed_observation",
+        "original_collection_time",
+        "raw_evidence_reference"
+      ]
+    },
+    {
+      "id": "W-64",
+      "title": "윈도우 방화벽 설정",
+      "page": 270,
+      "assets": [
+        "windows"
+      ],
+      "source_lab_ids": [
+        "WIN-LAB-006"
+      ],
+      "criterion": "Domain/Private/Public effective ActiveStore profiles enabled.",
+      "remediation": "Enable firewall after preserving permitted console/management access.",
+      "evidence_required": [
+        "typed_observation",
+        "original_collection_time",
+        "raw_evidence_reference"
+      ]
+    },
+    {
+      "id": "WEB-04",
+      "title": "웹 서비스 디렉터리 리스팅 방지 설정",
+      "page": 280,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "source_lab_ids": [
+        "WEB-LAB-N01"
+      ],
+      "criterion": "All scoped locations deny listing in effective config AND HTTP directory probes.",
+      "remediation": "Nginx autoindex off; Tomcat listings false; reload and probe.",
+      "evidence_required": [
+        "effective_config_listing_disabled",
+        "http_listing_absent",
+        "locations_inventory_complete"
+      ]
+    },
+    {
+      "id": "WEB-07",
+      "title": "웹 서비스 경로 내 불필요한 파일 제거",
+      "page": 290,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "source_lab_ids": [
+        "WAS-LAB-T02"
+      ],
+      "criterion": "Scoped deployment path inventory has no unnecessary files; HTTP probes confirm.",
+      "remediation": "Review path inventory and remove only LAB samples/manuals/backups; retest.",
+      "evidence_required": [
+        "filesystem_inventory_complete",
+        "unnecessary_files_absent",
+        "http_unnecessary_paths_absent"
+      ]
+    },
+    {
+      "id": "WEB-16",
+      "title": "웹 서비스 헤더 정보 노출 제한",
+      "page": 316,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "source_lab_ids": [
+        "WEB-LAB-N02"
+      ],
+      "criterion": "Effective information-hiding configuration AND normal/error HTTP responses minimized per product guide example.",
+      "remediation": "Nginx server_tokens off; Tomcat server generic and showServerInfo false.",
+      "evidence_required": [
+        "effective_config_minimized",
+        "normal_response_minimized",
+        "error_response_minimized"
+      ]
+    },
+    {
+      "id": "D-02",
+      "title": "데이터베이스의 불필요 계정을 제거하거나, 잠금설정 후 사용",
+      "page": 600,
+      "assets": [
+        "mysql"
+      ],
+      "source_lab_ids": [
+        "MYSQL-LAB-001"
+      ],
+      "criterion": "Complete account inventory reviewed against purposes; no unnecessary unlocked accounts.",
+      "remediation": "Review every account including system accounts; remove or lock unnecessary accounts.",
+      "evidence_required": [
+        "account_inventory_complete",
+        "account_purposes_reviewed",
+        "unnecessary_unlocked_accounts_absent"
+      ]
+    },
+    {
+      "id": "D-04",
+      "title": "데이터베이스 관리자 권한을 꼭 필요한 계정 및 그룹에 대해서만 허용",
+      "page": 608,
+      "assets": [
+        "mysql"
+      ],
+      "source_lab_ids": [
+        "MYSQL-LAB-005"
+      ],
+      "criterion": "All global/dynamic privileges, roles, proxy and mandatory-role paths reviewed; administrators authorized.",
+      "remediation": "Inventory SUPER and modern dynamic privileges, recursively expand roles; revoke excess.",
+      "evidence_required": [
+        "privilege_inventory_complete",
+        "role_and_proxy_expansion_complete",
+        "admin_purposes_reviewed",
+        "unauthorized_admin_privileges_absent"
+      ]
+    },
+    {
+      "id": "D-10",
+      "title": "원격에서 DB 서버로의 접속 제한",
+      "page": 628,
+      "assets": [
+        "mysql"
+      ],
+      "source_lab_ids": [
+        "MYSQL-LAB-002"
+      ],
+      "criterion": "Complete Host and network policy inventory restricts DB to designated IPs; allowed/denied probes.",
+      "remediation": "Restrict all applicable account Hosts and ingress; test from designated and other source IPs.",
+      "evidence_required": [
+        "account_host_inventory_complete",
+        "designated_ip_policy_only",
+        "allowed_source_connected",
+        "unauthorized_source_denied",
+        "network_policy_inventory_complete"
+      ]
+    },
+    {
+      "id": "S-06",
+      "title": "보안 장비 원격 관리 접근 통제",
+      "page": 363,
+      "assets": [
+        "opnsense"
+      ],
+      "source_lab_ids": [
+        "FW-02/FW-03"
+      ],
+      "criterion": "All scoped management interfaces allow designated source only, with positive/negative tests and policy mapping.",
+      "remediation": "Restrict management source IP after console/rollback preparation.",
+      "evidence_required": [
+        "management_policy_inventory_complete",
+        "designated_sources_only",
+        "allowed_source_connected",
+        "unauthorized_source_denied",
+        "probe_policy_correlation_complete"
+      ]
+    },
+    {
+      "id": "S-07",
+      "title": "보안장비 보안 접속",
+      "page": 364,
+      "assets": [
+        "opnsense"
+      ],
+      "source_lab_ids": [
+        "FW-management"
+      ],
+      "criterion": "Scoped management channels use encryption; real TLS/SSH handshake and plaintext exclusion.",
+      "remediation": "Use HTTPS/SSH; verify management path, certificate and unencrypted channel exposure.",
+      "evidence_required": [
+        "management_channels_inventory_complete",
+        "encrypted_handshake_observed",
+        "plaintext_management_disabled",
+        "certificate_or_hostkey_reviewed"
+      ]
+    },
+    {
+      "id": "CA-07",
+      "title": "VPC 네트워크 서브넷 관리",
+      "page": 860,
+      "assets": [
+        "aws"
+      ],
+      "source_lab_ids": [
+        "VPC-01"
+      ],
+      "criterion": "Public/internal resource separation validated with subnet route associations and public addressing.",
+      "remediation": "Separate scoped public/internal resources; inspect effective routes including main and IPv6.",
+      "evidence_required": [
+        "subnet_resource_inventory_complete",
+        "effective_routes_reviewed",
+        "public_private_resources_separated",
+        "private_public_address_exposure_absent"
+      ]
+    },
+    {
+      "id": "CA-09",
+      "title": "접근 제어 설정 관리",
+      "page": 862,
+      "assets": [
+        "aws"
+      ],
+      "source_lab_ids": [
+        "SG-01/NACL-01"
+      ],
+      "criterion": "SG/NACL source/destination/protocol/order reviewed; unnecessary rules absent AND periodic review records exist.",
+      "remediation": "Review effective SG/NACL and retain genuine dated periodic review records; remove excess only in owned LAB.",
+      "evidence_required": [
+        "policy_inventory_complete",
+        "unnecessary_rules_absent",
+        "management_sources_restricted",
+        "periodic_review_records_present"
+      ]
+    }
+  ],
+  "conditions": {
+    "U-01": {
+      "ssh_root_denied_all_contexts": true,
+      "other_remote_terminals_root_denied_or_absent": true,
+      "terminal_inventory_complete": true
+    },
+    "W-02": {
+      "guest_disabled": true,
+      "sid_501_identified": true
+    },
+    "WEB-04": {
+      "effective_config_listing_disabled": true,
+      "http_listing_absent": true,
+      "locations_inventory_complete": true
+    },
+    "WEB-07": {
+      "filesystem_inventory_complete": true,
+      "unnecessary_files_absent": true,
+      "http_unnecessary_paths_absent": true
+    },
+    "WEB-16": {
+      "effective_config_minimized": true,
+      "normal_response_minimized": true,
+      "error_response_minimized": true
+    },
+    "D-02": {
+      "account_inventory_complete": true,
+      "account_purposes_reviewed": true,
+      "unnecessary_unlocked_accounts_absent": true
+    },
+    "D-04": {
+      "privilege_inventory_complete": true,
+      "role_and_proxy_expansion_complete": true,
+      "admin_purposes_reviewed": true,
+      "unauthorized_admin_privileges_absent": true
+    },
+    "D-10": {
+      "account_host_inventory_complete": true,
+      "designated_ip_policy_only": true,
+      "allowed_source_connected": true,
+      "unauthorized_source_denied": true,
+      "network_policy_inventory_complete": true
+    },
+    "S-06": {
+      "management_policy_inventory_complete": true,
+      "designated_sources_only": true,
+      "allowed_source_connected": true,
+      "unauthorized_source_denied": true,
+      "probe_policy_correlation_complete": true
+    },
+    "S-07": {
+      "management_channels_inventory_complete": true,
+      "encrypted_handshake_observed": true,
+      "plaintext_management_disabled": true,
+      "certificate_or_hostkey_reviewed": true
+    },
+    "CA-07": {
+      "subnet_resource_inventory_complete": true,
+      "effective_routes_reviewed": true,
+      "public_private_resources_separated": true,
+      "private_public_address_exposure_absent": true
+    },
+    "CA-09": {
+      "policy_inventory_complete": true,
+      "unnecessary_rules_absent": true,
+      "management_sources_restricted": true,
+      "periodic_review_records_present": true
+    }
+  }
+}

@@ -23,6 +23,9 @@ if ($computer.PartOfDomain -or [int]$computer.DomainRole -ne 2) {
 if ([int]$operatingSystem.ProductType -ne 3) {
     throw 'KISA_LAB_WINDOWS_SERVER_REQUIRED'
 }
+if ([int]$operatingSystem.BuildNumber -ne 20348) {
+    throw 'KISA_LAB_WINDOWS_SERVER_2022_REQUIRED'
+}
 if ($Apply) {
     if (-not $AcknowledgeIsolatedLab) {
         throw 'KISA_LAB_EXPLICIT_ACKNOWLEDGEMENT_REQUIRED'
@@ -71,6 +74,22 @@ function Read-LockoutPolicy {
     }
 }
 
+function Read-SelectedControls {
+    $guest = @(Get-LocalUser | Where-Object { $_.SID.Value -match '-501$' })
+    if ($guest.Count -ne 1) { throw 'KISA_LAB_GUEST_SID_AMBIGUOUS' }
+    $profiles = @{}
+    foreach ($profile in @(Get-NetFirewallProfile -PolicyStore ActiveStore)) {
+        $profiles[[string]$profile.Name] = [bool]$profile.Enabled
+    }
+    if ($profiles.Count -ne 3) { throw 'KISA_LAB_FIREWALL_PROFILES_INCOMPLETE' }
+    return @{
+        guest_disabled = (-not $guest[0].Enabled)
+        sid_501_identified = $true
+        active_profiles = $profiles
+    }
+}
+
+$beforeControls = Read-SelectedControls
 $before = Read-LockoutPolicy
 if ($Apply) {
     # Explicit local policy update only, no domain/GPO or remote targets.
@@ -78,8 +97,11 @@ if ($Apply) {
     if ($LASTEXITCODE -ne 0) {
         throw 'KISA_LAB_LOCKOUT_SETTING_FAILED_INSPECT_VM_BEFORE_RETRY'
     }
+    Get-LocalUser | Where-Object { $_.SID.Value -match '-501$' } | Disable-LocalUser
+    Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 }
 $after = Read-LockoutPolicy
+$afterControls = Read-SelectedControls
 $thresholdOK = $after.lockout_threshold -ge 1 -and $after.lockout_threshold -le 5
 $durationOK = $after.lockout_duration -ge 60 -and $after.reset_minutes -ge 60
 
@@ -91,6 +113,9 @@ $record = [ordered]@{
     source = 'current_standalone_windows_vm_secedit_export'
     source_kind = 'local_powershell_policy_export'
     apply_requested = [bool]$Apply
+    product_version = [string]$operatingSystem.Version
+    before_controls = $beforeControls
+    after_controls = $afterControls
     observed_guideline_status = [ordered]@{
         'W-04' = $(if ($thresholdOK) { 'PASS' } else { 'FAIL' })
         'W-08' = $(if ($durationOK) { 'PASS' } else { 'FAIL' })
@@ -106,7 +131,7 @@ $record = [ordered]@{
     )
     limitations = @(
         'local_policy_only_not_domain_GPO',
-        'only_W04_W08_not_entire_KISA_guide',
+        'only_W02_W04_W08_W64_not_entire_KISA_guide',
         'actual_operational_access_and_account_lockout_not_tested',
         'VM_output_is_local_evidence_do_not_commit'
     )
