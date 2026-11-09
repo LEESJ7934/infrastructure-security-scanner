@@ -47,7 +47,9 @@ def scope():
                 or any(m.get('Type') != 'tmpfs' for m in obj.get('Mounts',[]))):
             raise ValueError('foreign_or_unsafe_selected_mysql_container')
         expected_caps = {'NET_ADMIN'} if service=='gate' else {'CHOWN','DAC_OVERRIDE','FOWNER','SETUID','SETGID'} if service=='mysql' else set()
-        if set(host.get('CapAdd') or []) != expected_caps or set(host.get('CapDrop') or []) != {'ALL'}:
+        caps = {c.removeprefix('CAP_') for c in host.get('CapAdd') or []}
+        dropped = {c.removeprefix('CAP_') for c in host.get('CapDrop') or []}
+        if caps != expected_caps or dropped != {'ALL'}:
             raise ValueError('selected_mysql_capabilities_invalid')
         nodes[service] = obj
     net = json.loads(command(args+['network','inspect',PROJECT+'_isolated']).stdout)[0]
