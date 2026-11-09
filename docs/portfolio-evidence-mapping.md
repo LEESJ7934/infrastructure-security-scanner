@@ -161,7 +161,7 @@ FW-04/05는 NEEDS_REVIEW/VALID/attached=true다. VALID는 첨부 조건·해시 
 IP/포트별 관리 접근 노출을 제한하되 자동 정책 변경은 하지 않도록 설계했다.
 차단 실습 규칙은 종료 후 비활성화 기록을 유지한다. 숫자 rulenr만으로 PF 규칙을 확정하지 않으며,
 기존 로그를 현재 실행 증거로 취급하지 않는다. 필요한 후속 자료는 시험 시각대·출발 포트·
-전후 규칙 세대·동일 캡처 맥락이다. [FW-05 상세](day4-fw05-log-rule-evidence.md).
+전후 규칙 세대·동일 캡처 맥락이다. [FW-05 상세](opnsense-log-rule-evidence.md).
 
 
 ### ModSecurity

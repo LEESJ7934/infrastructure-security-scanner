@@ -7,7 +7,7 @@
 - 추가 `config_audit/collectors/opnsense_log_rules.py`: 저장 로그·PF·시간/시험 맥락을 대조하고 기존 evaluate()로 별도 FW-05 증적 판정.
 - 수정 `scripts/run_day4_audit.py`: 선택적인 FW-05 입력과 분리된 결과 출력.
 - 추가 `tests/test_day4_log_rule_evidence.py`: 합성 데이터 unittest 23개.
-- 추가 본 문서, 수정 `docs/day4-opnsense.md`.
+- 추가 본 문서, 수정 `docs/opnsense-audit.md`.
 
 기존 API 수집기와 limit=20, IncompleteRead 처리, TLS/CA 검증, FW-01~04/FW-06 판정, 수동 증적 판정기는 변경하지 않았다. 실제 API/방화벽/계정 권한을 건드리지 않았으며 commit/push도 하지 않았다. 실제 로그·PF·manual.json은 읽기만 했고 수정하거나 Git에 추가하지 않았다.
 

@@ -1,4 +1,4 @@
-# Day5 4단계: 조치 전후 재점검 비교
+# 조치 전후 재점검 비교
 
 `config_audit.comparison`은 공통 보고서와 기존 증적 인덱스를 입력받는
 파일 접근 없는 비교 모듈이다. Collector, 진단 엔진, VM, Docker, SSH,
@@ -149,8 +149,8 @@ FW-04/05 NEEDS_REVIEW와 FW-06 수동 PASS 등 원본 상태는 그대로 유지
 ## 테스트와 다음 보고서 통합
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_comparison
-.\.venv\Scripts\python.exe -B -m unittest tests.test_day5_comparison tests.test_day5_evidence tests.test_day5_report
+.\.venv\Scripts\python.exe -B -m unittest tests.test_remediation_comparison
+.\.venv\Scripts\python.exe -B -m unittest tests.test_remediation_comparison tests.test_evidence_integrity tests.test_offline_reporting
 .\.venv\Scripts\python.exe -B -m unittest discover -s tests -p 'test_*.py'
 ```
 

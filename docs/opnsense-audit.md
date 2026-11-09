@@ -1,4 +1,4 @@
-# Day 4 — OPNsense 오프라인 자동 진단
+# OPNsense 방화벽 설정 진단 및 검증
 
 최종 수정일: 2026-11-06 (Asia/Seoul). 대상 저장소: `C:\Projects\infrastructure-security-scanner-clone`, 브랜치: `feature/day4-opnsense`.
 
@@ -19,7 +19,7 @@
 - `config_audit/collectors/opnsense.py`: 조회 전용 API 클라이언트, 인터페이스 응답 어댑터, 로그 스냅샷 검사, 정규화 증거 기반 수집기, 별도 승인 Ping 함수.
 - `scripts/run_day4_audit.py`: 준비 모드, `--execute`, `--ping`, 시나리오 선택, 기존 `evaluate()` 연결 및 안전한 JSON 출력.
 - `tests/test_day4_audit.py`: 기존 Day4 테스트 79개 유지, 로그 요청/응답 보완 9개 추가, 총 88개.
-- `docs/day4-opnsense.md`: 본 구현·검증·실행 보고서.
+- `docs/opnsense-audit.md`: 본 구현·검증·실행 보고서.
 - `config_audit/manual_evidence.py`: 수동 입력의 엄격한 구조 검사, 로컬 첨부 SHA-256 확인, 자동/수동 결과 분리와 충돌 표시.
 - `examples/day4-manual-evidence.template.json`: 증적 미첨부 상태의 빈 입력 템플릿.
 - `tests/test_day4_manual_evidence.py`: 수동 증적 연계 테스트 26개. 기존 88개 테스트는 변경하지 않았다.
@@ -345,12 +345,12 @@ Day4 unittest 114개는 모두 통과했다. 전체 unittest 495개 중 494개�
 
 ## L. FW-04 PF 스냅샷 분석 확장
 
-`config_audit/collectors/opnsense_pf.py`, `tests/test_day4_pf_evidence.py`, `docs/day4-pf-snapshots.md`를 추가하고 CLI와 문서를 수정했다. --pf-rules-evidence로 파일만 읽는 오프라인 분석을 선택할 수 있다. 기존 API 상태/403과 수동 상태는 그대로 두고 FW-04의 별도 pf_snapshot에 기존 evaluate()를 이용한 상태를 출력한다.
+`config_audit/collectors/opnsense_pf.py`, `tests/test_day4_pf_evidence.py`, `docs/opnsense-pf-snapshots.md`를 추가하고 CLI와 문서를 수정했다. --pf-rules-evidence로 파일만 읽는 오프라인 분석을 선택할 수 있다. 기존 API 상태/403과 수동 상태는 그대로 두고 FW-04의 별도 pf_snapshot에 기존 evaluate()를 이용한 상태를 출력한다.
 
-실제 tar 해시와 member 바이트, 일반/상세 64개 필터 규칙의 순서가 일치했다. 기본 차단·LAN 기본 IPv4 허용·LAN HTTP/HTTPS·WAN 지정 ICMP 구조는 확인했지만 동적 테이블/주소 및 전체 적용 범위가 미검증이므로 실제 PF 결과는 NEEDS_REVIEW다. GUI 실습 Block 비활성 상태와 전체 정책 안전성을 자동 PASS로 만들지 않았다. 명령·상세 범위·무결성 값·필요한 읽기 전용 후속 수집은 `docs/day4-pf-snapshots.md`에 기록했다. 원본 PF 증적/수동 JSON, 기존 자동 판정, 방화벽 및 API 권한은 변경하지 않았다.
+실제 tar 해시와 member 바이트, 일반/상세 64개 필터 규칙의 순서가 일치했다. 기본 차단·LAN 기본 IPv4 허용·LAN HTTP/HTTPS·WAN 지정 ICMP 구조는 확인했지만 동적 테이블/주소 및 전체 적용 범위가 미검증이므로 실제 PF 결과는 NEEDS_REVIEW다. GUI 실습 Block 비활성 상태와 전체 정책 안전성을 자동 PASS로 만들지 않았다. 명령·상세 범위·무결성 값·필요한 읽기 전용 후속 수집은 `docs/opnsense-pf-snapshots.md`에 기록했다. 원본 PF 증적/수동 JSON, 기존 자동 판정, 방화벽 및 API 권한은 변경하지 않았다.
 
 ## M. FW-05 저장 로그와 실제 규칙 연결
 
-`config_audit/collectors/opnsense_log_rules.py`, `tests/test_day4_log_rule_evidence.py`, `docs/day4-fw05-log-rule-evidence.md`를 추가하고 CLI/문서를 수정했다. --fw05-log-evidence와 SHA-256, 시험 구간 및 PF 입력으로 파일만 분석한다. live 로그 API/ID 매핑과 로컬 수집/규칙 연결/증적 판정을 분리하며 기존 자동·수동 상태를 덮어쓰지 않는다.
+`config_audit/collectors/opnsense_log_rules.py`, `tests/test_day4_log_rule_evidence.py`, `docs/opnsense-log-rule-evidence.md`를 추가하고 CLI/문서를 수정했다. --fw05-log-evidence와 SHA-256, 시험 구간 및 PF 입력으로 파일만 분석한다. live 로그 API/ID 매핑과 로컬 수집/규칙 연결/증적 판정을 분리하며 기존 자동·수동 상태를 덮어쓰지 않는다.
 
 실제 fw05-wan-tcp22.json의 3건은 튜플·block·RID/PF label·상세 @6·벽시계 범위가 일치했다. 단순 rulenr 일치보다 강한 연결 후보이나 로그 timezone 및 시험 시점의 규칙 세대 연속성이 미입증이라 최종 NEEDS_REVIEW다. 이번에 API는 실행하지 않았으며 기존 limit=20, IncompleteRead 및 403 분리는 유지한다. 정확한 실행 명령/부족 조건/context 계약과 검사 결과는 전용 문서에 기록했다. 원본 실제 증적은 수정하거나 Git에 넣지 않았다.
