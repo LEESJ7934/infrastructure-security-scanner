@@ -94,6 +94,12 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 
 실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 2026-11-07 문서 검증 과정에서는 VM·Docker·SSH·DB·AWS를 실행하지 않았습니다. 샘플 생성과 Day5 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
 
+## KISA 공식 가이드 권고 기준과 내부 LAB 판정 구분
+
+- [KISA 2025-12-24 선택 항목(U-18, W-04, W-08) 별도 재판정 및 사용법](docs/kisa-ciip-2025-selected-review.md)
+- 이 비교는 저장된 기존 LAB 보고서에 대한 **읽기 전용** 평가이며 전체 KISA 항목 준수나 운영장비 재진단이 아닙니다.
+- 기존 LAB PASS를 보존하고, 동일 관찰값에 대한 KISA 권고 비교 결과를 별도 기록합니다.
+
 ## 상세 문서와 코드
 
 - [검증 기록](docs/validation.md) · [아키텍처](docs/architecture.md) · [진단 항목별 검증 근거](docs/portfolio-evidence-mapping.md)
