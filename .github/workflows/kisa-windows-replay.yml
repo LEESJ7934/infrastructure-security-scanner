@@ -1,0 +1,73 @@
+name: KISA W-04 W-08 격리 Windows Server 재점검
+
+on:
+  push:
+    branches:
+      - feature/kisa-ciip-2025-selected-review
+  pull_request:
+    paths:
+      - "scripts/apply_windows_kisa_lab.ps1"
+      - "config_audit/kisa_ciip_review.py"
+      - "scripts/compare_kisa_ciip.py"
+      - "scripts/adapt_kisa_windows_selected.py"
+      - "config_audit/kisa_2026.py"
+      - "rules/kisa-2026-selected.json"
+      - ".github/workflows/kisa-windows-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-lockout-replay:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify isolated runner and apply KISA lockout recommendations
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & .\scripts\apply_windows_kisa_lab.ps1 `
+            -ExpectedComputerName $env:COMPUTERNAME `
+            -OutputPath (Join-Path $env:RUNNER_TEMP 'windows-kisa-after.json') `
+            -Apply -AcknowledgeIsolatedLab
+      - name: Compare freshly measured policy with KISA W-04/W-08
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $target = Join-Path $env:RUNNER_TEMP 'windows-kisa-after.json'
+          $result = Join-Path $env:RUNNER_TEMP 'kisa-windows-comparison.json'
+          python -m scripts.compare_kisa_ciip --windows-report $target | Out-File -LiteralPath $result -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw 'KISA_COMPARATOR_FAILED' }
+          $json = Get-Content -LiteralPath $result -Raw -Encoding utf8 | ConvertFrom-Json
+          $rows = @($json.results)
+          if ($rows.Count -ne 2) { throw 'EXPECTED_TWO_WINDOWS_RESULTS' }
+          foreach ($row in $rows) {
+            if ($row.kisa_recommendation_result -ne 'PASS') {
+              throw ('KISA_' + $row.kisa_id + '_NOT_PASS')
+            }
+          }
+          Write-Output 'KISA W-04 and W-08 observed PASS in isolated Windows Server VM'
+      - name: Evaluate four selected controls from fresh export
+        shell: pwsh
+        run: |
+          $result = Join-Path $env:RUNNER_TEMP 'kisa-selected-windows.json'
+          python -m scripts.adapt_kisa_windows_selected (Join-Path $env:RUNNER_TEMP 'windows-kisa-after.json') | Out-File -LiteralPath $result -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw 'SELECTED_ADAPTER_FAILED' }
+          $data = Get-Content -LiteralPath $result -Raw | ConvertFrom-Json
+          if ($data.summary.PASS -ne 4 -or $data.summary.NOT_TESTED -ne 12) { throw 'FOUR_SELECTED_WINDOWS_CONTROLS_NOT_PASS' }
+          Write-Output 'W-02 W-04 W-08 W-64 freshly collected in isolated Windows Server 2022; other 12 not tested here.'
+      - name: Upload KISA Windows policy evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kisa-windows-standalone-lockout
+          path: |
+            ${{ runner.temp }}/windows-kisa-after.json
+            ${{ runner.temp }}/kisa-selected-windows.json
+          if-no-files-found: ignore
+          retention-days: 90

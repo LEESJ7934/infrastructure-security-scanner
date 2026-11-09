@@ -20,7 +20,8 @@ def main():
         shutil.copyfile('/opt/lab/' + stage + '/' + name, target)
         hashes[name] = hashlib.sha256(Path(target).read_bytes()).hexdigest()
     Path('/run/lab/startup-hashes.json').write_text(json.dumps(hashes))
-    Path('/etc/shadow').chmod(0o666 if stage == 'before' else 0o640)
+    # KISA 2025-12-24 U-18: hardened replay stage must be root-only readable (0400).
+    Path('/etc/shadow').chmod(0o666 if stage == 'before' else 0o400)
     Path('/etc/ssh/sshd_config').chmod(0o666 if stage == 'before' else 0o600)
     subprocess.run(['ssh-keygen', '-A'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(['/usr/sbin/sshd', '-t'], check=True)

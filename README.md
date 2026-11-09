@@ -4,6 +4,8 @@
 
 서버·네트워크·DBMS·WEB/WAS·보안장비 5개 분야와 AWS를 대상으로, 승인 범위를 정하고 설정을 읽어 내부 LAB 기준으로 판단한 뒤 JSON/PDF와 증적 참조로 전달합니다. 실제 고객사나 운영환경의 진단·컨설팅 수행 경험, KISA 공식 인증을 주장하지 않습니다.
 
+**KISA 2026 선정 범위:** 공식 PDF 873쪽을 대조해 16개 항목을 고정했습니다. 별도 격리 Actions LAB에서 **U-01/U-18/W-02/W-04/W-08/W-64 6개 실측 PASS(37.5%)**, 나머지 10개는 NOT_TESTED입니다. 전체 100% 완료를 주장하지 않습니다. [공식 매핑·자산](docs/kisa-2026-selection-freeze.md), [실측 증적·미완료 결과](docs/kisa-2026-final-scope-result.md), [실행 절차](docs/kisa-2026-retest-runbook.md), [면접 사례](docs/kisa-2026-interview.md)를 구분해 제공합니다. 코드의 정규화 조건 판정 16개 지원은 전 분야 자동 수집 완료를 뜻하지 않습니다.
+
 ## 팀 프로젝트와 개인 확장
 
 - **팀 프로젝트 기반(2025.12~2026.01):** 포트·서비스 식별, CVE 후보, DB 저장, 위험평가 및 보고서 흐름을 출발점으로 사용했습니다. 기존 팀 기능 전체를 개인 단독 개발로 설명하지 않습니다.
@@ -93,6 +95,13 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 ```
 
 실제 수집·개선은 각 LAB의 별도 승인 범위와 실행 옵션을 확인해야 합니다. 2026-11-07 문서 검증 과정에서는 VM·Docker·SSH·DB·AWS를 실행하지 않았습니다. 샘플 생성과 Day5 실행은 출력 파일을 쓰므로 원본 보고서 보존 정책을 확인한 뒤 별도 출력 위치를 사용하세요.
+
+## KISA 공식 가이드 권고 기준과 내부 LAB 판정 구분
+
+- [KISA 2025-12-24 선택 항목(U-18, W-04, W-08) 별도 재판정 및 사용법](docs/kisa-ciip-2025-selected-review.md)
+- 이 비교는 저장된 기존 LAB 보고서에 대한 **읽기 전용** 평가이며 전체 KISA 항목 준수나 운영장비 재진단이 아닙니다.
+- 기존 LAB PASS를 보존하고, 동일 관찰값에 대한 KISA 권고 비교 결과를 별도 기록합니다.
+- **2026-11-09 신규 격리 실측:** GitHub Actions Linux Replay의 KISA **U-18 PASS**, 일회용 Windows Server 2022의 KISA **W-04/W-08 PASS**를 확인했습니다. ([Linux 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42574765798), [Windows 실행](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42575461694)). **전체 KISA 기술진단 기준 PASS나 로컬 개인 VM 재검증 완료를 뜻하지 않습니다.**
 
 ## 상세 문서와 코드
 
