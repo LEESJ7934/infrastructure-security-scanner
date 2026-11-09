@@ -1,0 +1,195 @@
+{
+  "profile": "KISA-2026-SELECTED-1.0",
+  "observations": [
+    {
+      "kisa_id": "U-01",
+      "asset_id": "linux",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "24.04",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "U-18",
+      "asset_id": "linux",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "24.04",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "W-02",
+      "asset_id": "windows",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.0.20348",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "W-04",
+      "asset_id": "windows",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.0.20348",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "W-08",
+      "asset_id": "windows",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.0.20348",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "W-64",
+      "asset_id": "windows",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.0.20348",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-04",
+      "asset_id": "nginx",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "1.30.6",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-04",
+      "asset_id": "tomcat",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.1.61",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-07",
+      "asset_id": "nginx",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "1.30.6",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-07",
+      "asset_id": "tomcat",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.1.61",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-16",
+      "asset_id": "nginx",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "1.30.6",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "WEB-16",
+      "asset_id": "tomcat",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "10.1.61",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "D-02",
+      "asset_id": "mysql",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "8.4.13",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "D-04",
+      "asset_id": "mysql",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "8.4.13",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "D-10",
+      "asset_id": "mysql",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": "8.4.13",
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "S-06",
+      "asset_id": "opnsense",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": null,
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "S-07",
+      "asset_id": "opnsense",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": null,
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "CA-07",
+      "asset_id": "aws",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": null,
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    },
+    {
+      "kisa_id": "CA-09",
+      "asset_id": "aws",
+      "source_kind": "MANUAL_LAB",
+      "collection_status": "NOT_TESTED",
+      "product_version": null,
+      "collected_at": null,
+      "evidence_reference": null,
+      "value": null
+    }
+  ]
+}

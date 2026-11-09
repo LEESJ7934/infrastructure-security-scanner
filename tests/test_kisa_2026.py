@@ -1,5 +1,8 @@
 """Synthetic rule boundaries and provenance, never reported as LAB measurements."""
 from copy import deepcopy
+from io import BytesIO
+import json
+from pathlib import Path
 import unittest
 from config_audit.kisa_2026 import PROFILE, assess, catalog, condition
 from scripts.adapt_kisa_windows_selected import adapt
@@ -98,6 +101,29 @@ class SelectedProfileTests(unittest.TestCase):
         self.assertEqual(result['summary']['PASS'], 4)
         self.assertEqual(result['summary']['NOT_TESTED'], 12)
         self.assertEqual(result['verified_lab_pass'], 0)
+
+    def test_pdf_preserves_ledger_counts_and_incomplete_states(self):
+        from config_audit.kisa_selected_report import write_pdf
+        from pypdf import PdfReader
+        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/kisa-2026-final-scope-result.json').read_text(encoding='utf-8'))
+        stream = BytesIO()
+        write_pdf(ledger, stream)
+        text = '\n'.join(p.extract_text() for p in PdfReader(stream).pages)
+        self.assertIn('37.5%', text)
+        self.assertIn('WEB-04 | NOT_TESTED', text)
+        self.assertIn('CA-09 | NOT_TESTED', text)
+        self.assertIn('W-64 | PASS', text)
+
+    def test_pdf_rejects_wrong_denominator_or_promoted_offline_sources(self):
+        from config_audit.kisa_selected_report import write_pdf
+        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/kisa-2026-final-scope-result.json').read_text(encoding='utf-8'))
+        for kind in ('count', 'source', 'id'):
+            bad = deepcopy(ledger)
+            if kind == 'count': bad['summary']['PASS'] = 16
+            elif kind == 'source': bad['results'][0]['source_kind'] = 'SYNTHETIC'
+            else: bad['results'][0]['kisa_id'] = 'N-06'
+            with self.assertRaises(ValueError):
+                write_pdf(bad, BytesIO())
 
 
 if __name__ == '__main__':
