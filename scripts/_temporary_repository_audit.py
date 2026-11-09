@@ -128,3 +128,57 @@ for token in ("app_config.yaml", "logging.conf", "scanner_config.yaml", "scope.a
     hits = [path for path, text in textual.items()
             if token in text and path != "scripts/_temporary_repository_audit.py"]
     print("CONFIGTOKEN", token, json.dumps(hits, ensure_ascii=False))
+
+
+# Final integrity gate: resolve Markdown targets and import modules within this repository.
+from urllib.parse import unquote
+all_paths = set(paths)
+broken_links = []
+for document, text in textual.items():
+    if not document.endswith(".md"):
+        continue
+    for match in re.finditer(r"\]\(([^)\n]+)\)", text):
+        dest = match.group(1).strip().split()[0].strip("<>")
+        if not dest or dest.startswith(("#", "http:", "https:", "mailto:", "data:")):
+            continue
+        target = unquote(dest.split("#", 1)[0].split("?", 1)[0])
+        if not target:
+            continue
+        full = (ROOT / document).parent.joinpath(target).resolve() if not target.startswith("/") else ROOT / target.lstrip("/")
+        try:
+            full.relative_to(ROOT)
+        except ValueError:
+            broken_links.append((document, dest, "outside-repo"))
+            continue
+        if not full.exists():
+            broken_links.append((document, dest, "missing"))
+internal_names = {"analysis", "api", "asset_management", "cloud_security", "config_audit", "db", "scanner", "scripts", "verification"}
+missing_modules = []
+for document, body in textual.items():
+    if not document.endswith(".py"):
+        continue
+    try:
+        tree = ast.parse(body)
+    except SyntaxError:
+        continue
+    parent = document.split("/")[:-1]
+    for node in ast.walk(tree):
+        names = []
+        if isinstance(node, ast.Import):
+            names = [n.name for n in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                parts = parent[:max(0, len(parent)-node.level+1)]
+                names = [".".join(parts+([node.module] if node.module else []))]
+            else:
+                names = [node.module or ""]
+        for name in names:
+            if not name or name.split(".")[0] not in internal_names:
+                continue
+            target = name.replace(".", "/")
+            if target+".py" not in all_paths and target+"/__init__.py" not in all_paths and not any(x.startswith(target+"/") for x in all_paths):
+                missing_modules.append((document, name))
+print("BROKEN_MARKDOWN_LINKS", json.dumps(broken_links,ensure_ascii=False))
+print("MISSING_INTERNAL_IMPORT_MODULES", json.dumps(missing_modules,ensure_ascii=False))
+if broken_links or missing_modules:
+    raise SystemExit("repository_integrity_check_failed")
