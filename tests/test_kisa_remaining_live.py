@@ -1,9 +1,13 @@
 """Synthetic parser/graph boundaries. These tests are never LAB attestations."""
 from copy import deepcopy
+import json
+from pathlib import Path
 import unittest
 from config_audit.collectors.kisa_mysql_live import role_privileges, restricted_ruleset
 from config_audit.collectors.kisa_web_live import app_listing, minimized, normalize, APPROVED
 from config_audit.kisa_2026 import assess
+from config_audit.collectors.kisa_aws_live import normalize as normalize_aws
+from cloud_security.aws_scope import AwsScope
 
 
 class RemainingLiveNormalizationTests(unittest.TestCase):
@@ -70,6 +74,41 @@ class RemainingLiveNormalizationTests(unittest.TestCase):
     def test_empty_ruleset_is_not_designated_ip_enforcement(self):
         self.assertFalse(restricted_ruleset({'nftables':[]}))
         self.assertFalse(restricted_ruleset({'nftables':[{'table':{'family':'inet','name':'other'}}]}))
+
+    def test_docker_dns_nat_does_not_hide_ingress_rule_or_source_change(self):
+        fixture=Path(__file__).parent/'fixtures/kisa_mysql/nft-docker-dns.json'
+        raw=json.loads(fixture.read_text(encoding='utf-8'))
+        self.assertTrue(restricted_ruleset(raw))
+        modified=deepcopy(raw)
+        rule=next(x['rule'] for x in modified['nftables'] if 'rule' in x and x['rule'].get('table')=='kisa_mysql')
+        rule['expr'][0]['match']['right']='0.0.0.0/0'
+        self.assertFalse(restricted_ruleset(modified))
+        modified=deepcopy(raw)
+        next(x['chain'] for x in modified['nftables'] if 'chain' in x and x['chain'].get('name')=='OUTPUT')['hook']='prerouting'
+        self.assertFalse(restricted_ruleset(modified))
+
+    def test_aws_partial_inventory_and_periodic_history_never_pass(self):
+        # Explicit synthetic VPC/IDs; no boto3 client or credentials are created.
+        scope=AwsScope('123456789012','aws',('ap-northeast-2',),('ec2',),
+            {'ec2':('vpc-001','subnet-001')},(),(),(),2,{'internal_subnet_ids':['subnet-001']})
+        raw=dict(complete=True,collected_at='2026-01-01T00:00:00Z',inventory=dict(
+            subnets=[dict(SubnetId='subnet-001',MapPublicIpOnLaunch=False)],
+            route_tables=[dict(Associations=[dict(SubnetId='subnet-001')],Routes=[dict(State='active',GatewayId='local')])],
+            network_interfaces=[],security_groups=[]))
+        packet,_=normalize_aws(raw,scope)
+        for row in packet['observations']: row['source_kind']='SYNTHETIC'
+        report=assess(packet)
+        self.assertEqual(report['summary']['PASS'],1)
+        self.assertEqual(report['summary']['NEEDS_REVIEW'],1)
+        self.assertEqual(report['verified_lab_pass'],0)
+        raw['complete']=False
+        packet,_=normalize_aws(raw,scope)
+        self.assertEqual(assess(packet)['summary']['PASS'],0)
+
+    def test_login_refresh_has_specific_nonsecret_error_code(self):
+        from cloud_security.aws_live import error_code
+        LoginRefreshRequired=type('LoginRefreshRequired',(Exception,),{})
+        self.assertEqual(error_code(LoginRefreshRequired()),'LoginRefreshRequired')
 
 
 if __name__=='__main__': unittest.main()

@@ -112,11 +112,37 @@ def role_privileges(accounts, static, dynamic, roles, proxies, mandatory):
 
 def restricted_ruleset(ruleset):
     entries = ruleset.get('nftables',[])
-    tables = [x['table'] for x in entries if 'table' in x]
-    chains = [x['chain'] for x in entries if 'chain' in x]
-    rules = [x['rule'] for x in entries if 'rule' in x]
+    selected=[]
+    for entry in entries:
+        if 'metainfo' in entry: continue
+        kind=next(iter(entry),None);row=entry.get(kind,{})
+        if row.get('family')=='inet' and (row.get('table')=='kisa_mysql' or kind=='table' and row.get('name')=='kisa_mysql'):
+            selected.append(entry);continue
+        # Docker installs DNS-only OUTPUT/POSTROUTING NAT in this namespace.
+        # It cannot override ingress filtering. Reject other tables/hooks and
+        # require every extra rule to stay at Docker's loopback DNS address.
+        if row.get('family')!='ip' or (row.get('name') if kind=='table' else row.get('table'))!='nat': return False
+        if kind=='table': continue
+        if kind=='chain':
+            if row.get('name') not in ('OUTPUT','POSTROUTING','DOCKER_OUTPUT','DOCKER_POSTROUTING'): return False
+            if row.get('hook') not in (None,'output','postrouting') or row.get('type') not in (None,'nat'): return False
+        elif kind=='rule':
+            if row.get('chain') not in ('OUTPUT','POSTROUTING','DOCKER_OUTPUT','DOCKER_POSTROUTING'): return False
+            matches=[e['match'] for e in row.get('expr',[]) if 'match' in e]
+            if not any(m.get('op')=='==' and m.get('left',{}).get('payload',{}).get('protocol')=='ip'
+                       and m['left']['payload'].get('field') in ('saddr','daddr') and m.get('right')=='127.0.0.11' for m in matches): return False
+            for expression in row.get('expr',[]):
+                if 'match' in expression or 'counter' in expression: continue
+                if 'xt' in expression and expression['xt'].get('type')=='target' and expression['xt'].get('name') in ('DNAT','SNAT'): continue
+                if 'jump' in expression and expression['jump'].get('target') in ('DOCKER_OUTPUT','DOCKER_POSTROUTING'): continue
+                return False
+        else: return False
+    tables = [x['table'] for x in selected if 'table' in x]
+    chains = [x['chain'] for x in selected if 'chain' in x]
+    rules = [x['rule'] for x in selected if 'rule' in x]
     if len(tables)!=1 or tables[0].get('family')!='inet' or tables[0].get('name')!='kisa_mysql': return False
-    if len(chains)!=1 or chains[0].get('hook')!='input' or chains[0].get('type')!='filter' or len(rules)!=3: return False
+    if (len(chains)!=1 or chains[0].get('name')!='input' or chains[0].get('hook')!='input'
+            or chains[0].get('type')!='filter' or chains[0].get('prio')!=0 or len(rules)!=3): return False
     patterns=[]
     for rule in rules:
         if rule.get('table')!='kisa_mysql' or rule.get('chain')!='input': return False
