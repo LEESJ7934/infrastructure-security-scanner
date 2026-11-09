@@ -117,3 +117,22 @@ Windows Server **2022 격리 가상머신의 관리자 PowerShell 콘솔**에서
 - Linux U-18, Windows W-04/W-08 이외 항목의 공식 가이드 전수 매핑·적용성 판단은 **아직 미완료**
 - 기존 개인 LAB의 5+9+8+8개 등 상태를 모아서 전체 KISA 준수율이라고 표기하지 않음
 - 단위 테스트용 PASS는 실제 VM 또는 Docker 재점검의 PASS를 대신하지 않음
+
+
+## 자동 실행된 새 격리 LAB 실측 증적 (2026-11-09)
+
+**이 절은 문서상의 예상 결과가 아니라, GitHub Actions에서 일회용 격리 환경을 실제로 구성·변경·재수집한 결과이다.** 이는 3개 항목의 실습 재현으로 범위를 제한한다.
+
+| 공식 항목 | 실제 신규 실행 환경 | 조치·재점검 결과 | 출처 |
+|---|---|---|---|
+| U-18 | GitHub Actions Linux 격리 Docker Replay LAB | `/etc/shadow` `0400` 수집, KISA 비교 **PASS**. Linux/MySQL 기존 LAB 10개는 새로 실행해 FAIL 10→PASS 10 | [실측 워크플로](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42574765798) |
+| W-04 | GitHub Actions 일회용 Windows Server 2022 standalone VM | 로컬 정책 잠금 임계값 5회 적용→`secedit` 재수집→KISA 비교 **PASS** | [Windows 실측 워크플로](https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42575461694) |
+| W-08 | 같은 Windows Server 2022 VM | 잠금 기간·초기화 각 60분 적용→`secedit` 재수집→KISA 비교 **PASS** | 동일 실행 |
+
+- GitHub Actions의 기존 CI 성공은 **프로그램 테스트**, 상기 실습 워크플로 성공은 **격리 환경 실측**에 해당한다. 서로 구분한다.
+- Windows의 최초 측정값과 개선 후 측정값은 Actions의 `windows-kisa-after.json` 아티팩트에 보존된다(보존 기간 7일).
+- Linux의 `before.json`, `after.json`, `kisa-u18.json`은 별도 Actions 아티팩트로 보존된다(보존 기간 7일).
+- Windows 2022 CI VM의 PASS를 사용자의 기존 Hyper-V VM에서 PASS로 측정한 것처럼 설명하면 안 된다.
+- U-18, W-04, W-08 **세 항목만 신규로 KISA 권고값을 충족했다고 실측 확인**했다. Linux/MySQL 10개는 **내부 LAB 기준**의 PASS이며 KISA 공식 항목 10개 PASS라는 뜻이 아니다.
+- 기존 저장 자료에서 `0640`, `10회`, `30분`이 KISA 권고 기준에 미달한다는 사실은 그대로 유지한다. 새 실습 결과로 과거 기록을 덮어쓰지 않는다.
+- **전체 KISA 상세가이드 전수 PASS 또는 프로젝트 전체 KISA 준수를 주장하지 않는다.** 보안장비, 네트워크, WEB/WAS, AWS 및 Windows의 추가 항목은 개별 공식 기준 적용성·실제 재점검이 필요하다.
