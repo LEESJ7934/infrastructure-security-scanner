@@ -1,1 +1,0 @@
-alert http 10.207.10.10 any -> 10.207.20.10 8080 (msg:"Harmless isolated IPS marker"; flow:established,to_server; http.uri; content:"/ips-lab-marker"; sid:1000701; rev:1;)

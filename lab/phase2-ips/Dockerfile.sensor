@@ -1,3 +1,0 @@
-FROM jasonish/suricata:8.0.6
-COPY sensor.py suricata.yaml alert.rules drop.rules classification.config reference.config /opt/ips/
-ENTRYPOINT ["/usr/bin/python3", "/opt/ips/sensor.py", "serve"]

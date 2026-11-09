@@ -38,7 +38,7 @@ flowchart LR
 | 보안장비 — ModSecurity | 엔진·감사·본문·CRS 설정 및 GET/PUT와 감사 이벤트 상관분석 | WAF 6개 PASS 요약 존재. 원시 HTTP/감사 로그가 없어 현재 파일만으로 실제 차단을 독립 재확인할 수 없음 |
 | 추가 — AWS | IAM/SG/VPC/NACL/CloudTrail/Flow Logs P1 8개. Scope 제한 읽기 전용 수집·정규화 | 독립 LAB 4건 FAIL→PASS. CT-01 FAIL, IAM-03 NEEDS_REVIEW 유지. 설정 판정이며 패킷 차단·로그 전달 증명 아님 |
 
-**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 기존 코드·테스트·기존 개발 기록은 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
+**Suricata IDS/IPS는 최종 검증 성과·개선 완료 집계에서 제외합니다.** 이전 IPS 전용 실험은 NFQUEUE 인라인 차단 검증을 완료하지 못했으므로, 현재 범위와 무관한 IPS 전용 구현·테스트·LAB 파일을 정리했습니다. 기존 실험 기록은 Git 커밋 이력에서 확인할 수 있습니다. 다른 Day3 IDS/WAF 실습 파일은 과거 실험과 보고서 재현 근거로 보존합니다. 영역별 세부 항목과 근거는 [근거 매핑](docs/portfolio-evidence-mapping.md), 구현 경계는 [최종 통합 범위](docs/phase2-final-integration.md)에 있습니다.
 
 ## 대표 취약 설정 → 개선 → 재점검
 
