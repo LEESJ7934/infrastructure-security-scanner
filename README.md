@@ -112,3 +112,9 @@ Linux/MySQL **10건**은 후속 Replay LAB의 결과이며, 초기 별도 실습
 - 보안장비: [OPNsense](docs/day4-opnsense.md) · [FW-04 PF](docs/day4-pf-snapshots.md) · [FW-05 로그](docs/day4-fw05-log-rule-evidence.md)
 - AWS: [오프라인](docs/phase2-aws-offline.md) · [읽기 전용 수집](docs/phase2-aws-collection.md) · [범위 스키마](docs/phase2-aws-scope-v2.md) · [독립 Terraform LAB](infra/aws/phase2-audit-lab/README.md)
 - 기존 코드: [scanner](scanner/) · [analysis](analysis/) · [Linux SSH](config_audit/collectors/linux_ssh.py) · [MySQL](config_audit/collectors/mysql_config.py) · [ModSecurity](config_audit/collectors/modsecurity.py) · [AWS 인벤토리](cloud_security/aws_inventory.py) · [SG 분석](cloud_security/aws_sg_analyzer.py)
+
+## 문서 및 커밋 관리
+
+- 현재 프로젝트 범위와 결과는 이 README, [검증 근거](docs/portfolio-evidence-mapping.md), [KISA 선정 결과](docs/kisa-2026-final-scope-result.md)를 우선 기준으로 봅니다. 과거 단계 문서는 당시 기록이며 현재 검증 완료 범위를 대신하지 않습니다.
+- 문서 중복 생성 방지, 증적 보존, 링크 확인과 한국어 커밋 메시지 형식은 [작업 규칙](AGENTS.md)을 따릅니다.
+- 이후 커밋 제목은 `유형: 변경 대상과 목적` 형식으로 작성합니다. 예: `문서: 증적 링크와 최종 결과 설명 정리`. 기존 공개 커밋은 이력 보존을 위해 재작성하지 않습니다.
