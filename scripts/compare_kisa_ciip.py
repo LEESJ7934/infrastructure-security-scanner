@@ -54,7 +54,8 @@ def main(argv=None):
         windows = load_report(args.windows_report) if args.windows_report else None
         result = review(linux=linux[0] if linux else None, windows=windows[0] if windows else None)
         result["input_sha256"] = {key: value[1] for key, value in (("linux", linux), ("windows", windows)) if value}
-        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        # ASCII-safe JSON works on Windows consoles even when stdout is cp1252.
+        print(json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True))
         return 0
     except KisaReviewInputError as exc:
         print("[ERROR] " + str(exc), file=sys.stderr)
