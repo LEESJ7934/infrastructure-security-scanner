@@ -1,0 +1,14 @@
+{
+  "profile": "fixed-disposable-MySQL-8.4.13-selected-LAB",
+  "accounts": {
+    "root@localhost": "Local socket administrator used by the collector and hardening scripts",
+    "mysql.infoschema@localhost": "Locked MySQL information schema system account",
+    "mysql.session@localhost": "Locked MySQL server internal session account",
+    "mysql.sys@localhost": "Locked MySQL sys schema account",
+    "lab_app@localhost": "Existing local read-only application account",
+    "lab_probe@172.30.96.20": "Designated remote SELECT-only positive connectivity probe",
+    "lab_reader@%": "Locked SELECT-only role granted to the remote probe"
+  },
+  "authorized_global_privilege_principals": ["root@localhost","mysql.infoschema@localhost","mysql.session@localhost","mysql.sys@localhost"],
+  "system_accounts_require_locked": ["mysql.infoschema@localhost","mysql.session@localhost","mysql.sys@localhost","lab_reader@%"]
+}

@@ -48,3 +48,11 @@
 `config_audit/kisa_2026.py`는 기존 AuditRule/Observation/evaluate 및 U-18/W-04/W-08 비교 함수를 재사용한다. 저장자료 값이 조건에 맞는 PASS와 실제 장비 출처 검증을 분리한다. 입력은 SYNTHETIC/SAVED_LAB/MANUAL_LAB만 허용하며 VERIFIED_LAB 자기선언은 거부한다. 오프라인 JSON의 verified_lab_pass는 항상 0이다. 검토자는 실제 워크플로 실행 SHA, 작업 로그, 원시 수집 파일과 수집 시각을 확인한 후 별도 실측 대장에 기록한다. 역사적 3건을 현재 스냅샷으로 합산하지 않는다.
 
 코드 구현은 16개 정규화 조건의 판정 지원을 뜻한다. 새 자동 수집·재점검 경로는 Linux 2개와 Windows 4개다. WEB/MySQL/OPNsense/AWS는 기존 수집기·원시 자료와 아래 수동 검토 요구를 연결해야 하며, 전체 조건의 자동 수집 완료를 주장하지 않는다. 제품 버전이 알려지지 않거나 불일치하면 안전한 관찰값도 NEEDS_REVIEW다.
+
+## 2026-11-09 후속 실측 반영(분모·ID·제품 버전 유지)
+
+WEB 3개는 기존 scanner-p2web의 두 제품 전체 선정 배포 루트/컨텍스트에서 실제 before/after HTTP·파일을 확인했다. MySQL 3개는 기존 초기화/개선 코드를 재사용한 별도 scanner-kisa-mysql 프로젝트에서 전체 계정·권한·역할/프록시 및 두 실제 출발지의 지정 IP 접근 정책을 확인했다. 결과는 공식 ID당 모든 지정 제품을 충족한 6개 PASS다.
+
+AWS 자산은 기존 과거 독립 LAB scope의 private-only VPC다. 전체 child inventory를 조회하여 내부 서브넷 1개·ENI 0개와 공인 IP/직접 IGW 경로 부재를 확인했다. 공개 workload를 새로 만들거나 전송 시험한 것은 아니며 이 제한을 명시한 CA-07 설정 범위 PASS다. CA-09는 현재 전체 SG/NACL 수집과 기술 검토를 했으나 규칙 목적·정기 검토 이력이 미입증이다. OPNsense는 현재 CA 검증 TLS·HTTP redirect·인증 인터페이스 API를 실제 수집했지만 규칙 API 403과 전체 관리면/비인가 출발지 미확인으로 두 항목 검토 필요다. 대상이 어려워서 분모에서 빼거나 NOT_APPLICABLE로 바꾸지 않았다.
+
+이전 6개 실행은 history에 원본으로 보존하고 13 PASS/3 NEEDS_REVIEW를 최신 대장에 기록했다. 동일 세션 반복 수집을 여러 차례의 정기 운영 점검으로 표기하지 않는다.

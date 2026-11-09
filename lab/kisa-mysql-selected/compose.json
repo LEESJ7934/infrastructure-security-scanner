@@ -1,0 +1,37 @@
+{
+  "name": "scanner-kisa-mysql",
+  "services": {
+    "gate": {
+      "build": {"context": ".", "dockerfile": "gate.Dockerfile"},
+      "image": "scanner-kisa-mysql-gate:local",
+      "cap_drop": ["ALL"], "cap_add": ["NET_ADMIN"],
+      "security_opt": ["no-new-privileges:true"],
+      "networks": {"isolated": {"ipv4_address": "172.30.96.10"}},
+      "read_only": true, "mem_limit": "96m", "pids_limit": 48
+    },
+    "mysql": {
+      "build": {"context": "..", "dockerfile": "kisa-mysql-selected/mysql.Dockerfile"},
+      "image": "scanner-kisa-mysql-server:local",
+      "network_mode": "service:gate",
+      "depends_on": ["gate"],
+      "cap_drop": ["ALL"], "cap_add": ["CHOWN","DAC_OVERRIDE","FOWNER","SETUID","SETGID"],
+      "security_opt": ["no-new-privileges:true"],
+      "tmpfs": ["/var/lib/mysql:rw,nosuid,size=512m","/run/lab:rw,noexec,nosuid,size=1m","/var/run/mysqld:rw,nosuid,size=4m"],
+      "mem_limit": "768m", "pids_limit": 128,
+      "healthcheck": {"test":["CMD-SHELL","mysql --defaults-extra-file=/run/lab/client.cnf --batch --execute='SELECT 1' >/dev/null 2>&1"],"interval":"3s","timeout":"5s","retries":40,"start_period":"60s"}
+    },
+    "allowed": {
+      "image":"scanner-kisa-mysql-server:local", "entrypoint":["bash","-c","exec sleep infinity"],
+      "cap_drop":["ALL"], "security_opt":["no-new-privileges:true"],
+      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m","/var/lib/mysql:rw,noexec,nosuid,size=1m"],
+      "networks":{"isolated":{"ipv4_address":"172.30.96.20"}}, "mem_limit":"96m", "pids_limit":48
+    },
+    "denied": {
+      "image":"scanner-kisa-mysql-server:local", "entrypoint":["bash","-c","exec sleep infinity"],
+      "cap_drop":["ALL"], "security_opt":["no-new-privileges:true"],
+      "read_only":true, "tmpfs":["/tmp:rw,noexec,nosuid,size=4m","/var/lib/mysql:rw,noexec,nosuid,size=1m"],
+      "networks":{"isolated":{"ipv4_address":"172.30.96.30"}}, "mem_limit":"96m", "pids_limit":48
+    }
+  },
+  "networks":{"isolated":{"internal":true,"driver":"bridge","ipam":{"config":[{"subnet":"172.30.96.0/24"}]}}}
+}

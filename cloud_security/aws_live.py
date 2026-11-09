@@ -25,7 +25,7 @@ OPERATIONS = {
  'cloudtrail': {'describe_trails':'DescribeTrails','get_trail_status':'GetTrailStatus','get_event_selectors':'GetEventSelectors'},
 }
 RETRYABLE = {'Throttling','RequestLimitExceeded','ServiceUnavailable','Timeout'}
-SAFE_ERRORS = {'AccessDenied','AccessDeniedException','UnauthorizedOperation','ExpiredToken','Throttling','RequestLimitExceeded',
+SAFE_ERRORS = {'AccessDenied','AccessDeniedException','UnauthorizedOperation','ExpiredToken','LoginRefreshRequired','Throttling','RequestLimitExceeded',
                'ServiceUnavailable','Timeout','NoCredentials','NoSuchEntity','ParseError','ScopeViolation','CallLimitExceeded','DeadlineExceeded','QueryFailed'}
 INTERNAL_ERRORS = {'API_not_allowed','STS_identity_required','EndpointRejected','STS_identity_malformed','STS_account_mismatch','MockScriptExhausted','MockRequestMismatch'}
 
@@ -105,6 +105,7 @@ def live_factory(scope, limits):
 
 def error_code(error):
     name=type(error).__name__
+    if name == 'LoginRefreshRequired': return 'LoginRefreshRequired'
     if isinstance(error,AcquisitionError):return str(error) if str(error) in SAFE_ERRORS|INTERNAL_ERRORS else 'QueryFailed'
     if name in {'NoCredentialsError','PartialCredentialsError','CredentialRetrievalError','SSOTokenLoadError'}:return 'NoCredentials'
     if isinstance(error,TimeoutError) or name in {'ConnectTimeoutError','ReadTimeoutError','EndpointConnectionError'}:return 'Timeout'

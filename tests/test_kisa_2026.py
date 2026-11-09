@@ -105,7 +105,7 @@ class SelectedProfileTests(unittest.TestCase):
     def test_pdf_preserves_ledger_counts_and_incomplete_states(self):
         from config_audit.kisa_selected_report import write_pdf
         from pypdf import PdfReader
-        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/kisa-2026-final-scope-result.json').read_text(encoding='utf-8'))
+        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/history/kisa-2026-6of16.json').read_text(encoding='utf-8'))
         stream = BytesIO()
         write_pdf(ledger, stream)
         text = '\n'.join(p.extract_text() for p in PdfReader(stream).pages)
@@ -116,7 +116,7 @@ class SelectedProfileTests(unittest.TestCase):
 
     def test_pdf_rejects_wrong_denominator_or_promoted_offline_sources(self):
         from config_audit.kisa_selected_report import write_pdf
-        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/kisa-2026-final-scope-result.json').read_text(encoding='utf-8'))
+        ledger = json.loads((Path(__file__).resolve().parents[1] / 'docs/history/kisa-2026-6of16.json').read_text(encoding='utf-8'))
         for kind in ('count', 'source', 'id'):
             bad = deepcopy(ledger)
             if kind == 'count': bad['summary']['PASS'] = 16

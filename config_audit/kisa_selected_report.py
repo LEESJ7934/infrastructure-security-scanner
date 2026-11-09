@@ -39,7 +39,7 @@ def write_pdf(report, destination):
         return t
     story = [p('KISA 2026 선정 범위 진단 결과', title),
         p(f"격리 LAB 실측 PASS {counts['PASS']}/16 ({report['verified_lab_pass_percent']}%)", head),
-        p('100% 목표 미달성. 서로 다른 일회용 Linux/Windows 환경의 검토된 증적 대장이다. 고객사 진단, 전체 KISA 준수 또는 인증을 뜻하지 않는다.'),
+        p(('100% 목표 미달성. ' if counts['PASS']<16 else '선정 범위의 실측 확인 완료. ')+report.get('scope_description','서로 다른 일회용 Linux/Windows 환경의 검토된 증적 대장이다.')+' 고객사 진단, 전체 KISA 준수 또는 인증을 뜻하지 않는다.'),
         p('공식 PDF 873쪽 직접 대조. 일반 권고를 기준으로 별도 개인 LAB 프로파일을 적용했다.'),
         p('구현 커밋: '+report['implementation_commit']),
         table([['상태','개수','해석']]+[[s,n,'실측 원본 검토' if s=='PASS' else '실측 미완료' if s=='NOT_TESTED' else 'PASS에 합산하지 않음'] for s,n in report['summary'].items()], [100,50,361]),
@@ -48,20 +48,26 @@ def write_pdf(report, destination):
     for row in rows:
         block = [p(row['kisa_id']+' | '+row['status'],head)]
         if row['status']=='PASS':
-            block += [p('조치 전: '+json.dumps(row['before'],ensure_ascii=False)),
-                      p('조치 후: '+json.dumps(row['after'],ensure_ascii=False)),
+            before_label='이전 공식 실측 없음: ' if row.get('before_status')=='NOT_TESTED' else '조치 전: '
+            after_label='현재 관찰(설정 변경 없음): ' if row.get('transition')=='NEWLY_VERIFIED_NO_REMEDIATION' else '조치 후: '
+            block += [p(before_label+json.dumps(row['before'],ensure_ascii=False)),
+                      p(after_label+json.dumps(row['after'],ensure_ascii=False)),
                       p('변화: '+row['transition']),p('원시 수집 시각: '+row['collected_at']),
                       p('실행 / 아티팩트: '+str(row['run_id'])+' / '+str(row['artifact_id'])),
                       p('증적: '+row['evidence_url']),p('원본 파일: '+', '.join(row['raw_files']))]
             if row['kisa_id'] == 'U-18':
                 block.insert(3,p('파일 권한(8진수): 0666 → 0400. JSON의 mode는 원본 정수 438 → 256이다.'))
+        elif row.get('after') is not None:
+            block += [p('실제 부분 수집: '+json.dumps(row['after'],ensure_ascii=False)),
+                      p('원시 수집 시각: '+str(row.get('collected_at'))),
+                      p('증적: '+str(row.get('evidence_url')))]
         block += [p('한계: '+row['limitation'])]
         story.append(KeepTogether(block))
     story += [p('구현·검증과 남은 작업',head),
-        p('16개 정규화 조건 판정 지원, 실제 신규 수집 경로는 Linux 2개와 Windows 4개. WEB/WAS·MySQL·보안장비·AWS의 전체 조건 실측 10개는 미완료다.'),
+        p(report.get('implementation_scope_note','16개 정규화 조건 판정 지원, 실제 신규 수집 경로는 Linux 2개와 Windows 4개. WEB/WAS·MySQL·보안장비·AWS의 전체 조건 실측 10개는 미완료다.')),
         p('Codex가 코드·문서 작성과 자동 Actions 실습을 수행했다. 사용자가 직접 수행한 실습 이력과 혼동하지 않는다. 합성 테스트의 성공은 실측 PASS가 아니다.'),
-        p('전체 로컬 회귀 1,328개 실행: 실패 0, 기존 환경 의존 skip 22개. 최신 원격 CI 및 main 병합 결과는 PR #5와 별도 최종 전달 기록에서 확인한다.'),
-        p('https://github.com/LEESJ7934/infrastructure-security-scanner/pull/5'),
+        p(report.get('validation_note','전체 로컬 회귀 1,328개 실행: 실패 0, 기존 환경 의존 skip 22개. 최신 원격 CI 및 main 병합 결과는 PR #5와 별도 최종 전달 기록에서 확인한다.')),
+        p(report.get('pull_request_url','https://github.com/LEESJ7934/infrastructure-security-scanner/pull/5')),
         p('실행 절차: docs/kisa-2026-retest-runbook.md / 면접 16개 사례: docs/kisa-2026-interview.md')]
     for limitation in report['limitations']:
         story.append(p(limitation))

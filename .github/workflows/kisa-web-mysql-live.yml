@@ -1,0 +1,118 @@
+name: KISA WEB MySQL 선정 6개 실제 LAB 재점검
+
+on:
+  push:
+    branches: [feature/kisa-2026-live-remaining]
+  pull_request:
+    paths:
+      - 'config_audit/**'
+      - 'scripts/collect_kisa_*live.py'
+      - 'lab/phase2-web-was/**'
+      - 'lab/kisa-mysql-selected/**'
+      - '.github/workflows/kisa-web-mysql-live.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web-selected-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run vulnerable WEB LAB and collect real HTTP and files
+        shell: bash
+        run: |
+          set -euo pipefail
+          export WEB_WAS_STAGE=before
+          docker compose -f lab/phase2-web-was/compose.json up -d --build
+          for i in $(seq 1 40); do
+            if docker compose -f lab/phase2-web-was/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          mkdir -p "$RUNNER_TEMP/kisa-web"
+          python -m scripts.collect_kisa_web_live --output-dir "$RUNNER_TEMP/kisa-web/before"
+      - name: Rebuild hardened WEB LAB and recollect actual responses
+        shell: bash
+        run: |
+          set -euo pipefail
+          export WEB_WAS_STAGE=after
+          docker compose -f lab/phase2-web-was/compose.json up -d --build --force-recreate
+          for i in $(seq 1 40); do
+            if docker compose -f lab/phase2-web-was/compose.json exec -T tomcat java -cp /opt/lab Probe 123456789012345678901234567890ab >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          python -m scripts.collect_kisa_web_live --output-dir "$RUNNER_TEMP/kisa-web/after"
+          python - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'kisa-web'
+          before=json.loads((root/'before/assessment.json').read_text())
+          after=json.loads((root/'after/assessment.json').read_text())
+          assert before['summary']['FAIL']==3, before['summary']
+          assert after['summary']['PASS']==3 and after['summary']['NOT_TESTED']==13, after['summary']
+          print('WEB-04 WEB-07 WEB-16: actual Nginx AND Tomcat FAIL -> PASS; remaining 13 not tested here')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kisa-web-selected-live
+          path: ${{ runner.temp }}/kisa-web
+          retention-days: 90
+      - name: Stop only disposable job WEB containers
+        if: always()
+        run: docker compose -f lab/phase2-web-was/compose.json down --remove-orphans
+
+  mysql-selected-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build isolated MySQL and two actual source clients
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose -f lab/kisa-mysql-selected/compose.json build gate mysql
+          docker compose -f lab/kisa-mysql-selected/compose.json up -d --no-build --wait --wait-timeout 180
+          mkdir -p "$RUNNER_TEMP/kisa-mysql"
+          python -m scripts.collect_kisa_mysql_live --output-dir "$RUNNER_TEMP/kisa-mysql/before"
+      - name: Harden owned MySQL accounts and namespace ingress then retest
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose -f lab/kisa-mysql-selected/compose.json exec -T mysql bash /opt/lab/harden-selected.sh
+          docker compose -f lab/kisa-mysql-selected/compose.json exec -T gate nft -f - <<'NFT'
+          table inet kisa_mysql {
+            chain input {
+              type filter hook input priority 0; policy accept;
+              ip saddr 172.30.96.20 tcp dport 3306 accept
+              iifname "lo" accept
+              tcp dport 3306 counter drop
+            }
+          }
+          NFT
+          python -m scripts.collect_kisa_mysql_live --output-dir "$RUNNER_TEMP/kisa-mysql/after"
+          python - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'kisa-mysql'
+          before=json.loads((root/'before/assessment.json').read_text())
+          after=json.loads((root/'after/assessment.json').read_text())
+          assert before['summary']['FAIL']==3, before['summary']
+          assert after['summary']['PASS']==3 and after['summary']['NOT_TESTED']==13, after['summary']
+          print('D-02 D-04 D-10: real SQL/inherited roles/designated and unauthorized source probes FAIL -> PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kisa-mysql-selected-live
+          path: ${{ runner.temp }}/kisa-mysql
+          retention-days: 90
+      - name: Stop only disposable job MySQL containers
+        if: always()
+        run: docker compose -f lab/kisa-mysql-selected/compose.json down --remove-orphans

@@ -1,0 +1,397 @@
+{
+  "profile": "KISA-2026-SELECTED-1.0",
+  "report_kind": "REVIEWED_CROSS_ENVIRONMENT_EVIDENCE_LEDGER",
+  "verification_basis": "Successful workflow job assertions plus downloaded raw JSON; downloaded ZIP digests matched GitHub artifact metadata. Not a simultaneous live snapshot.",
+  "implementation_commit": "2e75ca567f56dea727868207a178e229e37495c0",
+  "scope_denominator": 16,
+  "summary": {
+    "PASS": 6,
+    "FAIL": 0,
+    "NEEDS_REVIEW": 0,
+    "NOT_TESTED": 10,
+    "NOT_APPLICABLE": 0,
+    "ERROR": 0
+  },
+  "verified_lab_pass": 6,
+  "verified_lab_pass_percent": 37.5,
+  "guide_sha256": "44fe393981b244147be6af7423d99dc15633c089fad0bcb296cbe2371dde812d",
+  "results": [
+    {
+      "kisa_id": "U-01",
+      "title": "root 계정 원격 접속 제한",
+      "page": 12,
+      "assets": [
+        "linux"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "24.04",
+      "before": {
+        "ssh_root_denied_all_contexts": false,
+        "other_remote_terminals_root_denied_or_absent": true,
+        "terminal_inventory_complete": true,
+        "listening_tcp_ports": [
+          22,
+          9000,
+          22
+        ],
+        "sshd_config_sha256": "5635043b43896b095aa76edd919d3e120d11628d7033448f8216f46b90ab7904"
+      },
+      "after": {
+        "ssh_root_denied_all_contexts": true,
+        "other_remote_terminals_root_denied_or_absent": true,
+        "terminal_inventory_complete": true,
+        "listening_tcp_ports": [
+          22,
+          22
+        ],
+        "sshd_config_sha256": "9a6bbc6e6a932ee0dcd007dcf16378321fafff30c0589d3aa52e441a6f59feda"
+      },
+      "before_collected_at": "2026-11-09T07:38:18.308347+00:00",
+      "collected_at": "2026-11-09T07:38:26.600807+00:00",
+      "run_id": 42580520040,
+      "artifact_id": 13656249112,
+      "raw_files": [
+        "before.json",
+        "after.json",
+        "selected-before.json",
+        "selected-after.json"
+      ],
+      "raw_after_sha256": "baa3869b4e2538a00d3e34b73baa058bcb02a2b34c01fb80b42202b004c55044",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "limitation": "Exact include/Match-free disposable SSH template and container namespace only; no remote authentication claim.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520040/artifacts/13656249112"
+    },
+    {
+      "kisa_id": "U-18",
+      "title": "/etc/shadow 파일 소유자 및 권한 설정",
+      "page": 44,
+      "assets": [
+        "linux"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "24.04",
+      "before": {
+        "path": "/etc/shadow",
+        "mode": 438,
+        "uid": 0,
+        "regular": true,
+        "symlink": false,
+        "group_approved": true
+      },
+      "after": {
+        "path": "/etc/shadow",
+        "mode": 256,
+        "uid": 0,
+        "regular": true,
+        "symlink": false,
+        "group_approved": true
+      },
+      "before_collected_at": "2026-11-09T07:38:18.308347+00:00",
+      "collected_at": "2026-11-09T07:38:26.600807+00:00",
+      "run_id": 42580520040,
+      "artifact_id": 13656249112,
+      "raw_files": [
+        "before.json",
+        "after.json",
+        "selected-before.json",
+        "selected-after.json"
+      ],
+      "raw_after_sha256": "baa3869b4e2538a00d3e34b73baa058bcb02a2b34c01fb80b42202b004c55044",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "limitation": "Exact include/Match-free disposable SSH template and container namespace only; no remote authentication claim.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520040/artifacts/13656249112"
+    },
+    {
+      "kisa_id": "W-02",
+      "title": "Guest 계정 비활성화",
+      "page": 178,
+      "assets": [
+        "windows"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "10.0.20348",
+      "before": {
+        "guest_disabled": true,
+        "sid_501_identified": true
+      },
+      "after": {
+        "guest_disabled": true,
+        "sid_501_identified": true
+      },
+      "collected_at": "2026-11-09T07:37:42.9252312+00:00",
+      "before_collected_at": null,
+      "run_id": 42580520062,
+      "artifact_id": 13657425113,
+      "raw_files": [
+        "windows-kisa-after.json",
+        "kisa-selected-windows.json"
+      ],
+      "raw_after_sha256": "4fb088e08cb5d53e8a3cd1aaeba5eccd1afd3319b5bf995310787b526363c7e6",
+      "before_status": "PASS",
+      "transition": "UNCHANGED_PASS",
+      "limitation": "Standalone Actions Windows Server 2022; no domain GPO or user Hyper-V claim. Export records one final collection timestamp; separate pre-change timestamp unavailable.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062/artifacts/13657425113"
+    },
+    {
+      "kisa_id": "W-04",
+      "title": "계정 잠금 임계값 설정",
+      "page": 180,
+      "assets": [
+        "windows"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "10.0.20348",
+      "before": {
+        "lockout_threshold": 10,
+        "lockout_duration": 10,
+        "reset_minutes": 10
+      },
+      "after": {
+        "lockout_threshold": 5,
+        "lockout_duration": 60,
+        "reset_minutes": 60
+      },
+      "collected_at": "2026-11-09T07:37:42.9252312+00:00",
+      "before_collected_at": null,
+      "run_id": 42580520062,
+      "artifact_id": 13657425113,
+      "raw_files": [
+        "windows-kisa-after.json",
+        "kisa-selected-windows.json"
+      ],
+      "raw_after_sha256": "4fb088e08cb5d53e8a3cd1aaeba5eccd1afd3319b5bf995310787b526363c7e6",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "limitation": "Standalone Actions Windows Server 2022; no domain GPO or user Hyper-V claim. Export records one final collection timestamp; separate pre-change timestamp unavailable.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062/artifacts/13657425113"
+    },
+    {
+      "kisa_id": "W-08",
+      "title": "계정 잠금 기간 설정",
+      "page": 185,
+      "assets": [
+        "windows"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "10.0.20348",
+      "before": {
+        "lockout_threshold": 10,
+        "lockout_duration": 10,
+        "reset_minutes": 10
+      },
+      "after": {
+        "lockout_threshold": 5,
+        "lockout_duration": 60,
+        "reset_minutes": 60
+      },
+      "collected_at": "2026-11-09T07:37:42.9252312+00:00",
+      "before_collected_at": null,
+      "run_id": 42580520062,
+      "artifact_id": 13657425113,
+      "raw_files": [
+        "windows-kisa-after.json",
+        "kisa-selected-windows.json"
+      ],
+      "raw_after_sha256": "4fb088e08cb5d53e8a3cd1aaeba5eccd1afd3319b5bf995310787b526363c7e6",
+      "before_status": "FAIL",
+      "transition": "FAIL_TO_PASS",
+      "limitation": "Standalone Actions Windows Server 2022; no domain GPO or user Hyper-V claim. Export records one final collection timestamp; separate pre-change timestamp unavailable.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062/artifacts/13657425113"
+    },
+    {
+      "kisa_id": "W-64",
+      "title": "윈도우 방화벽 설정",
+      "page": 270,
+      "assets": [
+        "windows"
+      ],
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
+      "product_version": "10.0.20348",
+      "before": {
+        "active_profiles": {
+          "Public": true,
+          "Domain": true,
+          "Private": true
+        }
+      },
+      "after": {
+        "active_profiles": {
+          "Public": true,
+          "Domain": true,
+          "Private": true
+        }
+      },
+      "collected_at": "2026-11-09T07:37:42.9252312+00:00",
+      "before_collected_at": null,
+      "run_id": 42580520062,
+      "artifact_id": 13657425113,
+      "raw_files": [
+        "windows-kisa-after.json",
+        "kisa-selected-windows.json"
+      ],
+      "raw_after_sha256": "4fb088e08cb5d53e8a3cd1aaeba5eccd1afd3319b5bf995310787b526363c7e6",
+      "before_status": "PASS",
+      "transition": "UNCHANGED_PASS",
+      "limitation": "Standalone Actions Windows Server 2022; no domain GPO or user Hyper-V claim. Export records one final collection timestamp; separate pre-change timestamp unavailable.",
+      "evidence_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/actions/runs/42580520062/artifacts/13657425113"
+    },
+    {
+      "kisa_id": "WEB-04",
+      "title": "웹 서비스 디렉터리 리스팅 방지 설정",
+      "page": 280,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "WEB-07",
+      "title": "웹 서비스 경로 내 불필요한 파일 제거",
+      "page": 290,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "WEB-16",
+      "title": "웹 서비스 헤더 정보 노출 제한",
+      "page": 316,
+      "assets": [
+        "nginx",
+        "tomcat"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "D-02",
+      "title": "데이터베이스의 불필요 계정을 제거하거나, 잠금설정 후 사용",
+      "page": 600,
+      "assets": [
+        "mysql"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "D-04",
+      "title": "데이터베이스 관리자 권한을 꼭 필요한 계정 및 그룹에 대해서만 허용",
+      "page": 608,
+      "assets": [
+        "mysql"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "D-10",
+      "title": "원격에서 DB 서버로의 접속 제한",
+      "page": 628,
+      "assets": [
+        "mysql"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "S-06",
+      "title": "보안 장비 원격 관리 접근 통제",
+      "page": 363,
+      "assets": [
+        "opnsense"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "S-07",
+      "title": "보안장비 보안 접속",
+      "page": 364,
+      "assets": [
+        "opnsense"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "CA-07",
+      "title": "VPC 네트워크 서브넷 관리",
+      "page": 860,
+      "assets": [
+        "aws"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    },
+    {
+      "kisa_id": "CA-09",
+      "title": "접근 제어 설정 관리",
+      "page": 862,
+      "assets": [
+        "aws"
+      ],
+      "status": "NOT_TESTED",
+      "source_kind": "NOT_TESTED",
+      "before": null,
+      "after": null,
+      "collected_at": null,
+      "limitation": "Selected full criterion not recollected; prior internal LAB PASS is not sufficient. See runbook."
+    }
+  ],
+  "limitations": [
+    "No claim of KISA-wide coverage or customer engagement.",
+    "10 full criteria remain unmeasured.",
+    "Prior CloudTrail FAIL and IAM/firewall review states remain in historical reports.",
+    "Raw evidence retained in GitHub Actions for 90 days; download privately before expiry.",
+    "Generated code and automated Actions tests do not establish that the user personally operated the LAB."
+  ]
+}
