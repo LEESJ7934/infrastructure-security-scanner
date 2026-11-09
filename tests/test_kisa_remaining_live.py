@@ -29,6 +29,13 @@ class RemainingLiveNormalizationTests(unittest.TestCase):
             role_privileges([dict(user='app',host='localhost')],[],[],
                 [dict(from_user='missing',from_host='localhost',to_user='app',to_host='localhost')],[],'')
 
+    def test_builtin_wildcard_proxy_is_retained_as_admin_capability(self):
+        accounts=[dict(user='root',host='localhost'),dict(user='app',host='localhost')]
+        proxy=[dict(user='root',host='localhost',proxied_user='',proxied_host='')]
+        effective,_=role_privileges(accounts,[],[],[],proxy,'')
+        self.assertEqual(effective['root@localhost'],['PROXY_ANY_ACCOUNT'])
+        self.assertEqual(effective['app@localhost'],[])
+
     def test_http_failure_or_version_leak_cannot_pass(self):
         self.assertIsNone(minimized(dict(status=503,server='',body=''),200))
         self.assertFalse(minimized(dict(status=200,server='nginx/1.30.6',body=''),200))

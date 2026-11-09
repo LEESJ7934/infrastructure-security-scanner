@@ -93,6 +93,11 @@ def role_privileges(accounts, static, dynamic, roles, proxies, mandatory):
         edges[target].add(origin)
     for row in proxies:
         origin=row['proxied_user']+'@'+row['proxied_host']; target=row['user']+'@'+row['host']
+        if target in keys and row['proxied_user']=='' and row['proxied_host']=='':
+            # MySQL's built-in root proxy grant is a wildcard capability, not
+            # a missing literal account. Preserve it as a privileged right.
+            privilege[target].add('PROXY_ANY_ACCOUNT')
+            continue
         if origin not in keys or target not in keys: raise ValueError('proxy_account_missing')
         edges[target].add(origin)
     # Bounded fixed point handles cycles without dropping inherited privileges.
@@ -152,7 +157,7 @@ def normalize(raw):
     return packet, {'effective_global_privileges':effective,'excess_global_privileges':excess,'purposes_reviewed':reviewed}
 
 
-def collect():
+def collect_raw():
     args,nodes=scope()
     def execute(service,cmd,**kw): return command(args+['exec','-i',nodes[service]['Id']]+cmd,**kw)
     def sql(q):
@@ -183,5 +188,9 @@ def collect():
          'network_scope_verified':True,'sql':observed,'queries':queries,'probes':probes,'nft_ruleset':nft,
          'images':{k:v['Image'] for k,v in nodes.items()},
          'limitations':['Fixed isolated MySQL LAB only; no customer or host firewall claim.','No password, credential file or authentication hash is exported.']}
-    packet,analysis=normalize(raw)
+    return raw
+
+
+def collect():
+    raw=collect_raw();packet,analysis=normalize(raw)
     return raw,packet,assess(packet),analysis
