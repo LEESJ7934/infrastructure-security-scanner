@@ -58,3 +58,62 @@ W-04는 `0`이 계정 잠금 미사용을 뜻할 수 있으므로 0~5가 아닌 
 ```
 
 테스트에서는 위 과거 값이 KISA 권고 기준에 FAIL인 점, 권고값 PASS, 미수집/오류 처리, 심볼릭 링크·파일 권한, 계정잠금 비활성 상태와 일부 값 누락을 확인한다. **테스트가 통과해도 실제 LAB 재점검 성공을 의미하지 않는다.**
+
+
+## 실제 KISA 권고값에 맞춘 LAB 재조치 및 PASS 확보 절차
+
+**이번 분기에서 변경한 것은 KISA 비교 모듈뿐 아니라 별도 실습 환경의 개선값이다.** 다만 GitHub의 코드 변경 자체는 새 VM 실측 PASS가 아니다.
+
+### Linux U-18: 실제 Docker Replay LAB 재생성 후 측정
+
+기존 `before` 단계의 취약 설정은 그대로 두고, `after` 단계의 `/etc/shadow` 권한을 `0400`으로 변경했다. `LINUX-LAB-003` 내부 판정도 `0400`을 허용한다. 이전에 저장한 `0640` 개선 기록은 과거 LAB PASS로 보존하지만 KISA U-18에서는 여전히 FAIL이다.
+
+**프로젝트 루트 Windows PowerShell**에서 먼저 현재 replay 실습과 원본 증적 보존 상태를 확인한 뒤, 격리 replay Linux 컨테이너만 재생성한다.
+
+```powershell
+$env:LINUX_MYSQL_STAGE = 'after'
+docker compose -f .\lab\phase2-linux-mysql\compose.replay.json build linux
+docker compose -f .\lab\phase2-linux-mysql\compose.replay.json up -d --no-deps --no-build --force-recreate --wait --wait-timeout 60 linux
+
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+New-Item -ItemType Directory -Force .\logs\phase2-linux-mysql-replay | Out-Null
+$report = ".\logs\phase2-linux-mysql-replay\after-kisa-$stamp.json"
+.\.venv\Scripts\python.exe -B -m scripts.run_linux_mysql_audit --execute --lab-profile replay --output $report
+.\.venv\Scripts\python.exe -B -m scripts.compare_kisa_ciip --linux-report $report
+```
+
+이 과정은 기존 replay Linux 컨테이너를 재생성하므로 현재 그 컨테이너에 보존해야 하는 상태가 있다면 먼저 백업한다. 기존 `scanner-p2lm` 프로젝트의 컨테이너는 대상으로 하지 않는다. **KISA U-18 PASS는 마지막 비교 출력에 실제 재수집값 `0400`과 원본 출처가 존재할 때만 확정한다.**
+
+### Windows W-04/W-08: standalone Windows Server VM에서 실제 정책 변경·재수집
+
+`rules/windows-server-kisa-2025-lab.json`은 KISA 권고값인 잠금 임계값 **5회**, 잠금 지속·초기화 기간 **각각 60분**을 별도 LAB 기준으로 정의한다. 기존 `windows-server-personal-lab.json`의 10/30/30 기준과 과거 기록은 보존한다.
+
+Windows Server **2022 격리 가상머신의 관리자 PowerShell 콘솔**에서만 실행한다. 대상 컴퓨터 이름 확인, 도메인 비가입, 독립 서버, 가상화 모델, 관리자 권한 확인이 통과해야 변경할 수 있다.
+
+```powershell
+# VM 안에서 실행: 미리 C:\LabEvidence 디렉터리를 준비
+.\scripts\apply_windows_kisa_lab.ps1 `
+  -ExpectedComputerName $env:COMPUTERNAME `
+  -OutputPath 'C:\LabEvidence\windows-kisa-after.json' `
+  -Apply -AcknowledgeIsolatedLab
+```
+
+이 스크립트는 현재 VM에서 `secedit /export`로 잠금 정책을 수집하고, 명시적 `-Apply`가 있을 때만 로컬 잠금 정책을 변경한 뒤 다시 수집한다. 출력 파일이 이미 있으면 중단한다. **도메인/GPO 환경이나 실서버에 적용하면 안 된다.**
+
+수집한 JSON을 프로젝트 작업 PC로 **비공개** 복사한 다음 다음을 실행한다.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m scripts.compare_kisa_ciip `
+  --windows-report '.\evidence\windows-kisa-after.json'
+```
+
+여기서 W-04·W-08이 모두 PASS여야 이 **VM의 확인된 로컬 정책 두 항목**에 대해 KISA 권고를 만족했다고 표현할 수 있다. 전체 Windows 정책이나 KISA 전수진단 PASS가 아니다.
+
+기존 Windows LAB 리포트를 별도의 KISA 임계값으로 확인할 때는 `scripts.run_windows_audit --mode LAB --lab-criteria .\rules\windows-server-kisa-2025-lab.json`을 이용한다. 실행에 필요한 `--input-json`, `--before-json`, `--output-dir` 등은 기존 사용법을 따라 제공한다. 과거 10/30/30 수치를 넣으면 FAIL이 정상이다.
+
+### PASS 판정 원칙
+
+- **새로운 관찰값을 재수집하고 KISA 판정에 입력한 경우에만** 새 PASS로 보고
+- Linux U-18, Windows W-04/W-08 이외 항목의 공식 가이드 전수 매핑·적용성 판단은 **아직 미완료**
+- 기존 개인 LAB의 5+9+8+8개 등 상태를 모아서 전체 KISA 준수율이라고 표기하지 않음
+- 단위 테스트용 PASS는 실제 VM 또는 Docker 재점검의 PASS를 대신하지 않음
