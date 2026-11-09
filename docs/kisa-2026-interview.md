@@ -151,4 +151,3 @@
 4. 취약 설정 위협: 불필요한 접근 규칙으로 비인가 접속 가능. 해당 설정만으로 침해 사실이나 CVE 악용을 확정하지 않는다.
 5. 개선·운영 영향: Review effective SG/NACL and retain genuine dated periodic review records; remove excess only in owned LAB. SG/NACL source/destination/protocol/order와 IPv6 검토. 실제 날짜의 반복 검토 기록이 필요하며 오늘 한 번 검사로 주기 실적을 만들지 않음.
 6. 재점검·증적: 동일 자산·버전에서 같은 명령으로 재수집하고 설정+동작+원본 시각·파일 해시·출처를 연결한다. 이번 선정 전체 조건은 NOT_TESTED이며 기존 내부 LAB PASS로 대체하지 않는다.
-
