@@ -129,7 +129,27 @@
       "NOT_TESTED": 2,
       "total": 18
     },
-    "combined_count_note": "Current base16 from main, not an assertion that user-local S-06/S-07 followups were committed. Lab functional PASS is excluded from full-KISA overall PASS count."
+    "combined_count_note": "Current base16 from main, not an assertion that user-local S-06/S-07 followups were committed. Lab functional PASS is excluded from full-KISA overall PASS count.",
+    "current_integrated": {
+      "base16": {
+        "total": 16,
+        "PASS": 15,
+        "FAIL": 0,
+        "NEEDS_REVIEW": 1,
+        "NOT_TESTED": 0
+      },
+      "combined_full_kisa": {
+        "total": 18,
+        "PASS": 15,
+        "FAIL": 0,
+        "NEEDS_REVIEW": 1,
+        "NOT_TESTED": 2
+      },
+      "user_designated_pass": [
+        "S-06"
+      ],
+      "note": "The preceding at_revision fields retain the upstream historical snapshot. Suricata LAB functional PASS is excluded from KISA PASS."
+    }
   },
   "next_step": "If full KISA PASS desired, run one bounded lab verification of actual relevant enabled signatures plus alert delivery (S-19) and harmful-like non-destructive pattern blocking with benign traffic retained (S-23); preserve screenshot/eve evidence. The lab functional checks are already PASS.",
   "verdict_policy": {

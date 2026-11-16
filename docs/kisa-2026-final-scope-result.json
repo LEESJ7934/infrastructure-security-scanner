@@ -1,19 +1,19 @@
 {
   "profile": "KISA-2026-SELECTED-1.0",
   "report_kind": "REVIEWED_CROSS_ENVIRONMENT_EVIDENCE_LEDGER",
-  "verification_basis": "Successful actual WEB/MySQL workflow jobs plus downloaded raw artifacts and GitHub ZIP digests; direct read-only STS-matched AWS inventory; CA-verified real OPNsense transport and authenticated interface API. Partial/error conditions are not promoted.",
+  "verification_basis": "Successful actual WEB/MySQL workflow jobs plus downloaded raw artifacts and GitHub ZIP digests; direct read-only STS-matched AWS inventory; CA-verified real OPNsense transport and authenticated interface API. Partial/error conditions are not promoted. November 16 adds reviewed user-manual OPNsense screenshots and notes, with the earlier TLS measurement retained as historical evidence.",
   "implementation_commit": "c39ce02f12668919e02ac387ac6eee06802ffe2d",
   "scope_denominator": 16,
   "summary": {
-    "PASS": 13,
+    "PASS": 15,
     "FAIL": 0,
-    "NEEDS_REVIEW": 3,
+    "NEEDS_REVIEW": 1,
     "NOT_TESTED": 0,
     "NOT_APPLICABLE": 0,
     "ERROR": 0
   },
-  "verified_lab_pass": 13,
-  "verified_lab_pass_percent": 81.25,
+  "verified_lab_pass": 14,
+  "verified_lab_pass_percent": 87.5,
   "guide_sha256": "44fe393981b244147be6af7423d99dc15633c089fad0bcb296cbe2371dde812d",
   "results": [
     {
@@ -763,7 +763,7 @@
       "assets": [
         "opnsense"
       ],
-      "status": "NEEDS_REVIEW",
+      "status": "PASS",
       "source_kind": "LIVE_PARTIAL_LAB",
       "before": null,
       "after": {
@@ -771,28 +771,29 @@
           "management_policy_inventory_complete": null,
           "designated_sources_only": null,
           "allowed_source_connected": true,
-          "unauthorized_source_denied": null,
-          "probe_policy_correlation_complete": null
+          "unauthorized_source_denied": true,
+          "probe_policy_correlation_complete": true
         },
-        "tls_protocol": "TLSv1.3",
-        "certificate_verified": true,
-        "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
-        "http_redirect_status": 301,
-        "interface_rows_collected": 5,
-        "rules_api_http_status": 403,
-        "independent_unauthorized_source_test": "NOT_TESTED"
+        "anti_lockout_removed": true,
+        "verified_probe_count": 4,
+        "unauthorized_lan_to_wan_address": "NOT_TESTED",
+        "lan_wan_ipv6_addresses_present": false,
+        "broad_lan_ipv6_pass_rule_present": true,
+        "management_ipv6_wildcard_listeners_present": true
       },
-      "collected_at": "2026-11-09T08:35:43.794108+00:00",
-      "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
-      "product_version": null,
-      "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
-      "raw_files": [
-        "opnsense-management-raw.json",
-        "assessment.json",
-        "execution-manifest.json"
-      ],
-      "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
-      "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
+      "collected_at": "2026-11-16",
+      "limitation": "Observed LAN/WAN IPv4 probes only. Full PF rules/anchors and unauthorized LAN to the WAN-addressed Web GUI remain unverified. IPv6 has no LAN/WAN address; wildcard listeners and broad LAN IPv6 rules remain and require retest if enabled.",
+      "product_version": "26.7",
+      "evidence_url": "local-evidence:evidence/kisa-2026-s06-s07/",
+      "raw_files": [],
+      "verification_mode": "USER_MANUAL_RETEST",
+      "before_status": "NEEDS_REVIEW",
+      "before_collected_at": "2026-11-09T08:35:43.794108+00:00",
+      "transition": "NEEDS_REVIEW_TO_PASS",
+      "run_id": null,
+      "artifact_id": null,
+      "retest_ref": "opnsense_retests/2026-11-16/criteria/S-06",
+      "decision_basis": "USER_ACCEPTED_RETEST_SCOPE"
     },
     {
       "kisa_id": "S-07",
@@ -801,35 +802,39 @@
       "assets": [
         "opnsense"
       ],
-      "status": "NEEDS_REVIEW",
-      "source_kind": "LIVE_PARTIAL_LAB",
+      "status": "PASS",
+      "source_kind": "VERIFIED_LAB",
       "before": null,
       "after": {
         "criterion": {
-          "management_channels_inventory_complete": null,
+          "management_channels_inventory_complete": true,
           "encrypted_handshake_observed": true,
-          "plaintext_management_disabled": null,
+          "plaintext_management_disabled": true,
           "certificate_or_hostkey_reviewed": true
         },
-        "tls_protocol": "TLSv1.3",
-        "certificate_verified": true,
-        "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
+        "web_gui_https_port": 443,
         "http_redirect_status": 301,
-        "interface_rows_collected": 5,
-        "rules_api_http_status": 403,
-        "independent_unauthorized_source_test": "NOT_TESTED"
+        "ssh_enabled": false,
+        "telnet_listener_present": false,
+        "prior_measured_tls_protocol": "TLSv1.3",
+        "prior_tls_measurement_ref": "historical_snapshot:2026-11-09:S-07",
+        "operator_https_status": 200,
+        "operator_certificate_rsa_bits": 3072,
+        "operator_certificate_ip_san_matches_management_ip": true,
+        "certificate_revocation_status": "NOT_VERIFIED"
       },
-      "collected_at": "2026-11-09T08:35:43.794108+00:00",
-      "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
-      "product_version": null,
-      "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
-      "raw_files": [
-        "opnsense-management-raw.json",
-        "assessment.json",
-        "execution-manifest.json"
-      ],
-      "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
-      "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
+      "collected_at": "2026-11-16",
+      "limitation": "Scoped Hyper-V LAB Web GUI and SSH/Telnet checks. November 16 HTTPS/cert details use operator notes and TLS 1.3 is historical. HTTP 80 redirects; certificate revocation and other routes were not verified.",
+      "product_version": "26.7",
+      "evidence_url": "local-evidence:evidence/kisa-2026-s06-s07/",
+      "raw_files": [],
+      "verification_mode": "USER_MANUAL_RETEST_WITH_HISTORICAL_TRANSPORT",
+      "before_status": "NEEDS_REVIEW",
+      "before_collected_at": "2026-11-09T08:35:43.794108+00:00",
+      "transition": "NEEDS_REVIEW_TO_PASS",
+      "run_id": null,
+      "artifact_id": null,
+      "retest_ref": "opnsense_retests/2026-11-16/criteria/S-07"
     },
     {
       "kisa_id": "CA-07",
@@ -916,19 +921,275 @@
     }
   ],
   "limitations": [
-    "13/16(81.25%); the 100% target has not been achieved.",
-    "S-06/S-07/CA-09 remain NEEDS_REVIEW with actual partial evidence and explicit API 403/history gaps.",
+    "15/16 recorded PASS (93.75%): 14 verified LAB PASS and one user-accepted retest (S-06).",
+    "S-06 was accepted for the observed retest scope. Full effective policy and the alternate LAN-to-WAN-address path remain unverified. CA-09 remains NEEDS_REVIEW for complete rule purposes and recurring review history.",
     "CA-07 is a private-only existing isolated VPC with no ENI or public workload; no AWS configuration change or packet-test claim.",
     "Previous six PASS rows and original timestamps/run/artifact references are unchanged.",
     "No customer engagement, certification or full KISA coverage claim. No synthetic test is counted as a measurement.",
-    "AWS/OPNsense raw configuration evidence is retained privately in output ZIPs, not committed to the public repository."
+    "AWS/OPNsense raw configuration evidence is retained privately in output ZIPs, not committed to the public repository.",
+    "November 16 OPNsense screenshots and README remain local; hashes verify file integrity, not origin. Certificate revocation remains unverified."
   ],
   "scope_description": "일회용 Linux/Windows/WEB/MySQL 및 실제 개인 AWS/OPNsense의 서로 다른 시각·환경을 구분한 증적 대장이다.",
-  "implementation_scope_note": "16개 정규화 판정과 실제 대상별 수집 경로를 제공한다. 실측 PASS는 13개이며 S-06/S-07/CA-09 전체 조건은 검토 필요다. 기존 6개 실행 원본은 history에 보존했다.",
-  "validation_note": "전체 로컬 회귀 1,339개 실행: 성공 1,317개, 실패 0개, 기존 환경 의존 skip 22개. 최종 원격 CI 및 main 병합 결과는 PR #6와 별도 마감 기록에서 확인한다.",
+  "implementation_scope_note": "선정 범위 최종 PASS는 15개다. S-06은 실제 접속 시험 범위를 사용자가 수용해 PASS로 기록했다. 전체 유효 정책과 미시험 경로는 증적 한계에 남겼다. S-07은 사용자 수동 검증과 이전 TLS 실측을 대조했다. CA-09는 NEEDS_REVIEW다. 2026-11-09 당시 판정과 원본 증적 참조는 보존했다.",
+  "validation_note": "2026-11-09 당시 검증: 전체 로컬 회귀 1,339개 실행: 성공 1,317개, 실패 0개, 기존 환경 의존 skip 22개. 최종 원격 CI 및 main 병합 결과는 PR #6와 별도 마감 기록에서 확인한다.",
   "pull_request_url": "https://github.com/LEESJ7934/infrastructure-security-scanner/pull/6",
   "historical_six": {
     "path": "docs/history/kisa-2026-6of16.json",
     "sha256": "8bb9781eabeae6bfb6480785b4e9c6f7588d30ee2ae8760f7642ba89e8abef82"
+  },
+  "opnsense_retests": {
+    "2026-11-16": {
+      "observed_on": "2026-11-16",
+      "time_zone": "Asia/Seoul",
+      "time_precision": "DATE",
+      "product_version": "OPNsense 26.7",
+      "environment": "isolated Hyper-V LAB",
+      "source_kind": "USER_MANUAL_LAB",
+      "historical_snapshot": {
+        "date": "2026-11-09",
+        "ledger_sha256": "092f35a3a95d8d0ef5db12d1146aa055f05fd837c8f7df3eec6cdadc67386d15",
+        "summary": {
+          "PASS": 13,
+          "FAIL": 0,
+          "NEEDS_REVIEW": 3,
+          "NOT_TESTED": 0,
+          "NOT_APPLICABLE": 0,
+          "ERROR": 0
+        },
+        "results": [
+          {
+            "kisa_id": "S-06",
+            "title": "보안 장비 원격 관리 접근 통제",
+            "page": 363,
+            "assets": [
+              "opnsense"
+            ],
+            "status": "NEEDS_REVIEW",
+            "source_kind": "LIVE_PARTIAL_LAB",
+            "before": null,
+            "after": {
+              "criterion": {
+                "management_policy_inventory_complete": null,
+                "designated_sources_only": null,
+                "allowed_source_connected": true,
+                "unauthorized_source_denied": null,
+                "probe_policy_correlation_complete": null
+              },
+              "tls_protocol": "TLSv1.3",
+              "certificate_verified": true,
+              "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
+              "http_redirect_status": 301,
+              "interface_rows_collected": 5,
+              "rules_api_http_status": 403,
+              "independent_unauthorized_source_test": "NOT_TESTED"
+            },
+            "collected_at": "2026-11-09T08:35:43.794108+00:00",
+            "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
+            "product_version": null,
+            "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
+            "raw_files": [
+              "opnsense-management-raw.json",
+              "assessment.json",
+              "execution-manifest.json"
+            ],
+            "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
+            "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
+          },
+          {
+            "kisa_id": "S-07",
+            "title": "보안장비 보안 접속",
+            "page": 364,
+            "assets": [
+              "opnsense"
+            ],
+            "status": "NEEDS_REVIEW",
+            "source_kind": "LIVE_PARTIAL_LAB",
+            "before": null,
+            "after": {
+              "criterion": {
+                "management_channels_inventory_complete": null,
+                "encrypted_handshake_observed": true,
+                "plaintext_management_disabled": null,
+                "certificate_or_hostkey_reviewed": true
+              },
+              "tls_protocol": "TLSv1.3",
+              "certificate_verified": true,
+              "certificate_sha256": "c0b4a3354b644cb1f84060c8edc6b25abcf03a734abe6f1d7c877d72a51e9fd9",
+              "http_redirect_status": 301,
+              "interface_rows_collected": 5,
+              "rules_api_http_status": 403,
+              "independent_unauthorized_source_test": "NOT_TESTED"
+            },
+            "collected_at": "2026-11-09T08:35:43.794108+00:00",
+            "limitation": "Real TLS 1.3 and CA/IP-SAN verification, HTTP 301 to HTTPS, authenticated interface API collection. Existing auditor rules/rule-ID API returned 403. Full active management/PF inventory and independent unauthorized-source probe remain unavailable; no appliance policy was changed.",
+            "product_version": null,
+            "evidence_url": "private-artifact:KISA-2026-OPNsense-live.zip",
+            "raw_files": [
+              "opnsense-management-raw.json",
+              "assessment.json",
+              "execution-manifest.json"
+            ],
+            "raw_after_sha256": "c5125818826b841b235bcd6b3cc23dd75ada8dacd3fb4682b5e84decd7eada2f",
+            "artifact_zip_sha256": "a08de5c54cd2e9914aa9b562893467f7a29c8e9945a2a9d2d23348d08aa23763"
+          }
+        ]
+      },
+      "evidence": {
+        "location": "evidence/kisa-2026-s06-s07/",
+        "visibility": "LOCAL_ONLY",
+        "source_kind": "USER_MANUAL_SCREENSHOTS_AND_NOTES",
+        "raw_log_export_available": false,
+        "readme_sha256": "453168579922a2e72abef3660a8c1450627a1817d4bc8173e8a1a3949defcd8c",
+        "screenshots_hashes_matched": 21,
+        "screenshots_sha256": {
+          "screenshots/s06-all-interfaces-ipv6.png": "fea4ff4415d61aa7832633030e9a7724bdadd84dcbd189ccf747373601beed88",
+          "screenshots/s06-anti-lockout-removed.png": "e8e409884ce3febbae3495b6b212b290258e583e54dcbe5cd3c6e1e733b990f8",
+          "screenshots/s06-disable-anti-lockout-setting.png": "5484dcdb6646c76c78e8488f6512c2ee322c73f57624f44d0625cb5f4f3ae15e",
+          "screenshots/s06-final-ipv4-policy-order.png": "b5f047da1293fc593ff8f91d7566b251bb236b3ee53bade9bd77471fe25d20b3",
+          "screenshots/s06-http-firewall-log.png": "22a7038e0035f9bb88fb8cac00db0c3a383046d83a175bf08cda37792dda232d",
+          "screenshots/s06-https-firewall-log.png": "75790c0163af0154eb35ef590b4cc7b73f03adbffe076000b9818f46e10032f0",
+          "screenshots/s06-initial-https-rule-order.png": "79f568732fbd2da0b5156201b2eadab3cf92faa7d8c95bacd4bb6e9553be218d",
+          "screenshots/s06-ipv6-listeners.png": "6e7f6b75eff4607c5b30c921f35b15c9f9737dd215993cb21dd1463017f3f6bb",
+          "screenshots/s06-lan-ifconfig.png": "86e8c500f01540d269b3b9cb3666987048c43b9219b245c647de8c7faea1337e",
+          "screenshots/s06-original-anti-lockout.png": "7093fb3718a843e77dd7537123b057b022f932e8bce402c681004f0dbbae0742",
+          "screenshots/s06-original-interface-rules.png": "21543d3b48a81b877a1a561a5dccf227ba64e9c20f1948bde2041bc5aef85586",
+          "screenshots/s06-pfctl-active-rules.png": "69af2bce6ba89d980ab6ccdb1e3b8d9e43b809ec077e441a2673d22762656a6a",
+          "screenshots/s06-unauthorized-lan-http-nc.png": "7a1b49e3181145511eecaab13fd0e2530522159e70c83254feed20ae68afa875",
+          "screenshots/s06-unauthorized-lan-https-nc.png": "c22bc07d834b0e7ad319007c42b4c410a5c46b61d479a5aa12334ef9bcb843ab",
+          "screenshots/s06-unauthorized-wan-https-nc.png": "02dd8eb0a764536fe2ccd7541105c970fe7c8e337a244cb0073e5af1c2074262",
+          "screenshots/s06-wan-ifconfig.png": "04fd3b64e9ae4735972b99ac3f280496a615ddb5ee5a1b0306edc9fe4cf223a5",
+          "screenshots/s06-wan-log-detail.png": "02ba94f304fd2308f6b189cbbf2219aa668844fbf38ffd8ca11b00c601709c30",
+          "screenshots/s06-wan-log-summary.png": "dd0d490ca1026f585bd9998d48be8373fbb1571fab15b296e8a789ad6dfc4da6",
+          "screenshots/s07-secure-shell-settings.png": "32edd21a0570140a81930e55cf058594b7478b0a89d60897b5aed0bbc951d008",
+          "screenshots/s07-sockstat-ipv4-ipv6.png": "843b47cbf10c8c854f4fd368f56f0c9bb085cd8ecbf8b0df9723d26ced6e36b4",
+          "screenshots/s07-web-gui-settings.png": "10efd15739840957c3d87227069a88aaf043277017129ec89b7d89726d5f853e"
+        }
+      },
+      "criteria": {
+        "S-06": {
+          "management_policy_inventory_complete": {
+            "observed": null,
+            "basis": "GUI and the visible PF tail confirm LAN order and anti-lockout removal. The PF capture is clipped at the top; full rules and anchors were not collected.",
+            "evidence": [
+              "screenshots/s06-final-ipv4-policy-order.png",
+              "screenshots/s06-anti-lockout-removed.png",
+              "screenshots/s06-pfctl-active-rules.png"
+            ]
+          },
+          "designated_sources_only": {
+            "observed": null,
+            "basis": "HTTPS listens on all interfaces. The LAN TCP 80/443 blocks target only the LAN address. The following LAN pass makes the WAN-address path from unauthorized LAN a possible bypass. No such connection was tested.",
+            "evidence": [
+              "screenshots/s06-final-ipv4-policy-order.png",
+              "screenshots/s06-pfctl-active-rules.png",
+              "screenshots/s07-web-gui-settings.png",
+              "screenshots/s07-sockstat-ipv4-ipv6.png"
+            ]
+          },
+          "allowed_source_connected": {
+            "observed": true,
+            "basis": "Operator reported authorized LAN HTTPS and a successful CA-specified HTTPS request. Live View shows the authorized source passed.",
+            "evidence": [
+              "screenshots/s06-https-firewall-log.png",
+              "screenshots/s06-http-firewall-log.png",
+              "README.md"
+            ]
+          },
+          "unauthorized_source_denied": {
+            "observed": true,
+            "basis": "Separate unauthorized LAN client failed TCP 443 and TCP 80 to the LAN address; separate WAN client failed TCP 443 to the WAN address. This covers the three exercised cases.",
+            "evidence": [
+              "screenshots/s06-unauthorized-lan-https-nc.png",
+              "screenshots/s06-unauthorized-lan-http-nc.png",
+              "screenshots/s06-unauthorized-wan-https-nc.png",
+              "screenshots/s06-wan-log-detail.png"
+            ]
+          },
+          "probe_policy_correlation_complete": {
+            "observed": true,
+            "basis": "Source, destination, port and action match the rules for all four recorded probes: Allow-Admin-HTTPS, Block-Other-Admin-HTTPS, Block-Other-Admin-HTTP and WAN default deny/state violation.",
+            "evidence": [
+              "screenshots/s06-https-firewall-log.png",
+              "screenshots/s06-http-firewall-log.png",
+              "screenshots/s06-wan-log-summary.png",
+              "screenshots/s06-wan-log-detail.png"
+            ]
+          }
+        },
+        "S-07": {
+          "management_channels_inventory_complete": {
+            "observed": true,
+            "basis": "Web GUI HTTPS/443 on all interfaces and HTTP redirect enabled; both IPv4/IPv6 listener output and SSH GUI reviewed. No SSH or Telnet listener appeared.",
+            "evidence": [
+              "screenshots/s07-web-gui-settings.png",
+              "screenshots/s07-secure-shell-settings.png",
+              "screenshots/s07-sockstat-ipv4-ipv6.png"
+            ]
+          },
+          "encrypted_handshake_observed": {
+            "observed": true,
+            "basis": "TLS 1.3 sourced from the 2026-11-09 measurement; the 2026-11-16 operator README records HTTPS 200 with the LAB CA. The November 16 negotiated TLS version was not independently recorded.",
+            "evidence": [
+              "README.md",
+              "historical:2026-11-09:S-07"
+            ]
+          },
+          "plaintext_management_disabled": {
+            "observed": true,
+            "basis": "HTTP port 80 remains a redirect listener; 301 was measured previously and recorded in the retest README. No Telnet listener; SSH disabled.",
+            "evidence": [
+              "screenshots/s07-web-gui-settings.png",
+              "screenshots/s07-secure-shell-settings.png",
+              "screenshots/s07-sockstat-ipv4-ipv6.png",
+              "README.md",
+              "historical:2026-11-09:S-07"
+            ]
+          },
+          "certificate_or_hostkey_reviewed": {
+            "observed": true,
+            "basis": "Prior CA/IP-SAN validation and operator review of RSA 3072 and LAB management IP SAN. CA-specified curl succeeded with --ssl-revoke-best-effort; revocation status is unverified.",
+            "evidence": [
+              "README.md",
+              "historical:2026-11-09:S-07"
+            ]
+          }
+        }
+      },
+      "report_notes": {
+        "S-06": {
+          "previous": "2026-11-09 당시 NEEDS_REVIEW. 인터페이스 API는 성공했고 규칙 API는 403이었다. 독립 비인가 출발지 시험과 전체 유효 PF 증거는 없었다.",
+          "method": "인가 LAN의 HTTPS 접속과 비인가 LAN·WAN의 TCP 접속 시도를 Live View의 출발지·목적지·포트·적용 규칙에 대조했다. GUI와 pfctl 캡처로 최종 규칙 순서를 확인했다.",
+          "change_and_retest": "사용자가 Anti-lockout 자동 허용을 제거하고 관리자 HTTPS 허용 뒤에 LAN 주소 HTTPS·HTTP 차단을 배치했다. 관리자 443 허용, 비인가 LAN 443·80 및 비인가 WAN 443 차단을 관찰했다."
+        },
+        "S-07": {
+          "previous": "2026-11-09 당시 NEEDS_REVIEW. CA/IP SAN을 검증한 TLS 1.3과 HTTP 301은 실측했으며 전체 관리 채널 인벤토리는 미확보였다.",
+          "method": "Web GUI·SSH 설정, IPv4/IPv6 리스너, HTTP 리디렉션 및 로컬 CA를 지정한 curl 접속을 대조했다.",
+          "change_and_retest": "11월 16일 증적에서 HTTPS 443, HTTP 301, SSH 비활성화 및 Telnet 리스너 부재를 확인했다. 원본 TLS 측정과 RSA 3072·IP SAN 수동 기록을 연결했다. 별도 S-07 설정 변경은 입증되지 않았다."
+        }
+      }
+    }
+  },
+  "suricata_extension": {
+    "report_path": "docs/kisa-2026-suricata-s19-s23-extension.md",
+    "rules_path": "rules/kisa-2026-suricata-s19-s23-extension.json",
+    "combined_full_kisa": {
+      "total": 18,
+      "PASS": 15,
+      "FAIL": 0,
+      "NEEDS_REVIEW": 1,
+      "NOT_TESTED": 2
+    },
+    "items": [
+      {
+        "id": "S-19",
+        "lab_functional_status": "PASS",
+        "full_kisa_scope_status": "NOT_TESTED"
+      },
+      {
+        "id": "S-23",
+        "lab_functional_status": "PASS",
+        "full_kisa_scope_status": "NOT_TESTED"
+      }
+    ]
   }
 }

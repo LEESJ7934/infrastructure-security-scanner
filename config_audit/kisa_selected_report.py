@@ -17,11 +17,15 @@ def write_pdf(report, destination):
             or report.get('scope_denominator') != 16):
         raise ValueError('selected_ledger_required')
     counts = Counter(r['status'] for r in rows)
+    verified = sum(r['status'] == 'PASS' and r.get('source_kind') == 'VERIFIED_LAB' for r in rows)
+    accepted = sum(r['status'] == 'PASS' and r.get('source_kind') == 'LIVE_PARTIAL_LAB'
+                   and r.get('decision_basis') == 'USER_ACCEPTED_RETEST_SCOPE' and bool(r.get('retest_ref'))
+                   for r in rows)
     if (set(report['summary']) != set(STATUSES) or any(r['status'] not in STATUSES for r in rows)
             or any(counts[k] != v for k, v in report['summary'].items())
-            or any(r['status'] == 'PASS' and r.get('source_kind') != 'VERIFIED_LAB' for r in rows)
-            or report['verified_lab_pass'] != counts['PASS']
-            or report['verified_lab_pass_percent'] != 100 * counts['PASS'] / 16):
+            or counts['PASS'] != verified + accepted
+            or report['verified_lab_pass'] != verified
+            or report['verified_lab_pass_percent'] != 100 * verified / 16):
         raise ValueError('selected_ledger_summary_mismatch')
     font = _body_font()
     body = ParagraphStyle('KisaBody', fontName=font, fontSize=9, leading=13, spaceAfter=6, wordWrap='CJK')
@@ -38,16 +42,37 @@ def write_pdf(report, destination):
             ('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5)]))
         return t
     story = [p('KISA 2026 선정 범위 진단 결과', title),
-        p(f"격리 LAB 실측 PASS {counts['PASS']}/16 ({report['verified_lab_pass_percent']}%)", head),
+        p(f"최종 PASS {counts['PASS']}/16 (실측 {verified}, 사용자 수용 {accepted})" if accepted
+          else f"격리 LAB 실측 PASS {verified}/16 ({report['verified_lab_pass_percent']}%)", head),
         p(('100% 목표 미달성. ' if counts['PASS']<16 else '선정 범위의 실측 확인 완료. ')+report.get('scope_description','서로 다른 일회용 Linux/Windows 환경의 검토된 증적 대장이다.')+' 고객사 진단, 전체 KISA 준수 또는 인증을 뜻하지 않는다.'),
         p('공식 PDF 873쪽 직접 대조. 일반 권고를 기준으로 별도 개인 LAB 프로파일을 적용했다.'),
         p('구현 커밋: '+report['implementation_commit']),
-        table([['상태','개수','해석']]+[[s,n,'실측 원본 검토' if s=='PASS' else '실측 미완료' if s=='NOT_TESTED' else 'PASS에 합산하지 않음'] for s,n in report['summary'].items()], [100,50,361]),
+        table([['상태','개수','해석']]+[[s,n,('실측 및 사용자 범위 수용' if accepted else '실측 원본 검토') if s=='PASS' else '실측 미완료' if s=='NOT_TESTED' else 'PASS에 합산하지 않음'] for s,n in report['summary'].items()], [100,50,361]),
         p('공식 항목별 결과', head),
         table([['ID / 쪽','점검 항목','자산','상태']]+[[r['kisa_id']+' / '+str(r['page']),r['title'],', '.join(r['assets']),r['status']] for r in rows],[65,280,90,76])]
+    extension = report.get('suricata_extension')
+    if extension:
+        combined = extension['combined_full_kisa']
+        story.append(KeepTogether([p('Suricata 확장 범위', head),
+                  p(f"확장 {combined['total']}개: PASS {combined['PASS']} / NEEDS_REVIEW {combined['NEEDS_REVIEW']} / NOT_TESTED {combined['NOT_TESTED']}"),
+                  table([['항목', 'LAB 기능', 'KISA 전체']] + [[r['id'], r['lab_functional_status'], r['full_kisa_scope_status']]
+                         for r in extension['items']], [100, 170, 241]), p(extension['report_path'])]))
     for row in rows:
         block = [p(row['kisa_id']+' | '+row['status'],head)]
-        if row['status']=='PASS':
+        if row.get('retest_ref'):
+            block += [p('사용자 수동 LAB 재점검: '+row['collected_at']+' (KST, 날짜 정밀도)'),
+                      p('이전 항목 판정: '+row['before_status']+' / 변화: '+row['transition']),
+                      p('확인된 조건과 제한: '+json.dumps(row['after'],ensure_ascii=False)),
+                      p('로컬 수동 증적: '+row['evidence_url']),
+                      p('조건별 참조와 원본 판정: '+row['retest_ref'])]
+            retest = report.get('opnsense_retests', {}).get(row['collected_at'], {})
+            notes = retest.get('report_notes', {}).get(row['kisa_id'])
+            if notes:
+                block += [p('이전 증적: '+notes['previous']), p('점검 방법: '+notes['method']),
+                          p('개선과 재점검: '+notes['change_and_retest'])]
+            if row.get('decision_basis') == 'USER_ACCEPTED_RETEST_SCOPE':
+                block.append(p('사용자 지정 PASS. 미확인 조건은 한계에 기록했다.'))
+        elif row['status']=='PASS':
             before_label='이전 공식 실측 없음: ' if row.get('before_status')=='NOT_TESTED' else '조치 전: '
             after_label='현재 관찰(설정 변경 없음): ' if row.get('transition')=='NEWLY_VERIFIED_NO_REMEDIATION' else '조치 후: '
             block += [p(before_label+json.dumps(row['before'],ensure_ascii=False)),
@@ -69,8 +94,7 @@ def write_pdf(report, destination):
         p(report.get('validation_note','전체 로컬 회귀 1,328개 실행: 실패 0, 기존 환경 의존 skip 22개. 최신 원격 CI 및 main 병합 결과는 PR #5와 별도 최종 전달 기록에서 확인한다.')),
         p(report.get('pull_request_url','https://github.com/LEESJ7934/infrastructure-security-scanner/pull/5')),
         p('실행 절차: docs/kisa-2026-retest-runbook.md / 면접 16개 사례: docs/kisa-2026-case-studies.md')]
-    for limitation in report['limitations']:
-        story.append(p(limitation))
+    story.append(Paragraph('<br/>'.join(_text(limitation) for limitation in report['limitations']), body))
     def footer(canvas, doc):
         canvas.setFont(font,8)
         canvas.drawString(42,24,'Infrastructure Security Scanner | Personal LAB | KISA 2026')

@@ -20,14 +20,18 @@ Python 기반 보안 진단 프로젝트입니다. 서비스·버전 식별과 C
 
 | 실습 | 결과 |
 | --- | --- |
-| KISA 기준 선정 16개 항목 | **PASS 13 / NEEDS_REVIEW 3** (2026-11-09) |
+| KISA 기준 선정 16개 항목 | **PASS 15 / NEEDS_REVIEW 1** (2026-11-16 OPNsense 재점검 반영) |
+| KISA 확장 18개 항목 | **PASS 15 / NEEDS_REVIEW 1 / NOT_TESTED 2** |
+| Suricata 별도 LAB 기능 | **IDS Alert PASS / IPS Drop·복구 PASS** |
 | Linux·MySQL Replay LAB | **10건 FAIL → PASS** |
 | WEB/WAS 별도 LAB | **8건 FAIL → PASS** |
 | DVWA 웹 취약점 3종 | **자동 재검증 37건 통과** (SQLi 11, XSS 9, File Upload 17) |
 
-각 결과는 **서로 다른 실습 환경과 시점**에서 얻었으며 합산하지 않습니다. KISA 16개 항목 중 OPNsense 2건과 AWS 1건은 검증 조건이 부족해 NEEDS_REVIEW로 남겼습니다.
+결과마다 실습 환경과 수집 시점이 다릅니다. 기존 16개 중 증적 기반 PASS는 14개이며 S-06은 사용자 지정 PASS입니다. S-07은 관리 채널 재점검 증적으로 PASS, CA-09는 NEEDS_REVIEW입니다. 확장 18개에서 S-19·S-23의 KISA 전체 판정은 각각 NOT_TESTED입니다.
 
-- [KISA 16개 항목별 결과](docs/kisa-2026-final-scope-result.md)
+- [KISA 선정 16개 결과와 OPNsense 재점검 한계](docs/kisa-2026-final-scope-result.md)
+- [Suricata S-19·S-23 확장 결과](docs/kisa-2026-suricata-s19-s23-extension.md)
+- [CA-09 후속 검증과 S-06 시험 한계](docs/kisa-2026-external-followup.md)
 - [인프라 진단 근거 및 한계](docs/audit-evidence-mapping.md)
 - [DVWA 웹 취약점 개선·재점검](docs/web-dvwa/README.md)
 
@@ -66,6 +70,6 @@ python -m scripts.generate_report_sample
 
 ## 검증 범위
 
-실제 점검·개선 결과는 격리 LAB 또는 승인된 실습 자산에 한정됩니다. CVE 후보를 취약점 확정으로 취급하지 않으며, 증적이 불충분한 항목은 PASS로 처리하지 않습니다.
+실제 점검·개선 결과는 격리 LAB 또는 승인된 실습 자산에 한정됩니다. CVE 후보의 확인 근거와 미검증 조건을 기록합니다. 선정 대장에는 증적 기반 PASS와 사용자 지정 판정을 구분해 표시합니다.
 
 2026-11-16 기준 DVWA 자동 테스트 37건은 통과했습니다. 저장소 전체 Windows 로컬 테스트에는 WSL `/bin/bash` 부재로 인한 실패 1건과 Suricata 원본 증적 누락으로 시작되지 못한 테스트가 남아 있습니다. 자세한 내용은 [DVWA 검증 기록](docs/web-dvwa/README.md)에 기록했습니다.
