@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "profile": "KISA-2026-SURICATA-S19-S23-EXTENSION",
+  "source": {
+    "name": "주요정보통신기반시설 기술적 취약점 분석·평가 방법 상세가이드",
+    "published": "2025-12-24",
+    "url": "https://www.kisa.or.kr/2060204/form?lang_type=KO&postSeq=22"
+  },
+  "scope": {
+    "base_selection_count": 16,
+    "extension_count": 2,
+    "combined_selection_count": 18,
+    "base_rules": "rules/kisa-2026-selected.json",
+    "base_report": "docs/kisa-2026-final-scope-result.json",
+    "base_selection_frozen": true,
+    "extension_automated_engine_integration": false
+  },
+  "lab": {
+    "product": "OPNsense 26.7 / Suricata",
+    "environment": "Hyper-V isolated LAB",
+    "verified_at_utc": "2026-11-16",
+    "interface": "LAN hn1",
+    "source_ip": "10.77.40.20",
+    "destination_ip": "10.77.40.1",
+    "sid": 4294967294,
+    "evidence_bundle": "suricata_ids_ips_lab_evidence_2026-11-16.zip",
+    "evidence_kind": "user_manual_screenshots_private_local_only",
+    "raw_eve_json_available": false
+  },
+  "items": [
+    {
+      "id": "S-19",
+      "official_title": "이상징후 탐지 모니터링 수행",
+      "severity": "상",
+      "status": "NEEDS_REVIEW",
+      "checks": [
+        {
+          "code": "S19-01",
+          "criterion": "시험 트래픽의 IDS Alert 생성 및 식별",
+          "status": "VERIFIED_LAB",
+          "evidence": "ICMP 10.77.40.20 -> 10.77.40.1, Alert SID 4294967294, timestamp 2026-11-16T13:20:10.386236Z"
+        },
+        {
+          "code": "S19-02",
+          "criterion": "실제 이상징후 탐지 시그니처와 설정 범위",
+          "status": "NOT_VERIFIED",
+          "evidence": "only test IP-match rule reviewed"
+        },
+        {
+          "code": "S19-03",
+          "criterion": "담당자 신속 인지용 알림/모니터링 전달 및 수신",
+          "status": "NOT_VERIFIED",
+          "evidence": "manual GUI Alerts inspection only"
+        },
+        {
+          "code": "S19-04",
+          "criterion": "실제 모니터링 대상 구간과 대응 절차",
+          "status": "NOT_VERIFIED",
+          "evidence": "LAN single-path proof; no response procedure evidence"
+        }
+      ],
+      "decision": "Experimental alert was observed; full monitoring readiness and notification were not proved."
+    },
+    {
+      "id": "S-23",
+      "official_title": "유해 트래픽 탐지/차단 정책 설정",
+      "severity": "중",
+      "status": "NEEDS_REVIEW",
+      "checks": [
+        {
+          "code": "S23-01",
+          "criterion": "Netmap IPS process running",
+          "status": "VERIFIED_LAB",
+          "evidence": "Suricata --netmap observed"
+        },
+        {
+          "code": "S23-02",
+          "criterion": "Test drop and restoration",
+          "status": "VERIFIED_LAB",
+          "evidence": "drop ip, ping 4/0, GUI configured Drop, restored ping 4/4"
+        },
+        {
+          "code": "S23-03",
+          "criterion": "Enabled signatures identify genuinely unwanted traffic",
+          "status": "NOT_VERIFIED",
+          "evidence": "source/destination IP test rule is not threat-based; disabled after test"
+        },
+        {
+          "code": "S23-04",
+          "criterion": "Full installed active ruleset, action and interface inventory",
+          "status": "NOT_VERIFIED",
+          "evidence": "Download/Rules tab inventory not obtained"
+        },
+        {
+          "code": "S23-05",
+          "criterion": "Benign traffic accepted while safely simulated harmful pattern is blocked",
+          "status": "NOT_VERIFIED",
+          "evidence": "unconditional IP-test drop blocked benign ping"
+        }
+      ],
+      "decision": "Generic test drop worked, but effective harmful-traffic policy scope was not proved."
+    }
+  ],
+  "aggregation": {
+    "extension_PASS": 0,
+    "extension_NEEDS_REVIEW": 2,
+    "combined_PASS": null,
+    "combined_NEEDS_REVIEW": null,
+    "combined_denominator": 18,
+    "notes": "Do not aggregate with unverified base16 revisions; never turn functional lab checks into official PASS."
+  },
+  "next_step": "Inspect OPNsense Intrusion Detection > Administration > Download tab before any rule mutations."
+}
