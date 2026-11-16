@@ -56,6 +56,10 @@ flowchart LR
 
 [개선 전후 결과 상세](docs/remediation-comparison.md) · [KISA 대표 진단 사례](docs/kisa-2026-case-studies.md) · [장비별 참고 자료](docs/audit-evidence-mapping.md)
 
+### DVWA 웹 취약점 로컬 LAB
+
+SQL Injection, Reflected XSS, File Upload의 원인·개선과 실제 재점검을 별도로 정리했습니다. 수동 브라우저·Burp 증적과 자동 HTTP·Chromium 결과, 로컬 재현 절차를 확인할 수 있습니다. [DVWA 최종 재점검](docs/web-dvwa/README.md)
+
 ## 결과물 미리 보기
 
 **[통합 진단 보고서 PDF 샘플 열기](examples/integrated-report-sample/sample-integrated-report.pdf)**

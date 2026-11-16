@@ -1,0 +1,137 @@
+--- a/vulnerabilities/upload/source/low.php
++++ b/vulnerabilities/upload/source/low.php
+@@ -1,19 +1,115 @@
+-<?php
+-
+-if( isset( $_POST[ 'Upload' ] ) ) {
+-	// Where are we going to be writing to?
+-	$target_path  = DVWA_WEB_PAGE_TO_ROOT . "hackable/uploads/";
+-	$target_path .= basename( $_FILES[ 'uploaded' ][ 'name' ] );
+-
+-	// Can we move the file to the upload folder?
+-	if( !move_uploaded_file( $_FILES[ 'uploaded' ][ 'tmp_name' ], $target_path ) ) {
+-		// No
+-		$html .= '<pre>Your image was not uploaded.</pre>';
+-	}
+-	else {
+-		// Yes!
+-		$html .= "<pre>{$target_path} succesfully uploaded!</pre>";
+-	}
+-}
+-
+-?>
++<?php
++
++const DVWA_UPLOAD_MAX_BYTES = 100000;
++const DVWA_UPLOAD_DIRECTORY = '/var/lib/dvwa-uploads';
++
++function dvwaLowUploadResponse(int $status, string $message): void {
++    global $html;
++    http_response_code($status);
++    $html .= '<pre>' . htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</pre>';
++}
++
++if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
++    return;
++}
++
++$upload = $_FILES['uploaded'] ?? [];
++$error = $upload['error'] ?? UPLOAD_ERR_NO_FILE;
++if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) {
++    dvwaLowUploadResponse(413, 'Image exceeds the upload size limit.');
++    return;
++}
++if (in_array($error, [UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION], true)) {
++    dvwaLowUploadResponse(500, 'Image upload is unavailable.');
++    return;
++}
++$source = $upload['tmp_name'] ?? null;
++$clientName = $upload['name'] ?? null;
++if (!isset($_POST['Upload']) || $error !== UPLOAD_ERR_OK || !is_string($source)
++    || !is_string($clientName) || !is_uploaded_file($source)) {
++    dvwaLowUploadResponse(400, 'Provide a single complete image upload.');
++    return;
++}
++
++$bytes = filesize($source);
++if ($bytes === false || $bytes === 0) {
++    dvwaLowUploadResponse(400, 'The upload is empty or unreadable.');
++    return;
++}
++if ($bytes > DVWA_UPLOAD_MAX_BYTES) {
++    dvwaLowUploadResponse(413, 'Image exceeds the upload size limit.');
++    return;
++}
++
++$extension = strtolower(pathinfo($clientName, PATHINFO_EXTENSION));
++$formats = ['png' => ['image/png', IMAGETYPE_PNG], 'jpg' => ['image/jpeg', IMAGETYPE_JPEG],
++    'jpeg' => ['image/jpeg', IMAGETYPE_JPEG]];
++$format = $formats[$extension] ?? null;
++if ($format === null || (new finfo(FILEINFO_MIME_TYPE))->file($source) !== $format[0]) {
++    dvwaLowUploadResponse(415, 'Use a PNG or JPEG image with a matching extension.');
++    return;
++}
++
++$size = @getimagesize($source);
++if ($size === false || $size[2] !== $format[1] || $size[0] < 1 || $size[1] < 1) {
++    dvwaLowUploadResponse(415, 'The image could not be decoded.');
++    return;
++}
++if ($size[0] > 2048 || $size[1] > 2048) {
++    dvwaLowUploadResponse(413, 'Image dimensions exceed 2048 by 2048 pixels.');
++    return;
++}
++
++$isPng = $format[1] === IMAGETYPE_PNG;
++// Reject corrupt images even when GD produces a partial image along with a warning.
++set_error_handler(static function (int $level, string $message): never {
++    throw new ErrorException($message, 0, $level);
++}, E_WARNING);
++try {
++    $image = $isPng ? imagecreatefrompng($source) : imagecreatefromjpeg($source);
++} catch (ErrorException $error) {
++    $image = false;
++} finally {
++    restore_error_handler();
++}
++if ($image === false) {
++    dvwaLowUploadResponse(415, 'The image could not be decoded.');
++    return;
++}
++
++// Store only the image generated from decoded pixels, in a directory outside the web root.
++if ($isPng) {
++    imagesavealpha($image, true);
++}
++ob_start();
++$encoded = $isPng ? @imagepng($image) : @imagejpeg($image);
++$contents = ob_get_clean();
++if (!$encoded || $contents === false || $contents === '') {
++    dvwaLowUploadResponse(500, 'Image storage is unavailable.');
++    return;
++}
++
++$identifier = bin2hex(random_bytes(16)) . ($isPng ? '.png' : '.jpg');
++$path = DVWA_UPLOAD_DIRECTORY . '/' . $identifier;
++$previousUmask = umask(0077);
++try {
++    // Exclusive creation prevents overwrite, including when a name is already a symlink.
++    $file = @fopen($path, 'xb');
++} finally {
++    umask($previousUmask);
++}
++if ($file === false) {
++    dvwaLowUploadResponse(500, 'Image storage is unavailable.');
++    return;
++}
++$written = @fwrite($file, $contents);
++$closed = @fclose($file);
++if ($written !== strlen($contents) || !$closed) {
++    if (!@unlink($path)) {
++        error_log('DVWA upload: unable to remove an incomplete stored image');
++    }
++    dvwaLowUploadResponse(500, 'Image storage is unavailable.');
++    return;
++}
++
++dvwaLowUploadResponse(201, 'Image uploaded. ID: ' . $identifier);

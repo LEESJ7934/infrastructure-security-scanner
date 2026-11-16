@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "finding_id": "DVWA-UPLOAD-LOW",
+  "title": "DVWA Low File Upload",
+  "cwe": "CWE-434",
+  "captured_at_utc": "2026-11-16T09:35:01.417309+00:00",
+  "assessment": {
+    "baseline": "CONFIRMED",
+    "basis": "A benign non-image upload was accepted, stored under the web root, and fetched by HTTP.",
+    "after": "VERIFIED_FOR_TESTED_CASES",
+    "basis_after": "Valid PNG/JPEG were stored privately and all nine rejected cases left storage unchanged.",
+    "tests": {
+      "file_upload_http_and_storage": 17,
+      "sqli_http_regression": 11,
+      "xss_chromium_regression": 9
+    }
+  },
+  "deployments": {
+    "original_read_only": {
+      "origin": "http://127.0.0.1:4280",
+      "source_sha256": "a958136c538b253829ffbb8d8e6e7daee5061b31a531c4b9bcc99e8d2099503f"
+    },
+    "baseline": {
+      "origin": "http://127.0.0.1:4282",
+      "source_sha256": "a958136c538b253829ffbb8d8e6e7daee5061b31a531c4b9bcc99e8d2099503f"
+    },
+    "after": {
+      "origin": "http://127.0.0.1:4281",
+      "source_sha256": "e850dc53c4b8a345a9db292fc298c353ac2d09b4feeb1a133c214999c9d1769d"
+    }
+  },
+  "limits": {
+    "remote_code_execution": "NOT_TESTED",
+    "other_dvwa_security_levels": "NOT_TESTED",
+    "disk_exhaustion": "NOT_TESTED",
+    "concurrent_bulk_requests": "NOT_TESTED",
+    "exceeding_post_max_size": "NOT_TESTED",
+    "injected_server_failure": "NOT_TESTED"
+  },
+  "evidence": [
+    {
+      "id": "UPLOAD-ANALYSIS",
+      "path": "README.md",
+      "sha256": "bf69b4c55f6479f79422205845600c1f943094840d36261b90afedc8012df752"
+    },
+    {
+      "id": "UPLOAD-HTTP-STORAGE",
+      "path": "http-storage-evidence.json",
+      "sha256": "eca1e0d654654fc47d23d3b34fe74a1dd3fc8b0ec9f94e343c0f06783bf8c1b8"
+    },
+    {
+      "id": "UPLOAD-REGRESSION",
+      "path": "regression-evidence.json",
+      "sha256": "f15e79dd1a99ffee319a1e2b7d164a93f44d81f5692d22aec4fcace455852b4c"
+    },
+    {
+      "id": "UPLOAD-PHP-DIFF",
+      "path": "low.php.diff",
+      "sha256": "760cd9f349072e7ad8f7bd113d1acfea881b8d0735d689a4efff8dba4ff8b337"
+    }
+  ],
+  "manual_recheck_after": {
+    "method": "BURP_CAPTURE_REVIEW",
+    "origin": "http://127.0.0.1:4281",
+    "observed_status_codes": {
+      "png": 201,
+      "txt": 415
+    },
+    "capture_visibility": "LOCAL_ONLY",
+    "storage_verification": "AUTOMATED_FILESYSTEM_EVIDENCE"
+  }
+}
