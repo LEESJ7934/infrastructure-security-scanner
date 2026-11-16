@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "profile": "KISA-2026-SURICATA-S19-S23-EXTENSION",
   "source": {
     "name": "주요정보통신기반시설 기술적 취약점 분석·평가 방법 상세가이드",
@@ -32,7 +32,7 @@
       "id": "S-19",
       "official_title": "이상징후 탐지 모니터링 수행",
       "severity": "상",
-      "status": "NEEDS_REVIEW",
+      "status": "NOT_TESTED",
       "checks": [
         {
           "code": "S19-01",
@@ -59,13 +59,18 @@
           "evidence": "LAN single-path proof; no response procedure evidence"
         }
       ],
-      "decision": "Experimental alert was observed; full monitoring readiness and notification were not proved."
+      "decision": "Experimental alert was observed; full monitoring readiness and notification were not proved.",
+      "lab_functional_status": "PASS",
+      "full_kisa_scope_status": "NOT_TESTED",
+      "lab_functional_scope": "IDS test-packet alert generation, identification and manually observed log under one LAN path",
+      "not_tested_reason": "Active relevant anomaly-detection signatures, notification delivery/receipt and monitoring workflow could be verified in a LAB but have not been tested.",
+      "operational_context_limitations": "Customer-specific alert ownership, escalation SLAs and longitudinal monitoring effectiveness require actual organizational context; these are documented limitations, not assumed to have occurred."
     },
     {
       "id": "S-23",
       "official_title": "유해 트래픽 탐지/차단 정책 설정",
       "severity": "중",
-      "status": "NEEDS_REVIEW",
+      "status": "NOT_TESTED",
       "checks": [
         {
           "code": "S23-01",
@@ -98,16 +103,41 @@
           "evidence": "unconditional IP-test drop blocked benign ping"
         }
       ],
-      "decision": "Generic test drop worked, but effective harmful-traffic policy scope was not proved."
+      "decision": "Generic test drop worked, but effective harmful-traffic policy scope was not proved.",
+      "lab_functional_status": "PASS",
+      "full_kisa_scope_status": "NOT_TESTED",
+      "lab_functional_scope": "IPS netmap execution, user-defined test IP packet drop and restoration under one LAN path",
+      "not_tested_reason": "Enabled harmful-traffic detection/drop policies, installed signature inventory and benign-vs-harmful pattern discrimination can be tested in a LAB but have not been tested.",
+      "operational_context_limitations": "Customer-specific threat policy, risk acceptance and approval lifecycle require actual organizational context; these are documented limitations, not assumed to have occurred."
     }
   ],
   "aggregation": {
-    "extension_PASS": 0,
-    "extension_NEEDS_REVIEW": 2,
-    "combined_PASS": null,
-    "combined_NEEDS_REVIEW": null,
-    "combined_denominator": 18,
-    "notes": "Do not aggregate with unverified base16 revisions; never turn functional lab checks into official PASS."
+    "extension_lab_functional_PASS": 2,
+    "extension_full_kisa_PASS": 0,
+    "extension_full_kisa_NOT_TESTED": 2,
+    "extension_full_kisa_NEEDS_REVIEW": 0,
+    "base_source_of_truth": "docs/kisa-2026-final-scope-result.json",
+    "base16_at_revision": {
+      "PASS": 13,
+      "FAIL": 0,
+      "NEEDS_REVIEW": 3
+    },
+    "combined_full_kisa_at_revision": {
+      "PASS": 13,
+      "FAIL": 0,
+      "NEEDS_REVIEW": 3,
+      "NOT_TESTED": 2,
+      "total": 18
+    },
+    "combined_count_note": "Current base16 from main, not an assertion that user-local S-06/S-07 followups were committed. Lab functional PASS is excluded from full-KISA overall PASS count."
   },
-  "next_step": "Inspect OPNsense Intrusion Detection > Administration > Download tab before any rule mutations."
+  "next_step": "If full KISA PASS desired, run one bounded lab verification of actual relevant enabled signatures plus alert delivery (S-19) and harmful-like non-destructive pattern blocking with benign traffic retained (S-23); preserve screenshot/eve evidence. The lab functional checks are already PASS.",
+  "verdict_policy": {
+    "PASS": "Assessed requirement demonstrably satisfied within the explicitly stated scope.",
+    "FAIL": "Actual unsafe or noncompliant configuration/behavior observed against scoped criterion.",
+    "NOT_TESTED": "Condition is testable in the isolated LAB but has not been exercised or evidence has not been collected.",
+    "NEEDS_REVIEW": "Requires evidence from a real customer's organizational policy, approvals, historical/ongoing operational process or business context not reproducible or not authentically available in this LAB.",
+    "NOT_APPLICABLE": "Condition does not apply to the defined assessment scope, with recorded justification.",
+    "scope_note": "The LAB functional PASS is a separate subordinate verdict, not certification and not a PASS against the complete KISA item."
+  }
 }
