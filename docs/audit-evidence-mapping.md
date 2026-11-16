@@ -316,6 +316,59 @@ GitHub Actions 일회용 Docker 환경에서 동일한 서비스 대상으로 �
 
 **실제 AWS EC2 설정을 변경한 결과가 아닙니다.** 별도 SQLite SQL 앱과 DVWA의 결과도 같은 서비스의 개선 전후로 취급하지 않습니다.
 
+### 로컬 DVWA Low SQL Injection 개선 재점검
+
+2026-11-16 KST에 기존 로컬 DVWA `127.0.0.1:4280`과 별도 Docker 복사본 `127.0.0.1:4281`을 비교했다. 두 환경은 동일한 DVWA 이미지 `068d974`를 기반으로 한다. 복사본은 전용 Compose 네트워크와 MariaDB 볼륨을 사용한다.
+
+`low.php`의 데이터 흐름은 `$_REQUEST['id']` → `WHERE user_id = '$id'` → `mysqli_query()` 또는 SQLite `query()`다. 입력의 작은따옴표가 문자열 리터럴을 닫으면 `OR '1'='1'`이 SQL 조건으로 해석된다. 정상 조회에서 1행을 반환하던 쿼리가 실습 계정 5행을 반환했으므로 데이터 기밀성에 영향을 주는 [CWE-89](https://cwe.mitre.org/data/definitions/89.html)에 해당한다. `impossible.php`는 DVWA가 제공한 참고 코드로만 검토했다. 두 컨테이너에서 해당 파일의 SHA-256이 일치했다.
+
+[개선 코드](../lab/dvwa-sqli-retest/low.php)는 1 이상 2,147,483,647 이하인 10진 정수 ID를 받고, 고정 SQL `WHERE user_id = :user_id`에 정수로 바인딩한다. 실습 환경의 MySQL 호환 경로는 DVWA가 설정한 네이티브 PDO Prepared Statement를 사용한다. 잘못된 입력은 DB 조회 전에 `400`을 반환한다. 조회된 이름은 HTML 이스케이프를 거쳐 표시한다. [Dockerfile](../lab/dvwa-sqli-retest/Dockerfile)이 복사본의 `low.php`를 교체하고 PHP 구문을 검사한다.
+
+| GET 요청의 입력 | 원본 4280 | 개선본 4281 |
+|---|---|---|
+| `id=1`, `id=2` | 각각 `200`, 1행 | 각각 `200`, 동일 사용자 1행 |
+| `id=999999` | `200`, 0행 | `200`, 0행 |
+| `id=1' OR '1'='1` | `200`, 서로 다른 사용자 5행 | `400`, 0행, `Invalid user ID.` |
+| `id[]=1`, ID 누락, `id=2147483648` | 미수행 | 각각 `400`, 0행 |
+
+[HTTP 비교 테스트](../lab/dvwa-sqli-retest/test_http_comparison.py)는 각 포트에서 로그인하고 Low 쿠키와 응답의 Low 표시를 확인한다. 같은 네 요청의 HTTP 메서드·경로·쿼리가 일치하고 정상 ID 두 건에서 같은 사용자가 반환되는지 비교한다. SHA-256은 응답 본문 바이트를 식별하는 데 사용하며, JSON에는 본문·사용자 이름·자격 증명·세션값을 남기지 않는다. 실행 전 제공된 검증기의 `finding_status=CONFIRMED`와 최상위 `status=POTENTIAL`은 기존 판정 모델의 값이며, 아래 테스트의 PASS는 예상한 HTTP 동작과 일치했다는 뜻이다.
+
+#### 실행 및 증적 파일
+
+저장소 루트에서 최초 한 번 복사본 DB 비밀번호를 생성하거나, 기존 복사본용 비밀번호를 같은 환경 변수에 로드한다. 기존 복사본을 다시 기동할 때는 최초 값이 필요하다.
+
+```powershell
+$env:DVWA_RETEST_DB_PASSWORD = [guid]::NewGuid().ToString('N') # 최초 생성 시
+docker compose -f lab/dvwa-sqli-retest/compose.yml config --quiet
+docker compose -f lab/dvwa-sqli-retest/compose.yml up -d --build
+```
+
+새 복사본에서만 [DB 초기화 화면](http://127.0.0.1:4281/setup.php)을 열고 **Create / Reset Database**를 한 번 누른다. 이후 `admin` / `password`로 로그인한다. 원본 DVWA는 이미 초기화되어 있어야 한다. 원본의 실습 로그인 값이 기본값과 다르면 `DVWA_BEFORE_USERNAME`과 `DVWA_BEFORE_PASSWORD`를 현재 셸에 설정한다.
+
+```powershell
+New-Item -ItemType Directory -Force evidence/dvwa-sqli-retest | Out-Null
+py -3 -B lab/dvwa-sqli-retest/test_http_comparison.py --output evidence/dvwa-sqli-retest/dvwa-sqli-http.json
+```
+
+Python 테스트는 `requests`와 `beautifulsoup4`를 사용하고, 결과 파일은 새 경로에만 생성한다. 실행별로 아래 파일을 한 폴더에 둔다. 저장소 내 `evidence/`는 Git에서 제외한다.
+
+| 파일 | 연결되는 근거 |
+|---|---|
+| `dvwa-sqli-http.json` | 실제 요청 대상, 시간(UTC), 상태, 행 수, 응답 바이트 수와 SHA-256, 판정 |
+| `dvwa-sqli-low.diff` | 원본 컨테이너의 `low.php`와 실행된 개선본 `low.php`의 차이 |
+| `dvwa-sqli-report.md` | 두 파일의 SHA-256, 배포된 소스 해시, 테스트 결과표, 수동 증적 상태 |
+
+Diff를 다시 만들 때는 각 컨테이너의 `/var/www/html/vulnerabilities/sqli/source/low.php`를 `docker cp`로 별도 임시 경로에 복사한 뒤 `git diff --no-index -- <원본 파일> <개선 파일>`을 실행한다. 이 명령의 종료 코드 `1`은 차이를 발견했다는 뜻이다. `docker exec <컨테이너> sha256sum <소스 경로>`로 컨테이너의 파일을 식별한다. Burp에서 별도로 수집하는 요청·응답은 `before`/`after`와 사례(`id_1`, `sqli`)를 파일명이나 기록에 표시하고, 공유 사본에서 세션값과 사용자 이름을 가린다. 이후 사용자 Burp 캡처에서 개선본의 정상 ID 요청 `200`과 SQLi 요청 `400`을 확인했다.
+
+#### Burp Suite 재점검
+
+1. **Proxy → Open browser**에서 먼저 [원본 로그인](http://127.0.0.1:4280/login.php) 또는 [개선본 로그인](http://127.0.0.1:4281/login.php)을 연다. 각 포트의 **DVWA Security** 메뉴에서 **Low**를 선택한다.
+2. 해당 포트의 [원본 SQLi 화면](http://127.0.0.1:4280/vulnerabilities/sqli/) 또는 [개선본 SQLi 화면](http://127.0.0.1:4281/vulnerabilities/sqli/)에서 ID `1`을 제출한다. **Proxy → HTTP history**에서 이 GET을 찾아 **Send to Repeater**로 보낸다. 원본과 개선본은 각 포트에서 캡처해 별도 탭에 둔다. 동일 호스트의 쿠키는 포트별로 분리되지 않으므로 각 탭의 `PHPSESSID`는 해당 포트에서 캡처한 값으로 유지하고 `security=low`를 확인한다.
+3. 각 Repeater 탭의 목적지가 HTTP `127.0.0.1:4280` 또는 `127.0.0.1:4281`인지 확인한다. 먼저 `GET /vulnerabilities/sqli/?id=1&Submit=Submit HTTP/1.1`을 전송한다. 다음으로 요청 줄만 `GET /vulnerabilities/sqli/?id=1%27+OR+%271%27%3D%271&Submit=Submit HTTP/1.1`으로 바꿔 전송한다.
+4. 정상 응답은 양쪽에서 `200`과 `First name:` 1건이다. SQLi 요청의 기대값은 원본 `200`과 5건, 개선본 `400`과 0건 및 `Invalid user ID.`다. 로그인 리다이렉트가 나오면 해당 포트의 세션을 다시 캡처한다.
+
+이 절의 자동 실행 이후 수동 Burp·브라우저 증적을 추가 검토했다. [DVWA 최종 재점검](web-dvwa/README.md)에 현재 범위와 결과를 정리했다.
+
 ### 4. 판정 상태
 
 | 상태 | 의미 |

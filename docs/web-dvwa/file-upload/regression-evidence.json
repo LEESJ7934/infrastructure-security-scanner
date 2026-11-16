@@ -1,0 +1,490 @@
+{
+  "sqli": {
+    "finding": "CWE-89",
+    "captured_at_utc": "2026-11-16T09:34:58.813935+00:00",
+    "targets": {
+      "before": {
+        "origin": "http://127.0.0.1:4280",
+        "cases": {
+          "id_1": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=1&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4738,
+              "body_sha256": "f3a77e7e93f1e1e6fbb68dde698dc43bf45493f8f813bd53958830b16ace13af",
+              "result_rows": 1,
+              "result_blocks": 1,
+              "distinct_user_names": 1,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "id_2": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=2&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4652,
+              "body_sha256": "34f35b2a16708173c5148afb193a3e22ebde9ef123ea8f00b93af143fe8df043",
+              "result_rows": 1,
+              "result_blocks": 1,
+              "distinct_user_names": 1,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "unknown_id": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=999999&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4592,
+              "body_sha256": "81cd8d3f7374b62a36d6ee31592c7ff47c2300ae478d7de782bba28708801b06",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "sqli": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=1%27+OR+%271%27%3D%271&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4939,
+              "body_sha256": "fdd3fc2f1d1c5435d7df6490c07bab268e500df2c5e0df3a2c0a4cdc7f8dccc0",
+              "result_rows": 5,
+              "result_blocks": 5,
+              "distinct_user_names": 5,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          }
+        }
+      },
+      "after": {
+        "origin": "http://127.0.0.1:4281",
+        "cases": {
+          "id_1": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=1&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4738,
+              "body_sha256": "f3a77e7e93f1e1e6fbb68dde698dc43bf45493f8f813bd53958830b16ace13af",
+              "result_rows": 1,
+              "result_blocks": 1,
+              "distinct_user_names": 1,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "id_2": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=2&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4652,
+              "body_sha256": "34f35b2a16708173c5148afb193a3e22ebde9ef123ea8f00b93af143fe8df043",
+              "result_rows": 1,
+              "result_blocks": 1,
+              "distinct_user_names": 1,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "unknown_id": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=999999&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4592,
+              "body_sha256": "81cd8d3f7374b62a36d6ee31592c7ff47c2300ae478d7de782bba28708801b06",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": false
+            },
+            "verdict": "PASS"
+          },
+          "sqli": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=1%27+OR+%271%27%3D%271&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 400,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4615,
+              "body_sha256": "6c634289812ceec63cf95f8314b9066f38211bb0a0c182b8d2a98348ed7461b1",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": true
+            },
+            "verdict": "PASS"
+          },
+          "array_id": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id%5B%5D=1&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 400,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4615,
+              "body_sha256": "6c634289812ceec63cf95f8314b9066f38211bb0a0c182b8d2a98348ed7461b1",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": true
+            },
+            "verdict": "PASS"
+          },
+          "missing_id": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 400,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4615,
+              "body_sha256": "6c634289812ceec63cf95f8314b9066f38211bb0a0c182b8d2a98348ed7461b1",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": true
+            },
+            "verdict": "PASS"
+          },
+          "out_of_range_id": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/sqli/?id=2147483648&Submit=Submit",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "http_status": 400,
+              "content_type": "text/html;charset=utf-8",
+              "body_bytes": 4615,
+              "body_sha256": "6c634289812ceec63cf95f8314b9066f38211bb0a0c182b8d2a98348ed7461b1",
+              "result_rows": 0,
+              "result_blocks": 0,
+              "distinct_user_names": 0,
+              "low_page": true,
+              "invalid_id_message": true
+            },
+            "verdict": "PASS"
+          }
+        }
+      }
+    },
+    "matched_requests": {
+      "id_1": true,
+      "id_2": true,
+      "unknown_id": true,
+      "sqli": true
+    },
+    "matched_normal_rows": {
+      "id_1": true,
+      "id_2": true
+    },
+    "verdict": "PASS",
+    "errors": []
+  },
+  "xss_reflected": {
+    "finding": "CWE-79",
+    "captured_at_utc": "2026-11-16T09:34:59.571474+00:00",
+    "targets": {
+      "before": {
+        "origin": "http://127.0.0.1:4280",
+        "cases": {
+          "normal": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=test123",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4859,
+              "body_sha256": "2300ab9a089b8dc7f3b4dee263f46e3799e83fb4ad56ac940f66cd4f49dd009f",
+              "greeting_html": "<pre>Hello test123</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello test123",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "script": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4790,
+              "body_sha256": "6e0206285df50a4ae92c88c6f0bf049b93c67066e3ffbb7b60d6869eb3a6e37c",
+              "greeting_html": "<pre>Hello <script>alert(1)</script></pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello ",
+              "greeting_descendant_tags": [
+                "SCRIPT"
+              ],
+              "dialogs_during_load": [
+                {
+                  "type": "alert",
+                  "message": "1"
+                }
+              ]
+            },
+            "verdict": "PASS"
+          },
+          "html_characters": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=Tom+%26+%22O%27Reilly%22",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4781,
+              "body_sha256": "aadd3e97f85544b6e7b525efaad3d343d430b70ca83a2cde499c0a5d6b9f6d2e",
+              "greeting_html": "<pre>Hello Tom & \"O'Reilly\"</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello Tom & \"O'Reilly\"",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          }
+        }
+      },
+      "after": {
+        "origin": "http://127.0.0.1:4281",
+        "cases": {
+          "normal": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=test123",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4859,
+              "body_sha256": "2300ab9a089b8dc7f3b4dee263f46e3799e83fb4ad56ac940f66cd4f49dd009f",
+              "greeting_html": "<pre>Hello test123</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello test123",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "script": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4802,
+              "body_sha256": "895bc2cf865562be645dfab8bfc2568c893c2d97ba91900ff4852387df36d417",
+              "greeting_html": "<pre>Hello &lt;script&gt;alert(1)&lt;/script&gt;</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello <script>alert(1)</script>",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "html_characters": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=Tom+%26+%22O%27Reilly%22",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4800,
+              "body_sha256": "89a49cd341ca0a9792f3dcf587b102fc0dd9b9124557784f701adf2cea0be085",
+              "greeting_html": "<pre>Hello Tom &amp; &quot;O&#039;Reilly&quot;</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello Tom & \"O'Reilly\"",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "entity_text": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=%26lt%3Bscript%26gt%3B",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4787,
+              "body_sha256": "630e51fd3f4183eab86d717f45f50ea7305e173bada00b5d924396626502d3f2",
+              "greeting_html": "<pre>Hello &amp;lt;script&amp;gt;</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello &lt;script&gt;",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "array_name": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name%5B%5D=test123",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4748,
+              "body_sha256": "15e204ab90d34d449b487a2d972f2b02e10efd9f42f705293339b8c2f2c9c84d",
+              "greeting_html": null,
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 0,
+              "greeting_visible": false,
+              "visible_text": null,
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          },
+          "invalid_utf8": {
+            "request": {
+              "method": "GET",
+              "target": "/vulnerabilities/xss_r/?name=%FF",
+              "security_level_sent": "low"
+            },
+            "response": {
+              "status": 200,
+              "content_type": "text/html;charset=utf-8",
+              "low_page": true,
+              "body_bytes": 4768,
+              "body_sha256": "5d68dd52531569c8e15867136bbd70bbe5f8b7789b5480c73bcb60a5631c5239",
+              "greeting_html": "<pre>Hello �</pre>",
+              "greeting_html_matches": true
+            },
+            "browser": {
+              "greeting_count": 1,
+              "greeting_visible": true,
+              "visible_text": "Hello �",
+              "greeting_descendant_tags": [],
+              "dialogs_during_load": []
+            },
+            "verdict": "PASS"
+          }
+        }
+      }
+    },
+    "matched_requests": {
+      "normal": true,
+      "script": true,
+      "html_characters": true
+    },
+    "errors": [],
+    "browser": {
+      "engine": "Chromium",
+      "version": "145.0.7632.6",
+      "headless": true
+    },
+    "verdict": "PASS"
+  }
+}

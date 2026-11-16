@@ -1,0 +1,697 @@
+{
+  "finding_id": "DVWA-UPLOAD-LOW",
+  "cwe": "CWE-434",
+  "captured_at_utc": "2026-11-16T09:35:01.417309+00:00",
+  "targets": {
+    "baseline": {
+      "origin": "http://127.0.0.1:4282",
+      "container": "scanner-dvwa-upload-baseline-web-1",
+      "cases": {
+        "png": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-image.PNG",
+            "part_content_type": "image/png",
+            "file_bytes": 77,
+            "file_sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712",
+            "multipart_sha256": "87bfbf4272c7aa97bc8527bbcc2f457817685a2c4fd3278ae608061cb4ec0963"
+          },
+          "response": {
+            "status": 200,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4691,
+            "body_sha256": "7e6ea8702ff98c50f2cdee5695b072a8f54a09e836de62bb07eca49ead39715c",
+            "message_excerpt": "../../hackable/uploads/dvwa-upload-05130814ada7-image.PNG succesfully uploaded!",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {
+                "dvwa-upload-05130814ada7-image.PNG": {
+                  "type": "file",
+                  "bytes": 77,
+                  "sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712",
+                  "mode": "644",
+                  "mime": "image/png"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "original_public_path": {
+              "status": 200,
+              "sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712"
+            }
+          },
+          "verdict": "PASS"
+        },
+        "jpeg": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-image.jpeg",
+            "part_content_type": "application/octet-stream",
+            "file_bytes": 633,
+            "file_sha256": "e70340111b49abbf7dbc06683585595eb2cd11bdc23e3ce1cb0b58b0b71e0ebc",
+            "multipart_sha256": "8d13f9b1ff38edba7efd4c4e078d6ba5d62a695d4f89bde212560910b27ea564"
+          },
+          "response": {
+            "status": 200,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4605,
+            "body_sha256": "4363ac190923ad524aaa4c10e180bc40dc6a1eeac56c3b8926340985e5cfef9d",
+            "message_excerpt": "../../hackable/uploads/dvwa-upload-05130814ada7-image.jpeg succesfully uploaded!",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {
+                "dvwa-upload-05130814ada7-image.jpeg": {
+                  "type": "file",
+                  "bytes": 633,
+                  "sha256": "e70340111b49abbf7dbc06683585595eb2cd11bdc23e3ce1cb0b58b0b71e0ebc",
+                  "mode": "644",
+                  "mime": "image/jpeg"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "original_public_path": {
+              "status": 200,
+              "sha256": "e70340111b49abbf7dbc06683585595eb2cd11bdc23e3ce1cb0b58b0b71e0ebc"
+            }
+          },
+          "verdict": "PASS"
+        },
+        "txt": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-text.txt",
+            "part_content_type": "text/plain",
+            "file_bytes": 44,
+            "file_sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+            "multipart_sha256": "b9685577c90c2a2c9d6b0840e51c80789dbbd5d7eebb7abd61b4ec579d10e2c5"
+          },
+          "response": {
+            "status": 200,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4603,
+            "body_sha256": "1007a617b8aff4a7c5035cc52da0718480305111de8e8fd3ccb3916c37319718",
+            "message_excerpt": "../../hackable/uploads/dvwa-upload-05130814ada7-text.txt succesfully uploaded!",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {
+                "dvwa-upload-05130814ada7-text.txt": {
+                  "type": "file",
+                  "bytes": 44,
+                  "sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+                  "mode": "644",
+                  "mime": "text/plain"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "original_public_path": {
+              "status": 200,
+              "sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb"
+            }
+          },
+          "verdict": "PASS"
+        },
+        "txt_as_png": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-disguised.png",
+            "part_content_type": "image/png",
+            "file_bytes": 44,
+            "file_sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+            "multipart_sha256": "ee332855966a8bf631c70f5bfc3bb2f539c89950f5012ccc57eb42b52a4ebaf4"
+          },
+          "response": {
+            "status": 200,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4608,
+            "body_sha256": "ec2039a3de477996c78e09ef019859d168d794c931cea5fd906df60a5d7de55b",
+            "message_excerpt": "../../hackable/uploads/dvwa-upload-05130814ada7-disguised.png succesfully uploaded!",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {
+                "dvwa-upload-05130814ada7-disguised.png": {
+                  "type": "file",
+                  "bytes": 44,
+                  "sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+                  "mode": "644",
+                  "mime": "text/plain"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "original_public_path": {
+              "status": 200,
+              "sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb"
+            }
+          },
+          "verdict": "PASS"
+        }
+      }
+    },
+    "after": {
+      "origin": "http://127.0.0.1:4281",
+      "container": "scanner-dvwa-sqli-retest-web-1",
+      "cases": {
+        "png": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-image.PNG",
+            "part_content_type": "image/png",
+            "file_bytes": 77,
+            "file_sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712",
+            "multipart_sha256": "87bfbf4272c7aa97bc8527bbcc2f457817685a2c4fd3278ae608061cb4ec0963"
+          },
+          "response": {
+            "status": 201,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4668,
+            "body_sha256": "a9648fe0a89c717b00c2d02bdd6590a29b2d77de2d5f575ae8201e614d5b1041",
+            "message_excerpt": "Image uploaded. ID: 5335d871fbe50ef3c3f3ddf7fd41100c.png",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {
+                "5335d871fbe50ef3c3f3ddf7fd41100c.png": {
+                  "type": "file",
+                  "bytes": 100,
+                  "sha256": "44b92ec5078279cd82b140c8d1a5c7b155945521351eee0ebf7016e7c429ebf9",
+                  "mode": "600",
+                  "mime": "image/png"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "public_upload_path": {
+              "status": 404
+            },
+            "private_dir_name_as_url": {
+              "status": 404
+            }
+          },
+          "verdict": "PASS"
+        },
+        "jpeg": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-image.jpeg",
+            "part_content_type": "application/octet-stream",
+            "file_bytes": 633,
+            "file_sha256": "e70340111b49abbf7dbc06683585595eb2cd11bdc23e3ce1cb0b58b0b71e0ebc",
+            "multipart_sha256": "8d13f9b1ff38edba7efd4c4e078d6ba5d62a695d4f89bde212560910b27ea564"
+          },
+          "response": {
+            "status": 201,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4581,
+            "body_sha256": "5d59ef652c65753263a47c92e07a5102c67e9f7a705a62d5d874b07816e58884",
+            "message_excerpt": "Image uploaded. ID: 915ba1aeb6b4f290f658b38415d973a6.jpg",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {
+                "915ba1aeb6b4f290f658b38415d973a6.jpg": {
+                  "type": "file",
+                  "bytes": 697,
+                  "sha256": "8c81d07b6a32fe18a49a9ff81836ef343a7172d7ebfa23280735c0b0ebdcdd12",
+                  "mode": "600",
+                  "mime": "image/jpeg"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "public_upload_path": {
+              "status": 404
+            },
+            "private_dir_name_as_url": {
+              "status": 404
+            }
+          },
+          "verdict": "PASS"
+        },
+        "txt": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-text.txt",
+            "part_content_type": "text/plain",
+            "file_bytes": 44,
+            "file_sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+            "multipart_sha256": "b9685577c90c2a2c9d6b0840e51c80789dbbd5d7eebb7abd61b4ec579d10e2c5"
+          },
+          "response": {
+            "status": 415,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4575,
+            "body_sha256": "8efa7b55d86e52ff44b1747c3013222efe8a82c7149ce49ccc29bfc2eee43477",
+            "message_excerpt": "Use a PNG or JPEG image with a matching extension.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "txt_as_png": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-disguised.png",
+            "part_content_type": "image/png",
+            "file_bytes": 44,
+            "file_sha256": "118b90095607f4739ea972a3a8f402dd9c6dc6d822d9a9141acc6e6fa4ca1aeb",
+            "multipart_sha256": "ee332855966a8bf631c70f5bfc3bb2f539c89950f5012ccc57eb42b52a4ebaf4"
+          },
+          "response": {
+            "status": 415,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4575,
+            "body_sha256": "8efa7b55d86e52ff44b1747c3013222efe8a82c7149ce49ccc29bfc2eee43477",
+            "message_excerpt": "Use a PNG or JPEG image with a matching extension.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "png_as_jpeg": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-mismatch.jpg",
+            "part_content_type": "image/jpeg",
+            "file_bytes": 77,
+            "file_sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712",
+            "multipart_sha256": "be887ebf4fb6bc7bfae91e4ab98e4397352e18fc0b973b35e8b021831bea7376"
+          },
+          "response": {
+            "status": 415,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4575,
+            "body_sha256": "8efa7b55d86e52ff44b1747c3013222efe8a82c7149ce49ccc29bfc2eee43477",
+            "message_excerpt": "Use a PNG or JPEG image with a matching extension.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "truncated_png": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-truncated.png",
+            "part_content_type": "image/png",
+            "file_bytes": 45,
+            "file_sha256": "98158fb901d1aec2a7486804b788572cff01f910bf7a849123aafe5e3f388180",
+            "multipart_sha256": "425df7198f08e3f2f56c89f254290c621f348d164c462a2e781c12a36e210ad0"
+          },
+          "response": {
+            "status": 415,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4556,
+            "body_sha256": "ccaa2ef64092710429a6975c918762730c65881bf1b15a1abdc4f01f58275b80",
+            "message_excerpt": "The image could not be decoded.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "exact_limit": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-limit.png",
+            "part_content_type": "image/png",
+            "file_bytes": 100000,
+            "file_sha256": "787b855dc62eba361a229ee1b606e25483127a424aa8158963bddf42b8b12ef5",
+            "multipart_sha256": "4777ba9c19feba7b4efa748159ed13b5f4d8987567765f75bff6e5a9958e16d5"
+          },
+          "response": {
+            "status": 201,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4581,
+            "body_sha256": "965aaf0c8ceec81bc7937102ab4a3cdb35ccb53dfeeede7457f402793c354f7c",
+            "message_excerpt": "Image uploaded. ID: a31f5c773a1216e017ce21086e4001c7.png",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {
+                "a31f5c773a1216e017ce21086e4001c7.png": {
+                  "type": "file",
+                  "bytes": 100,
+                  "sha256": "44b92ec5078279cd82b140c8d1a5c7b155945521351eee0ebf7016e7c429ebf9",
+                  "mode": "600",
+                  "mime": "image/png"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "public_upload_path": {
+              "status": 404
+            },
+            "private_dir_name_as_url": {
+              "status": 404
+            }
+          },
+          "verdict": "PASS"
+        },
+        "over_limit": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-over.png",
+            "part_content_type": "image/png",
+            "file_bytes": 100001,
+            "file_sha256": "96030c0824cf655f8243228f001383570c547dc07cd7e1664a79b1f334a0c757",
+            "multipart_sha256": "4b9b51831bd0ee8083e6ab7435835e024ddd2edf359b008d7d08a43c2074d6c0"
+          },
+          "response": {
+            "status": 413,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4561,
+            "body_sha256": "e74b92ffc5b86935caa050fb544e04dcd1edbbdb4cbcdd9a5ca30503a7e9f400",
+            "message_excerpt": "Image exceeds the upload size limit.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "over_php_limit": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-over-php.png",
+            "part_content_type": "image/png",
+            "file_bytes": 2097153,
+            "file_sha256": "9da10e62aaf7e2ef0c934f100c1a40fdc15a1a0b308545f914f9e191af700982",
+            "multipart_sha256": "b232b19a59b90829e6dad7894ced697511bf8e9803023a32b6fc74ef728246c4"
+          },
+          "response": {
+            "status": 413,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4561,
+            "body_sha256": "e74b92ffc5b86935caa050fb544e04dcd1edbbdb4cbcdd9a5ca30503a7e9f400",
+            "message_excerpt": "Image exceeds the upload size limit.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "oversize_dimensions": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-wide.png",
+            "part_content_type": "image/png",
+            "file_bytes": 91,
+            "file_sha256": "c9301420403547db6e3726287037363f594870bd673b9d16156944785f488e66",
+            "multipart_sha256": "cbba478e637498e023d07ae9f66aa0d79ac3214600a4da6ef6491c63a621c573"
+          },
+          "response": {
+            "status": 413,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4569,
+            "body_sha256": "a9a35c67ac72142340a55b0592464e788dff0b852697c75e71f2a55a73eb07f6",
+            "message_excerpt": "Image dimensions exceed 2048 by 2048 pixels.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "empty": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-empty.png",
+            "part_content_type": "image/png",
+            "file_bytes": 0,
+            "file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "multipart_sha256": "c691f3ddfb0fa510f15845d7c88dd6d7aafcc150b7b48e6e73e404b79ad8be13"
+          },
+          "response": {
+            "status": 400,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4559,
+            "body_sha256": "5eb5ac6bd06a694bfe2278ada642501ab9904e8a26bc033cd4b487d9c1bc9618",
+            "message_excerpt": "The upload is empty or unreadable.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "no_file": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "",
+            "part_content_type": "application/octet-stream",
+            "file_bytes": 0,
+            "file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "multipart_sha256": "fc635b6b5151c00a650112f827790cb1bb56a1e8ccbad202f13abf8b60cb8a59"
+          },
+          "response": {
+            "status": 400,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4564,
+            "body_sha256": "3a463c6dc8073b63ecbbc7ab67fb4646afe07a9fef0f7c71c43e063e88c94ac0",
+            "message_excerpt": "Provide a single complete image upload.",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {},
+          "verdict": "PASS"
+        },
+        "same_filename": {
+          "request": {
+            "method": "POST",
+            "target": "/vulnerabilities/upload/",
+            "security_level": "low",
+            "filename": "dvwa-upload-05130814ada7-image.PNG",
+            "part_content_type": "image/png",
+            "file_bytes": 77,
+            "file_sha256": "ade806763d2085318394e251241d8604757528126340417593e2653bf4d3d712",
+            "multipart_sha256": "5982402778ae6772aaaeb60559101a7e8912a574e17006edd892627e1f000a45"
+          },
+          "response": {
+            "status": 201,
+            "content_type": "text/html;charset=utf-8",
+            "body_bytes": 4581,
+            "body_sha256": "05239d48b92d6a758658cda59126b6c534679c314aeffeb884a864434440eaea",
+            "message_excerpt": "Image uploaded. ID: 3fc9752e467176c4b758c573c5571a1d.png",
+            "low_page": true
+          },
+          "storage_diff": {
+            "web_uploads": {
+              "added": {},
+              "removed": 0,
+              "modified": 0
+            },
+            "private_uploads": {
+              "added": {
+                "3fc9752e467176c4b758c573c5571a1d.png": {
+                  "type": "file",
+                  "bytes": 100,
+                  "sha256": "44b92ec5078279cd82b140c8d1a5c7b155945521351eee0ebf7016e7c429ebf9",
+                  "mode": "600",
+                  "mime": "image/png"
+                }
+              },
+              "removed": 0,
+              "modified": 0
+            }
+          },
+          "http_read_checks": {
+            "public_upload_path": {
+              "status": 404
+            },
+            "private_dir_name_as_url": {
+              "status": 404
+            }
+          },
+          "verdict": "PASS"
+        }
+      }
+    }
+  },
+  "matched_requests": {
+    "png": true,
+    "jpeg": true,
+    "txt": true,
+    "txt_as_png": true
+  },
+  "errors": [],
+  "verdict": "PASS"
+}
