@@ -5,9 +5,43 @@ import ipaddress
 import socket
 import ssl
 import time
+import re
 from dataclasses import dataclass
 
 MAX_BANNER_BYTES = 16384
+
+
+def sanitize_banner(data: bytes | str | None):
+    """Preserve identity evidence, discard HTTP bodies and nonessential headers.
+
+    An allowlist also excludes unknown authentication/token headers, redirects
+    with query credentials, cookies and obsolete folded continuations. Binary
+    service greetings are not treated as HTTP.
+    """
+    if not data:
+        return data
+    was_text = isinstance(data, str)
+    raw = data.encode("latin1", "replace") if was_text else data
+    if not raw.startswith(b"HTTP/"):
+        return data
+    header = re.split(rb"\r?\n\r?\n", raw, maxsplit=1)[0]
+    lines = re.split(rb"\r?\n", header)
+    kept = [lines[0]]
+    allowed = {b"server", b"x-elastic-product", b"kbn-version", b"content-type", b"content-length"}
+    markers = {b"kbn-name", b"kbn-license-sig"}
+    for line in lines[1:]:
+        if line.startswith((b" ", b"\t")) or b":" not in line:
+            continue
+        name, value = line.split(b":", 1)
+        key = name.strip().lower()
+        if key in allowed:
+            kept.append(name + b":" + value)
+        elif key in markers:
+            kept.append(name + b": [PRESENT]")
+    # Do not convert a truncated response into complete-header evidence.
+    suffix = b"\r\n\r\n" if re.search(rb"\r?\n\r?\n", raw) else b""
+    safe = b"\r\n".join(kept) + suffix
+    return safe.decode("latin1") if was_text else safe
 
 
 @dataclass
@@ -86,7 +120,7 @@ def collect_banner(host: str, port: int, service: str, timeout: float = 1.0,
                     plain.settimeout(max(0.001, deadline - time.monotonic()))
                     plain.sendall(_http_request(host, port, server_name))
                     data = _read(plain, deadline)
-        return BannerObservation(data=data, error=None if data else "no_response", tls=tls)
+        return BannerObservation(data=sanitize_banner(data), error=None if data else "no_response", tls=tls)
     except (OSError, ValueError) as exc:
         return BannerObservation(error=type(exc).__name__, tls=tls)
 

@@ -14,6 +14,7 @@ from uuid import UUID
 from analysis.vuln_mapper import load_catalog
 from db.db_client import get_connection
 from db.statuses import VulnStatus
+from db.scan_history import supports_history, get_observations, read_snapshot
 
 PRIORITIES = ("P1", "P2", "P3", "P4", "UNASSESSED")
 FRESHNESS = ("CURRENT", "STALE", "MISSING")
@@ -69,7 +70,9 @@ def validate_selection(*, asset_uid=None, scan_id=None):
 def json_value(value):
     """Preserve absent values and make MySQL Decimal/date results JSON compatible."""
     if isinstance(value, datetime):
-        return value.replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z") if value.tzinfo is None else value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        # Historical MySQL DATETIME fields have mixed/unknown origins. Only
+        # explicit aware inputs can truthfully be labelled Z.
+        return value.isoformat() if value.tzinfo is None else value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     if isinstance(value, date):
         return value.isoformat()
     if isinstance(value, Decimal):
@@ -134,6 +137,10 @@ def _related(cursor, sql, identifiers, suffix=""):
 
 
 def _read_rows(conn, selection):
+    history_enabled = supports_history(conn)
+    if history_enabled:
+        selection['selection_note'] = ('Immutable per-scan port observations; asset metadata and review status are current, not an as-of snapshot.'
+                                       if selection['type'] == 'scan' else 'Latest measured observation per endpoint; partial scans retain earlier endpoints with NOT_REOBSERVED relevance.')
     with conn.cursor(dictionary=True) as cursor:
         asset_sql = "SELECT " + ", ".join("h." + key for key in ASSET_FIELDS) + " FROM hosts AS h WHERE "
         scan_sql = """
@@ -168,11 +175,35 @@ def _read_rows(conn, selection):
                    p.version, p.state, p.last_scan_id, p.fingerprint
             FROM ports AS p JOIN hosts AS h ON h.id = p.host_id WHERE
         """ + port_condition + " ORDER BY p.host_id, p.port, p.protocol, p.id", port_params)
+        if history_enabled:
+            observations = get_observations(conn,
+                scan_id=selection.get('scan_id'), asset_uid=selection.get('asset_uid'),
+                current=selection['type'] == 'asset')
+            ports = [{**o, 'last_scan_id': o['scan_id'], 'history_capability': 'IMMUTABLE_V8'} for o in observations]
+            if selection['type'] == 'asset':
+                ids = {o['scan_id'] for o in observations} | {a['last_scan_id'] for a in assets if a.get('last_scan_id')}
+                scans = _related(cursor, scan_sql, ids)
+            for scan in scans:
+                saved = read_snapshot(conn, scan['scan_id'])
+                scan['immutable_execution'] = saved
+                if saved and saved['time_basis'] == 'UTC':
+                    for field in ('started_at', 'finished_at'):
+                        if isinstance(scan.get(field), datetime) and scan[field].tzinfo is None:
+                            scan[field] = scan[field].replace(tzinfo=timezone.utc)
+            for asset in assets:
+                asset['asset_namespace'] = next((o['asset_namespace'] for o in observations if o['host_id'] == asset['id']), 'legacy')
         findings = _related(cursor, """
             SELECT v.id AS vuln_id, v.port_id, v.cve_id, v.title, v.source, v.status, v.severity,
                    v.first_detected_at, v.last_detected_at, v.verified_at, v.closed_at
             FROM vulns AS v WHERE v.port_id IN
         """, [row["port_id"] for row in ports], "AND v.source LIKE 'catalog:%' ORDER BY v.id")
+        if history_enabled:
+            links = _related(cursor, 'SELECT l.vuln_id,l.relation,o.id AS observation_id,o.scan_id,'
+                'o.identity_sha256,o.product,o.version,o.service,o.state '
+                'FROM finding_observation_links l JOIN scan_port_observations o ON o.id=l.observation_id '
+                'WHERE l.vuln_id IN', [f['vuln_id'] for f in findings], 'ORDER BY o.id')
+            for finding in findings:
+                finding['observation_links'] = [link for link in links if link['vuln_id'] == finding['vuln_id']]
         cloud_resources, cloud_findings = [], []
         cloud_select = """
             SELECT cr.id AS cloud_resource_id, cr.host_id, cr.provider, cr.account_id, cr.region,
@@ -184,8 +215,8 @@ def _read_rows(conn, selection):
         seen_cloud_ids = set()
         lookup_groups = (
             ("host_id", [row["id"] for row in assets if row.get("asset_type") == "CLOUD_RESOURCE"]),
-            ("private_ip", [row["host_ip"] for row in assets if row.get("host_ip")]),
-            ("public_ip", [row["host_ip"] for row in assets if row.get("host_ip")]),
+            ("private_ip", [row["host_ip"] for row in assets if row.get("host_ip") and row.get('asset_namespace', 'legacy') == 'legacy']),
+            ("public_ip", [row["host_ip"] for row in assets if row.get("host_ip") and row.get('asset_namespace', 'legacy') == 'legacy']),
         )
         for column, values in lookup_groups:
             for row in _related(cursor, cloud_select.format(column=column), values, "ORDER BY cr.host_id, cr.id"):
@@ -252,7 +283,8 @@ def parse_evidence(row):
         parsed.update(result=content.get("status"), reason=content.get("match_reason"),
                       additional_checks=content.get("conditions_to_verify"),
                       references=content.get("references"), affected=content.get("affected"),
-                      catalog_sha256=content.get("catalog_sha256"))
+                      catalog_sha256=content.get("catalog_sha256"),
+                      package_assessment=content.get("package_assessment"))
     parsed.update(_pick(document, ("first_checked_at", "last_checked_at", "observations")))
     checks = content.get("details")
     if isinstance(checks, dict):
@@ -272,17 +304,24 @@ def _assessment(row, finding, asset, endpoint):
     # Only normalized provider fields are retained; never render arbitrary response bodies.
     provenance = {}
     for provider, fields in {
-        "cvss": ("state", "score", "version", "vector", "severity", "source", "metric_type", "endpoint", "error_code"),
-        "epss": ("state", "score", "percentile", "date", "source", "error_code"),
+        "cvss": ("state", "score", "version", "vector", "severity", "source", "metric_type", "endpoint", "error_code", "fetched_at", "ttl_seconds", "freshness_policy"),
+        "epss": ("state", "score", "percentile", "date", "source", "error_code", "fetched_at", "ttl_seconds", "freshness_policy"),
         "kev": ("state", "status", "source", "catalog_version", "date_released", "date_added", "due_date",
-                "known_ransomware_campaign_use", "required_action", "vendor_project", "product", "error_code", "errors"),
+                "known_ransomware_campaign_use", "required_action", "vendor_project", "product", "error_code", "errors", "fetched_at", "ttl_seconds", "freshness_policy"),
     }.items():
         value = document.get(provider)
         provenance[provider] = _pick(value, fields) if isinstance(value, dict) else None
     assessment["provenance"] = provenance
+    from analysis.intel_freshness import evaluate_intel_freshness
+    assessment['intel_freshness'] = evaluate_intel_freshness(document)
     for key in ("internet_exposed", "handles_personal_data"):
         assessment[key] = _boolean(assessment[key])
     reasons = []
+    for provider, metadata in assessment['intel_freshness'].items():
+        if metadata.get('status') == 'STALE':
+            reasons.append(provider + '_intel_stale')
+        elif metadata.get('status') == 'UNKNOWN' and isinstance(document.get(provider), dict) and 'fetched_at' in document[provider]:
+            reasons.append(provider + '_intel_time_invalid')
     for field, current in (("vuln_status", finding["status"]), ("asset_criticality", asset["criticality"]),
                            ("internet_exposed", asset["internet_exposed"]),
                            ("handles_personal_data", asset["handles_personal_data"])):
@@ -315,11 +354,48 @@ def snapshot_sha256(snapshot):
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def finding_relevance(finding, endpoint, *, latest_asset_scan=None, historical=False):
+    """Current CVE applicability is independent from an immutable review status.
+
+    A matching advertised version establishes candidate applicability, never a
+    new confirmation. A previous CONFIRMED remains historical until its positive
+    evidence is explicitly linked to this exact observation.
+    """
+    if endpoint.get('observation_time_basis') == 'LEGACY_UNSPECIFIED':
+        return 'NOT_REOBSERVED', 'legacy_observation_timezone_unknown'
+    if endpoint.get('state') in {'error', 'unknown', 'not_tested'}:
+        return 'NOT_REOBSERVED', 'current_endpoint_not_successfully_inspected'
+    if not historical and latest_asset_scan is not None and endpoint.get('last_scan_id') != latest_asset_scan:
+        return 'NOT_REOBSERVED', 'endpoint_outside_latest_asset_scan'
+    if endpoint.get('state') != 'open':
+        return 'STALE', 'endpoint_no_longer_open'
+    rule = next((r for r in load_catalog()[0]['rules'] if r['id'] == finding.get('source') and r['cve'] == finding.get('cve_id')), None)
+    if rule is None:
+        return 'NOT_REOBSERVED', 'reviewed_rule_unavailable'
+    if not endpoint.get('product') or not endpoint.get('version'):
+        return 'NOT_REOBSERVED', 'current_product_or_version_missing'
+    if endpoint['product'] != rule['product']:
+        return 'STALE', 'current_product_changed'
+    from analysis.vuln_mapper import normalized_version
+    version = normalized_version(rule['product'], endpoint['version'])
+    if version is None:
+        return 'NOT_REOBSERVED', 'current_version_format_unsupported'
+    if not (normalized_version(rule['product'], rule['affected']['introduced']) <= version
+            < normalized_version(rule['product'], rule['affected']['fixed'])):
+        return 'STALE', 'current_version_outside_reviewed_range'
+    links = finding.get('observation_links') or []
+    source_links = [link for link in links if link['relation'] == 'CANDIDATE']
+    if source_links and endpoint.get('identity_sha256') and source_links[-1].get('identity_sha256') != endpoint['identity_sha256']:
+        return 'STALE', 'service_observation_identity_changed'
+    return 'CURRENT', 'advertised_product_version_matches_candidate_rule_not_patch_proof'
+
+
 def _assemble(selection, rows):
     assets, scans, ports, findings, assessments, evidence, history, cloud_resources, cloud_findings = rows
     by_asset = {}
     for row in sorted(assets, key=lambda row: row["id"]):
         item = _pick(row, ASSET_FIELDS)
+        item['asset_namespace'] = row.get('asset_namespace', 'legacy')
         for key in ("internet_exposed", "handles_personal_data"):
             item[key] = _boolean(row.get(key))
         by_asset[row["id"]] = {**item, "ports": [], "findings": [],
@@ -328,7 +404,7 @@ def _assemble(selection, rows):
     cloud_asset_links = {}
     asset_ids_by_ip = {}
     for asset_id, asset in by_asset.items():
-        if asset.get("host_ip"):
+        if asset.get("host_ip") and asset.get('asset_namespace') == 'legacy':
             asset_ids_by_ip.setdefault(asset["host_ip"], []).append(asset_id)
     for row in cloud_resources:
         item = _pick(row, CLOUD_FIELDS)
@@ -361,6 +437,7 @@ def _assemble(selection, rows):
     by_port = {}
     for row in sorted(ports, key=lambda row: (row["host_id"], row["port"], row["protocol"], row["port_id"])):
         item = _pick(row, PORT_FIELDS)
+        item.update(_pick(row, ('observation_id', 'observed_at', 'reason', 'error_code', 'identity_sha256')))
         fp, fp_state = _object(row.get("fingerprint"))
         item.update(fingerprint=_pick(fp, FINGERPRINT_FIELDS), fingerprint_status=fp_state)
         by_port[item["port_id"]] = item
@@ -374,6 +451,9 @@ def _assemble(selection, rows):
                                                         "action_type", "reason", "changed_by", "changed_at")))
     summary = {"asset_count": len(by_asset), "open_port_count": sum(p["state"] == "open" for p in ports),
                "finding_count": len(findings), "cloud_configuration_finding_count": len(cloud_findings),
+               "current_finding_count": 0,
+               "historical_status_counts": {status.value: 0 for status in VulnStatus},
+               "relevance_counts": dict.fromkeys(('CURRENT', 'STALE', 'NOT_REOBSERVED'), 0),
                "status_counts": {status.value: 0 for status in VulnStatus},
                "priority_counts": dict.fromkeys(PRIORITIES, 0),
                "cloud_priority_counts": cloud_priority_counts,
@@ -386,14 +466,34 @@ def _assemble(selection, rows):
         port = by_port[item["port_id"]]
         asset = by_asset[port["host_id"]]
         endpoint = {**_pick(port, PORT_FIELDS), "host_ip": asset["host_ip"], "asset_uid": asset["asset_uid"]}
+        endpoint.update(_pick(port, ('observation_id', 'identity_sha256', 'observed_at', 'reason', 'error_code')))
+        endpoint['observation_time_basis'] = port.get('observation_time_basis')
+        relevance, relevance_reason = finding_relevance(row, endpoint,
+            latest_asset_scan=asset.get('last_scan_id'), historical=selection['type'] == 'scan')
+        verified_links = [link for link in row.get('observation_links', []) if link['relation'] == 'VERIFIED']
+        verification_relevance = 'CURRENT' if endpoint.get('observation_id') is not None and any(
+            link['observation_id'] == endpoint['observation_id'] for link in verified_links) else 'NOT_REOBSERVED'
+        effective_status = item['status'] if relevance == 'CURRENT' else None
+        if effective_status == 'CONFIRMED' and verification_relevance != 'CURRENT':
+            effective_status = 'RETEST_REQUIRED'
         assessment, freshness, reasons = _assessment(latest.get(item["vuln_id"]), item, asset, endpoint)
+        if relevance != 'CURRENT' or effective_status != item['status']:
+            reasons.append('finding_current_relevance_not_verified')
+            freshness = 'STALE' if assessment else 'MISSING'
         priority = assessment["priority"] if freshness == "CURRENT" else "UNASSESSED"
         item.update(endpoint=endpoint, assessment=assessment, assessment_freshness=freshness,
+                    current_relevance=relevance, relevance_reason=relevance_reason,
+                    historical_status=item['status'], effective_status=effective_status,
+                    verification_relevance=verification_relevance, observation_links=json_value(row.get('observation_links', [])),
                     freshness_reasons=reasons, effective_priority=priority,
                     effective_action=assessment["action"] if freshness == "CURRENT" else None,
                     evidence=evidence_by.get(item["vuln_id"], []), history=history_by.get(item["vuln_id"], []))
         asset["findings"].append(item)
-        summary["status_counts"][item["status"]] = summary["status_counts"].get(item["status"], 0) + 1
+        summary['historical_status_counts'][item['status']] += 1
+        summary['relevance_counts'][relevance] += 1
+        if effective_status:
+            summary['current_finding_count'] += 1
+            summary['status_counts'][effective_status] = summary['status_counts'].get(effective_status, 0) + 1
         summary["priority_counts"][priority] += 1
         summary["assessment_freshness_counts"][freshness] += 1
     summary["highest_priority"] = next((level for level in PRIORITIES if summary["priority_counts"][level]), "UNASSESSED")
@@ -402,6 +502,7 @@ def _assemble(selection, rows):
     scan_documents = []
     for row in sorted(scans, key=lambda row: row["scan_id"]):
         item = _pick(row, ("scan_id", "scan_uid", "status", "scan_type", "target", "port_range", "started_at", "finished_at"))
+        item['immutable_execution'] = json_value(row.get('immutable_execution'))
         targets = row.get("requested_targets")
         try:
             targets = json.loads(targets) if isinstance(targets, (str, bytes)) else targets
@@ -415,6 +516,9 @@ def _assemble(selection, rows):
         scan_documents.append(item)
     snapshot = {"schema_version": 2, "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                 "selection": selection, "summary": summary, "scans": scan_documents, "assets": list(by_asset.values()),
+                "history_capability": 'IMMUTABLE_V8' if any(r.get('immutable_execution') for r in scans) else 'LEGACY_CURRENT_STATE_ONLY',
+                "timestamp_policy": 'Explicit UTC is offset-aware; legacy naive wall clocks retain unknown timezone without a fabricated Z.',
+                "finding_status_basis": 'Stored review status/history is retained; effective_status is qualified by observation relevance. Historical observation replay is not an as-of finding-status snapshot.',
                 "integrity": {"algorithm": "SHA-256", "digest_excludes": ["generated_at", "integrity.snapshot_sha256"]}}
     snapshot["integrity"]["snapshot_sha256"] = snapshot_sha256(snapshot)
     return snapshot

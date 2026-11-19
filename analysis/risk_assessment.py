@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from analysis.kev_catalog import fetch_kev_catalog, lookup_kev
+from analysis.intel_freshness import usable_intel
 from analysis.nvd_cvss import fetch_cvss_scores, valid_cve, validate_timeout
 from analysis.risk_engine import METHODOLOGY_ID, assess_priority, sha256_json
 from analysis.vuln_mapper import RETIRED_RULE_IDS, load_catalog
@@ -66,7 +67,8 @@ def _asset_context(row):
 
 def build_assessment(row, cvss, epss, kev):
     asset = _asset_context(row)
-    result = assess_priority(row["status"], asset, cvss, epss, kev)
+    effective, freshness = usable_intel({"cvss": cvss, "epss": epss, "kev": kev})
+    result = assess_priority(row["status"], asset, **effective)
     errors = []
     for name, source in (("cvss", cvss), ("epss", epss), ("kev", kev)):
         if source.get("error_code"):
@@ -78,7 +80,9 @@ def build_assessment(row, cvss, epss, kev):
             "current_status": row["status"], "asset_context": asset,
             "endpoint": {key: row.get(key) for key in ("port_id", "port", "protocol", "scan_id")},
             "cvss": cvss, "epss": epss, "kev": kev, **result,
-            "source_errors": errors, "incomplete": bool(errors)}
+            "intel_freshness": freshness,
+            "source_errors": errors, "incomplete": bool(errors) or any(
+                item["status"] != "FRESH" for item in freshness.values())}
 
 
 def _save_one(snapshot, intel, reviewed, *, scan_id=None, asset_uid=None):
@@ -108,7 +112,8 @@ def _save_one(snapshot, intel, reviewed, *, scan_id=None, asset_uid=None):
         input_hash = sha256_json(details)
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         assessment_id, reused = upsert_risk_assessment(conn, current["vuln_id"], details, input_hash, now)
-        update_risk_score_summaries(conn, current["vuln_id"], details["cvss"], details["epss"])
+        effective, _ = usable_intel({name: details[name] for name in ("cvss", "epss", "kev")})
+        update_risk_score_summaries(conn, current["vuln_id"], effective["cvss"], effective["epss"])
         conn.commit()
         return {**details, "vuln_id": current["vuln_id"], "outcome": "SAVED", "input_sha256": input_hash,
                 "assessment_id": assessment_id, "assessment_reused": reused}

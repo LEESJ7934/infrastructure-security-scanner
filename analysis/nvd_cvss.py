@@ -8,6 +8,7 @@ import time
 from datetime import date
 
 import requests
+from analysis.intel_freshness import stamp_acquisition
 
 NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 EPSS_URL = "https://api.first.org/data/v1/epss"
@@ -147,12 +148,13 @@ def parse_cvss(data, cve_id):
 def fetch_cvss(cve_id, *, timeout=10, session=None):
     validate_timeout(timeout)
     if not valid_cve(cve_id):
-        return cvss_result("ERROR", error_code="INVALID_CVE")
+        return stamp_acquisition(cvss_result("ERROR", error_code="INVALID_CVE"), "cvss")
     api_key = os.getenv("NVD_API_KEY")
     data, error = request_json(NVD_BASE_URL, params={"cveId": cve_id},
                                headers={"apiKey": api_key} if api_key else {},
                                timeout=timeout, session=session)
-    return cvss_result("ERROR", error_code=error) if error else parse_cvss(data, cve_id)
+    result = cvss_result("ERROR", error_code=error) if error else parse_cvss(data, cve_id)
+    return stamp_acquisition(result, "cvss")
 
 
 def fetch_cvss_scores(cve_ids, *, timeout=10, session=None):

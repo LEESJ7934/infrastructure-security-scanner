@@ -34,13 +34,15 @@ def _status(asset: AuditAsset, rule: AuditRule, observation: Observation) -> Aud
         return AuditStatus.NEEDS_REVIEW
     if observation.observed_value is None:
         return AuditStatus.NOT_TESTED
+    if observation.supported is False or observation.review_reason:
+        return AuditStatus.NEEDS_REVIEW
     if rule.condition is not None:
         try:
             satisfied = rule.condition(observation.observed_value)
         except Exception:
             return AuditStatus.ERROR
         if satisfied is True:
-            return AuditStatus.PASS
+            return AuditStatus.NEEDS_REVIEW if observation.collection_complete is False else AuditStatus.PASS
         if satisfied is False:
             return AuditStatus.FAIL
     return AuditStatus.NEEDS_REVIEW
@@ -71,4 +73,11 @@ def evaluate(
         checked_at=checked_at,
         previous_result_reference=previous_result_reference,
         standard_reference=rule.standard_reference,
+        collected_at=observation.collected_at,
+        source_kind=observation.source_kind,
+        collection_scope=observation.collection_scope,
+        collection_complete=observation.collection_complete,
+        supported=observation.supported,
+        review_reason=observation.review_reason,
+        evidence_visibility=observation.evidence_visibility,
     )

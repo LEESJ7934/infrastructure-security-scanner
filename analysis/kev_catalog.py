@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from analysis.intel_freshness import stamp_acquisition
 
 from analysis.nvd_cvss import KEV_URL, KEV_MIRROR_URL, iso_date, request_json, valid_cve, validate_timeout
 
@@ -46,19 +47,20 @@ def fetch_kev_catalog(*, timeout=10, session=None):
         if error is None:
             try:
                 version, released, entries = _parse_catalog(data)
-                return {"state": "OK", "source": source, "catalog_version": version,
-                        "date_released": released, "entries": entries, "errors": errors, "error_code": None}
+                return stamp_acquisition({"state": "OK", "source": source, "catalog_version": version,
+                        "date_released": released, "entries": entries, "errors": errors, "error_code": None}, "kev")
             except (KeyError, TypeError, ValueError):
                 error = "SCHEMA_ERROR"
         errors.append({"source": source, "error_code": error})
-    return {"state": "ERROR", "source": None, "catalog_version": None, "date_released": None,
-            "entries": {}, "errors": errors, "error_code": "KEV_UNAVAILABLE"}
+    return stamp_acquisition({"state": "ERROR", "source": None, "catalog_version": None, "date_released": None,
+            "entries": {}, "errors": errors, "error_code": "KEV_UNAVAILABLE"}, "kev")
 
 
 def lookup_kev(catalog, cve_id):
     base = {"source": catalog["source"], "catalog_version": catalog["catalog_version"],
             "date_released": catalog["date_released"], "error_code": catalog["error_code"],
             "errors": list(catalog["errors"]), **dict.fromkeys(FIELDS)}
+    base.update({key: catalog[key] for key in ("fetched_at", "ttl_seconds", "freshness_policy") if key in catalog})
     if not valid_cve(cve_id):
         return {**base, "state": "ERROR", "status": "UNKNOWN", "error_code": "INVALID_CVE"}
     if catalog["state"] != "OK":

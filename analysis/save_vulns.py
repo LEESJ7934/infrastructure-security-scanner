@@ -5,6 +5,7 @@ import math
 
 from db.db_client import get_connection
 from db.query_helpers import insert_vuln_evidence, upsert_vuln
+from db.scan_history import link_finding
 
 
 def as_float(value, default=None):
@@ -55,6 +56,7 @@ def save_vulns(vulns: list[dict]) -> list[int]:
                 insert_vuln_evidence(conn, vuln_id, "cve_catalog_mapper", "BANNER",
                                      details=details, sha256=digest)
             saved_ids.append(vuln_id)
+            link_finding(conn, vuln_id, vuln.get('observation_id'), port_id=vuln['port_id'])
         conn.commit()
         return saved_ids
     except Exception:

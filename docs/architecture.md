@@ -302,7 +302,7 @@ Nuclei 결과 하나만으로 자동 `CONFIRMED`를 만드는 구조가 아니�
 - 모든 서비스 프로토콜의 완전한 버전 식별
 - 전체 CVE 데이터베이스 자동 매칭
 - 원격 관찰만으로 배포판 backport 확정
-- 과거 시점의 완전한 포트 snapshot replay
+- V8 이전 관찰의 과거 snapshot 복구 및 과거 시점의 자산/판정 전체 재현
 - 조직별 실제 SLA·법적 의무 판단
 - 인증 우회나 파괴적인 exploitation
 
@@ -327,3 +327,40 @@ approved ScopePolicy ──> existing private-IP scanner ──> CVE pipeline
 ```
 
 CVE 후보와 AWS 설정 점검 결과는 별도 데이터로 관리한다. AWS 자산 조회 결과가 스캔 승인으로 이어지지는 않는다. VPC·IAM·Security Group 설정은 `infra/aws/terraform/`, 검증 코드는 `.github/workflows/`와 `tests/`에서 확인할 수 있다.
+
+## 15. 진단 신뢰성 및 V8 관찰 이력
+
+TCP 연결 거부만 `closed`, timeout은 `unknown`, 권한/네트워크/호스트 오류는 `error`로 남긴다. 무응답만으로 filtered를 확정하지 않는다. UDP는 IPv4/IPv6 connected datagram을 사용하며 응답은 open, 명시적 port unreachable은 closed, 무응답은 open|filtered다. 이 구분과 reason/error, 서비스의 observed/guessed 출처는 CLI·JSON에서 보존한다.
+
+CLI와 함수 기본은 `1-1024`다. `--profile lab`은 DBMS·DVWA·Kibana·HTTP·Elasticsearch 접점을 포함하지만 승인 scope의 대상·포트 수·worker 제한을 그대로 적용한다. 전체 범위 `--ports 1-65535`도 별도 scope 승인 없이 제한을 우회하지 않는다. 모든 범위는 상한을 먼저 검증하며 작업 큐는 worker 수로 제한한다. 중단/deadline 이후 미실행 항목은 not_tested다. 이미 진행 중인 socket 작업은 최대 해당 timeout까지 정리한다.
+
+새 스캔은 UTC offset을 가진 수집 시각과 monotonic duration을 기록한다. DB DATETIME 경계에서 UTC로 변환하며, 출처 불명인 기존 naïve 시각은 보정하거나 Z를 붙이지 않는다. V8 이전 KST/UTC 혼합 데이터에 일괄 시간 보정은 수행하지 않는다.
+
+```bash
+python -m scripts.run_scan scan --target 127.0.0.1 --ports 4280,5601,9200 -sV --no-db --output-json <새결과.json>
+python -m scripts.import_scan_results --input <보존결과.json>
+```
+
+일반 실행도 DB 접근 전에 비민감 원시 JSON을 별도 신규 경로에 flush/fsync한다. DB 실패 시 그 파일을 명시적으로 재수입할 수 있다. HTTP 배너는 식별에 필요한 허용 헤더만 남기고 body·cookie·인증 헤더와 임의 확장 헤더를 제외한다. 동일 파일 경로를 덮어쓰지 않는다. Nmap은 선택 비교 도구이며 스캐너가 모르는 버전을 임의 보충하지 않는다. Kibana/Elasticsearch는 제품 전용 HTTP 헤더가 관찰될 때만 reported 제품으로 식별하고, 버전 헤더가 없으면 버전은 unknown이다.
+
+### V8 마이그레이션 및 호환성
+
+`sql/migration_v8.sql`은 운영 DB에 자동 적용되지 않는다. V7 백업과 격리 검증 후 운영자가 대상 DB를 명시 선택해야 한다. 기존 init.sql과 migration_v7.sql이 준비된 DB에 **한 번** 적용하는 migration이다. 자동 반복 실행·DROP DATABASE·기존 기록 초기화는 지원하지 않는다.
+
+- `scan_run_snapshots`: 원시 실행의 해시·요청 범위·UTC/LEGACY_UNSPECIFIED·namespace·JSON을 보존한다.
+- `scan_port_observations`: 실행/자산/endpoint별 open·closed·filtered·open|filtered·unknown·error·not_tested와 실제 시각·근거를 append-only로 저장한다.
+- `finding_observation_links`: 후보/양성 검증의 원래 관찰 연결을 보존한다. 동일 실행 UID의 동일 내용은 재사용하고 다른 내용은 충돌로 거절한다.
+- `ports`는 현재 요약이며 부분 범위 스캔이 다른 endpoint 이력을 지우지 않는다. 늦게 수입된 과거 UTC 실행·출처 불명 시각은 더 최신의 명시 UTC 관찰을 대체하지 않는다.
+- `hosts(asset_namespace, host_ip)`로 고객/VPC namespace를 구분한다. 기본 `legacy`는 기존 동작을 유지한다. 기존 IP를 임의 고객/VPC로 자동 추정하지 않는다.
+
+V8 미적용 DB는 기존 경로를 유지하면서 `LEGACY_CURRENT_STATE_ONLY`를 표시한다. 그 DB에서 새 namespace·불변 이력이 있다고 주장하지 않는다. 기존 데이터는 새 실측 관찰로 backfill하지 않는다. V8의 scan 선택은 포트 관찰을 재생하지만 자산 메타데이터와 review status는 현재값이다. 완전한 과거 시점 판정 snapshot으로 설명하지 않는다.
+
+과거 CONFIRMED는 삭제하지 않는다. 현재 관련성 CURRENT/STALE/NOT_REOBSERVED와 `effective_status`를 분리한다. 제품/관찰이 달라지면 과거 확정 상태를 현재 확정 건수에 더하지 않으며, 같은 광고 버전이어도 새 관찰에 양성 증거가 연결되지 않으면 RETEST_REQUIRED다.
+
+### 위협정보와 패키지 검토
+
+NVD·FIRST·CISA 실제 fetch는 fetched_at을 기록한다. 자체 TTL은 CVSS 7일, EPSS 2일, KEV 1일이며 공급자 보증기간이 아니다. EPSS 원관측일도 검사한다. 최신 다운로드로 오래된 EPSS를 갱신된 관측처럼 만들지 않는다. 명시적 stale/비정상 시각은 새 우선순위 산정에서 제외하고, 옛 기록의 조회 시각은 UNKNOWN으로 남긴다. 보고서 생성 중 외부 정보를 재조회하지 않는다.
+
+`analysis.package_evidence`는 지원 배포판·release·설치 패키지·CVE·공식 vendor advisory·검토자·시각·증적 hash가 연결된 검토를 REPORTED_*로 내보낸다. 배너 suffix로 백포트 여부를 추정하거나 자동으로 finding을 닫지 않는다. source 인증과 실제 patch 검증은 별도로 남긴다.
+
+설정 진단의 기존 도메인 asset_id와 DB UUID는 `asset_management.audit_binding.bind_audit_results()`의 명시 crosswalk로 연결할 수 있다. supplemental CLI의 `--asset-bindings`도 같은 함수를 쓴다. 매핑 선언은 DB 검증 완료가 아니며 원래 ID·판정·수집 시각을 바꾸지 않는다. 모든 도메인 결과의 자동 DB 수입을 구현한 것은 아니다.

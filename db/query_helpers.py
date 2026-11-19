@@ -45,6 +45,7 @@ def upsert_host(
     host_ip: str,
     host_name: Optional[str] = None,
     last_scan_id: Optional[int] = None,
+    asset_namespace: str = 'legacy',
 ) -> int:
     now = utc_now()
     canonical_ip = normalize_ip_address(host_ip)
@@ -73,17 +74,25 @@ def upsert_host(
         );
     """
 
+    if asset_namespace != 'legacy':
+        from .scan_history import namespace_for, supports_history
+        namespace_for({'asset_namespace': asset_namespace})
+        if not supports_history(conn):
+            raise RuntimeError('V8 migration required for isolated asset namespaces')
+        sql = sql.replace('asset_uid,', 'asset_uid, asset_namespace,', 1).replace(
+            'VALUES (%s, %s, %s, %s, %s, %s)', 'VALUES (%s, %s, %s, %s, %s, %s, %s)', 1)
     with conn.cursor() as cursor:
         cursor.execute(
             sql,
-            (
+            ((new_asset_uid, asset_namespace, canonical_ip, host_name, now, now, last_scan_id)
+             if asset_namespace != 'legacy' else (
                 new_asset_uid,
                 canonical_ip,
                 host_name,
                 now,
                 now,
                 last_scan_id,
-            ),
+            )),
         )
         return cursor.lastrowid
 
@@ -95,6 +104,13 @@ def get_all_ports(scan_id: int | None = None, asset_uid: str | None = None) -> L
     p.last_scan_id = h.last_scan_id excludes stale ports omitted by a later scan.
     """
     conn = get_connection()
+    from .scan_history import supports_history, get_observations
+    if supports_history(conn):
+        try:
+            rows = get_observations(conn, scan_id=scan_id, asset_uid=asset_uid, current=scan_id is None)
+            return [row for row in rows if row['state'] == 'open' and row['protocol'] == 'tcp']
+        finally:
+            conn.close()
     sql = """
     SELECT p.id AS port_id, h.asset_uid, h.host_ip, p.port, p.protocol,
            p.service, p.product, p.version, p.banner, p.fingerprint, p.state,
@@ -160,6 +176,7 @@ def upsert_port(
         "closed",
         "filtered",
         "open_or_filtered",
+        "unknown", "error", "not_tested",
     }:
         raise ValueError(
             "지원하지 않는 포트 상태입니다: "
@@ -167,6 +184,9 @@ def upsert_port(
         )
 
     now = utc_now()
+
+    from .scan_history import supports_history
+    history_enabled = supports_history(conn)
 
     sql = """
     INSERT INTO ports (
@@ -199,6 +219,13 @@ def upsert_port(
         last_scan_id = VALUES(last_scan_id);
     """
 
+    if history_enabled:
+        # A NOT_TESTED row is preserved in immutable history, but cannot erase
+        # a previously measured endpoint from the current-state summary.
+        assignments = ('service', 'version', 'banner', 'product', 'fingerprint', 'state', 'last_seen', 'last_scan_id')
+        for field in assignments:
+            sql = sql.replace(f'{field} = VALUES({field})',
+                f"{field} = IF(VALUES(state) = 'not_tested', {field}, VALUES({field}))")
     with conn.cursor() as cursor:
         cursor.execute(
             sql,
@@ -644,6 +671,13 @@ def update_vuln_verification(
         reason=reason,
         changed_by="verification",
     )
+    from .scan_history import link_finding, supports_history
+    if normalize_vuln_status(status) == VulnStatus.CONFIRMED.value and supports_history(conn):
+        with conn.cursor(dictionary=True) as cursor:
+            cursor.execute('SELECT port_id FROM vulns WHERE id=%s', (vuln_id,))
+            row = cursor.fetchone()
+        if row:
+            link_finding(conn, vuln_id, port_id=row['port_id'], relation='VERIFIED')
 
 
 def get_ports_with_vuln_candidates(

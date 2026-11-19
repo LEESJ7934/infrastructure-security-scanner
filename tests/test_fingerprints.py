@@ -105,12 +105,15 @@ class LocalProbeTests(unittest.TestCase):
         observation = collect_banner("127.0.0.1", self.server.server_port, "http", 1, "lab\r\nX-Test: invalid")
         self.assertEqual(observation.error, "ValueError")
 
-    def test_closed_port_has_no_product(self):
+    def test_unlistened_port_has_no_product_without_inventing_closed(self):
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
-        result = scan_single_port("127.0.0.1", port, 0.2, True)
-        self.assertEqual(result.state, "closed")
+        # A local firewall can drop instead of refusing even on loopback. This
+        # live test must not infer CLOSED from absence; refusal itself has a
+        # deterministic separate regression in test_scanner_reliability.
+        result = scan_single_port("127.0.0.1", port, .2, True)
+        self.assertIn((result.state, result.reason), {("closed", "connection_refused"), ("unknown", "timeout")})
         self.assertIsNone(result.product)
 
 

@@ -18,6 +18,7 @@ from ..models import AuditAsset, AuditRule, Observation
 from ..reporting import ReportResult, SourceSnapshot
 from ..windows_comparison import assess_collection_time
 from ..windows_policy import TARGETS, WindowsPolicyError, load_policy, parse_audit
+from ..support import support_scope
 
 MAX_BYTES = 1024 * 1024
 RULE_VERSION = "0.1"
@@ -338,6 +339,7 @@ def audit(bundle=None, *, asset_id, synthetic=False, policy=None):
                 "sha256": collector.policy.sha256, "approval_status": collector.policy.document["approval"]["status"],
                 "approval_attested": collector.policy.approval_attested, "approval_integrity": collector.policy.approval_integrity}
     return {"schema_version": 1, "phase": 2, "mode": "synthetic_unit_test_only" if synthetic else "offline_saved_settings" if bundle else "preparation_only",
+            "support_scope": support_scope('windows'),
             "generated_at": now.isoformat(), "origin": bundle.document["origin"] if bundle else None,
             "collection_time_validation": assess_collection_time(bundle.document["collected_at"] if bundle else None, reference_at=now),
             "integrity": bundle.integrity if bundle else "NOT_VERIFIED", "sha256": bundle.sha256 if bundle else None,

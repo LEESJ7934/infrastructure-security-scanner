@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+from .windows_lockout import lockout_assessment
 
 GUIDE = "KISA 주요정보통신기반시설 기술적 취약점 분석·평가 방법 상세가이드"
 GUIDE_PUBLICATION_DATE = "2025-12-24"
@@ -108,14 +109,8 @@ def review_windows(report):
             verdict, reason = "ERROR", "invalid_observation_type"
         else:
             observed = {key: values.get(key) for key in keys}
-            if any(not _int(values.get(key)) for key in keys):
-                verdict, reason = "NEEDS_REVIEW", "missing_or_invalid_policy_value"
-            elif kisa_id == "W-04":
-                verdict = "PASS" if 1 <= values["lockout_threshold"] <= 5 else "FAIL"
-                reason = "matches_kisa_recommendation" if verdict == "PASS" else "does_not_match_kisa_recommendation"
-            else:
-                verdict = "PASS" if all(values[key] >= 60 for key in keys) else "FAIL"
-                reason = "matches_kisa_recommendation" if verdict == "PASS" else "does_not_match_kisa_recommendation"
+            met, reason = lockout_assessment(kisa_id, values)
+            verdict = "PASS" if met is True else "FAIL" if met is False else "NEEDS_REVIEW"
         output.append(_row("WIN-LAB-004", kisa_id, criterion, observed, verdict, _source_status(source),
                            source.get("assessment_basis", "saved_windows_lab_report"), None, reason))
     return output

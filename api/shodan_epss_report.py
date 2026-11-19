@@ -1,5 +1,6 @@
 """FIRST EPSS batch client. The historical ``epss`` key remains an alias of score."""
 from __future__ import annotations
+from analysis.intel_freshness import stamp_acquisition
 
 from analysis.nvd_cvss import (EPSS_URL, bounded_number, iso_date, request_json,
                                valid_cve, validate_timeout)
@@ -64,4 +65,4 @@ def fetch_epss_scores(cve_list: list[str], *, timeout=15, session=None) -> dict[
                                    timeout=timeout, session=session)
         result.update({cve: epss_result("ERROR", error_code=error) for cve in chunk}
                       if error else _parse_batch(data, chunk))
-    return result
+    return {cve: stamp_acquisition(value, "epss") for cve, value in result.items()}

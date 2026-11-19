@@ -16,6 +16,8 @@ import xml.etree.ElementTree as ET
 from ..engine import evaluate
 from ..models import AuditAsset, AuditRule, Observation
 from ..reporting import ReportResult, SourceSnapshot
+from .nginx_effective import effective_values
+from ..support import support_scope
 
 PROJECT = "scanner-p2web"
 RULE_VERSION = "WEB-WAS-LAB-0.1"
@@ -66,21 +68,9 @@ def stamp(value):
         raise WebInputError("collection_time_invalid") from None
 
 
-def nginx_values(raw):
-    """Recognize only the two shipped, include-free LAB configurations.
-
-    Unknown contexts, includes, directives or overrides are NOT guessed. This
-    is intentionally not a general nginx grammar/inheritance implementation.
-    """
-    def normalized(text):
-        return re.sub(r"\s+", " ", re.sub(r"#[^\n]*", "", text)).strip()
-    for stage in ("before", "after"):
-        template = (ROOT / "lab/web-was-lab" / stage / "nginx.conf").read_text(encoding="utf-8")
-        if normalized(raw) == normalized(template):
-            good = stage == "after"
-            return {"autoindex_disabled": good, "tokens_hidden": good,
-                    "private_blocked": good, "access_logging": good}
-    return {key: None for product, key, *_ in CHECKS.values() if product == "nginx"}
+def nginx_values(raw, *, includes=None):
+    """Evaluate explicit supported contexts, never filesystem Include guesses."""
+    return effective_values(raw, includes=includes)
 
 
 def tomcat_values(raw, apps):
@@ -201,6 +191,7 @@ def audit(bundle=None, *, synthetic=False):
                "settings_basis": "explicit_LAB_config_and_observed_runtime_only_no_default_inference"}
         results.append(row)
     return {"schema_version": 1, "mode": "LAB", "origin": bundle["origin"] if bundle else "not_executed",
+            "support_scope": support_scope('web_was'),
             "generated_at": now.isoformat(), "rule_version": RULE_VERSION, "bundle": bundle,
             "results": results, "summary": dict(Counter(r["status"] for r in results)),
             "http_verification": {"status": "PASS" if bundle and bundle["http"].get("proxy_ok") is True else "FAIL" if bundle and bundle["http"].get("proxy_ok") is False else "NOT_TESTED",

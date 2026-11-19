@@ -141,6 +141,18 @@ class VerificationRunnerTests(unittest.TestCase):
     def run_one(self, **options):
         return run_verifications(policy=POLICY, vuln_id=1, **options)
 
+    def test_positive_verification_links_current_observation_in_same_transaction(self):
+        with patch('verification.run_verification.run_checker', return_value={
+                'status': 'CONFIRMED', 'checker': 'PositiveFixture', 'reason': 'fixture positive proof',
+                'evidence_type': 'MANUAL', 'details': {},
+                'positive_evidence': {'kind': 'fixture_exact_condition', 'summary': 'synthetic positive fixture'}}), \
+             patch('verification.run_verification.link_finding') as link:
+            self.run_one()
+            link.assert_called_once()
+            self.assertEqual(link.call_args.kwargs['relation'], 'VERIFIED')
+            self.assertEqual(link.call_args.kwargs['port_id'], 1)
+            self.assertEqual(self.db.connections[-1].commits, 1)
+
     def test_candidate_query_includes_candidate_potential_retest_and_error(self):
         self.db.state["rows"] = [stored_row(i, status) for i, status in enumerate(
             ("CANDIDATE", "POTENTIAL", "RETEST_REQUIRED", "ERROR", "CONFIRMED", "CLOSED"), 1)]

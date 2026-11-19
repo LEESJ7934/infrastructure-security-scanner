@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from scanner.fingerprints import identify_service
+from analysis.package_evidence import assess_package_evidence
 
 DEFAULT_RULES = Path(__file__).with_name("vuln_rules.json")
 RETIRED_RULE_IDS = frozenset({
@@ -115,12 +116,15 @@ def analyze_ports(port_records: list[dict], rule_path: str | Path = DEFAULT_RULE
             bounds = rule["affected"]
             candidates.append({
                 "port_id": record.get("port_id", record.get("id")),
+                "observation_id": record.get("observation_id"),
                 "scan_id": record.get("scan_id"), "host_ip": record.get("host_ip"),
                 "port": record.get("port"), "protocol": record.get("protocol"),
                 "cve_id": rule["cve"], "title": rule["title"],
                 "severity": rule["severity"], "severity_basis": rule["severity_basis"],
                 "status": "CANDIDATE", "source": rule["id"], "rule_id": rule["id"],
                 "product": product, "version": version, "fingerprint": fingerprint,
+                "package_assessment": assess_package_evidence(
+                    rule['cve'], product, record.get('package_evidence')),
                 "affected": bounds,
                 "match_reason": f"{product} {version}: >= {bounds['introduced']} and < {bounds['fixed']}",
                 "conditions_to_verify": rule["conditions"], "references": rule["references"],

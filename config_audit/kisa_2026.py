@@ -12,6 +12,7 @@ import re
 from .engine import evaluate
 from .models import AuditAsset, AuditRule, Observation
 from .kisa_ciip_review import review_linux, review_windows
+from .windows_lockout import lockout_assessment
 
 PROFILE = 'KISA-2026-SELECTED-1.0'
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,14 +43,7 @@ def condition(kisa_id, value):
         status = review_linux(report)[0]['kisa_recommendation_result']
         return {'PASS': True, 'FAIL': False}.get(status)
     if kisa_id in ('W-04', 'W-08'):
-        report = {'mode': 'LAB', 'results': [{'check_id': 'WIN-LAB-004',
-                  'status': 'NEEDS_REVIEW', 'after_values': value}]}
-        status = next(r for r in review_windows(report) if r['kisa_id'] == kisa_id)['kisa_recommendation_result']
-        # A disabled threshold invalidates the duration's security effect too.
-        if kisa_id == 'W-08' and (type(value.get('lockout_threshold')) is not int
-                                 or value['lockout_threshold'] <= 0):
-            return False if value.get('lockout_threshold') == 0 else None
-        return {'PASS': True, 'FAIL': False}.get(status)
+        return lockout_assessment(kisa_id, value)[0]
     if kisa_id == 'W-64':
         profiles = value.get('active_profiles')
         if not isinstance(profiles, dict) or set(profiles) != {'Domain', 'Private', 'Public'}:

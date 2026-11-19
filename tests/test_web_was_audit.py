@@ -69,7 +69,9 @@ class WebWasAuditTests(unittest.TestCase):
 
     def test_nginx_missing_directive_not_assumed_default(self):
         raw = (w.ROOT / "lab/web-was-lab/after/nginx.conf").read_text().replace("server_tokens off;", "")
-        self.assertTrue(all(v is None for v in w.nginx_values(raw).values()))
+        result = w.nginx_values(raw)
+        self.assertIsNone(result['tokens_hidden'])
+        self.assertTrue(result['autoindex_disabled'])  # independently explicit evidence survives
 
     def test_tomcat_missing_autodeploy_not_assumed_safe(self):
         raw = (w.ROOT / "lab/web-was-lab/after/server.xml").read_text().replace('autoDeploy="false"', '')

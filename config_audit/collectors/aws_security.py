@@ -12,6 +12,7 @@ from cloud_security.aws_observations import INTERPRETERS, ReviewRequired, outcom
 from ..engine import evaluate
 from ..models import AuditAsset, AuditRule, Observation
 from ..reporting import ReportResult, SourceSnapshot
+from ..support import support_scope
 
 RULE_VERSION = 'AWS-LAB-OFFLINE-0.1'
 CHECKS = {
@@ -89,7 +90,10 @@ def convert(check, section, scope, evidence_reference):
         except ReviewRequired as error: value = outcome(None, str(error))
         except (AwsOfflineError, ValueError, TypeError, KeyError, IndexError, AttributeError):
             return Observation(evidence_reference=evidence_reference, collection_error=True)
-    return Observation(value, evidence_reference)
+    return Observation(value, evidence_reference,
+        collected_at=datetime.fromisoformat(section['collected_at']),
+        source_kind='saved_aws_api_response', collection_scope=check,
+        collection_complete=pagination['complete'] and not pagination['next_token_present'])
 
 
 def build_report(document, scope, *, source_reference, source_sha256, expected_sha256=None, scope_sha256=None):
@@ -122,6 +126,7 @@ def build_report(document, scope, *, source_reference, source_sha256, expected_s
             'verification_method': 'offline_saved_aws_configuration', 'origin': document['origin'],
             'analyses': {'data_plane_reachability': 'NOT_TESTED', 'log_delivery_records': 'NOT_TESTED'} })
     return {'schema_version': 1, 'mode': 'LAB_OFFLINE', 'origin': document['origin'], 'origin_basis': 'input_declaration_not_remote_attestation',
+        'support_scope': support_scope('aws'),
         'execution_id': execution, 'rule_version': rule_version, 'generated_at': now.isoformat(), 'snapshot_collected_at': document['collected_at'],
         'account_id': scope.account_id, 'partition': scope.partition, 'scope_sha256': scope_sha256, 'results': results,
         'summary': dict(Counter(row['status'] for row in results)),

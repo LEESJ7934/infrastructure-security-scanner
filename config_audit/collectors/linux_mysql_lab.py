@@ -19,6 +19,7 @@ from ..engine import evaluate
 from ..models import AuditAsset, AuditRule, Observation
 from ..reporting import ReportResult, SourceSnapshot
 from ..comparison import TRANSITIONS
+from ..support import support_scope
 
 PROJECT = 'scanner-p2lm'
 REPLAY_PROJECT = 'scanner-p2lm-replay'
@@ -232,6 +233,7 @@ def audit(bundle=None, *, synthetic=False):
             'scope': SCOPE, 'verification_method': 'synthetic_fixture' if synthetic else 'readonly_local_Docker_queries' if bundle else 'not_executed',
             'legacy_check_id': legacy, 'reason': item.get('error_code') or ('unsupported_or_unknown_product_version' if bundle and not supported else 'internal_LAB_criterion')})
     return {'schema_version': 1, 'mode': 'LAB', 'origin': bundle['origin'] if bundle else 'not_executed', 'rule_version': RULE_VERSION,
+        'support_scope': support_scope('linux_mysql'),
         'generated_at': now.isoformat(), 'bundle': deepcopy(bundle), 'results': results, 'summary': dict(Counter(r['status'] for r in results)),
         'limitations': ['internal_LAB_not_KISA_certification', 'Linux_container_not_full_host_audit', 'SSH_Match_scope_root_loopback_only',
             'rsyslog_route_and_process_not_log_delivery', 'demo_TCP9000_only_not_all_services', 'TLS_transport_policy_not_TCP_TLS_handshake',

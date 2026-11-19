@@ -143,3 +143,16 @@ Remove-Item Env:LINUX_MYSQL_STAGE -ErrorAction SilentlyContinue
 - [공식 MySQL 이미지 초기화 코드](https://github.com/docker-library/mysql/blob/master/8.4/docker-entrypoint.sh)
 
 제품 문서는 지시어/변수 의미를 확인하는 출처이며, 여기서 사용하는 양호 기준은 프로젝트의 개인 실습 기준이다.
+
+## 추가 수집 증적의 보수적 평가
+
+`python -m scripts.run_supplemental_audit --input <입력.json> --output <새출력.json>`은 명시적으로 제공한 비민감 증적을 오프라인 평가한다. 새 명령은 SSH 접속·SQL·marker 전송·시스템 변경을 수행하지 않는다. 기존 Docker LAB 10개 결과를 확장 실측처럼 덮어쓰지 않는다.
+
+- `LINUX-ACCOUNT-UID0`: 완전한 계정 목록에서 지정 계정 이외 UID0 여부. 결과에는 계정 이름 대신 수량을 내보낸다.
+- `LINUX-SSH-ROOT-CONTEXTS`, `LINUX-SSH-PASSWORD-CONTEXTS`: 예상 context 목록과 `sshd -T -C` 결과의 일치를 확인하고 모든 context의 명시 설정을 비교한다. 하나의 loopback 결과로 전체 Match 범위를 추정하지 않는다.
+- `LINUX-LOG-DELIVERY`: 이번 고유 marker·목적지·발송/수신 시각을 대조한다. daemon 실행만으로 delivery PASS를 만들지 않는다.
+- `MYSQL-TLS-SESSION`: 실제 TCP 세션 cipher/protocol과 클라이언트 peer identity 검증을 구분한다. Unix socket이나 cipher 단독 관찰은 TLS identity의 PASS가 아니다.
+
+입력 최상위 필드는 `schema_version=1`, `origin=SYNTHETIC|SAVED_LAB|MANUAL_LAB`, `items`이다. 각 item에는 `check_id`, `asset_id`, `product_version`, `collection_status`, `value`, 원수집 `collected_at`(offset 포함), `evidence_reference`, `scope`, `complete`, `supported`를 제공한다. `review_reason`은 선택 사항이며 조직 예외/미확인 조건을 남긴다. 정확한 value 스키마와 양호/미흡/누락/미지원 예시는 `tests/test_audit_reliability.py`에 있다. 출처 인증은 별도이며 선언만으로 VERIFIED_LAB를 허용하지 않는다. 부분 수집의 긍정 결과는 NEEDS_REVIEW, 명확히 관찰한 위반은 FAIL, 미수집은 NOT_TESTED, 수집 오류는 ERROR이다. 출력은 기존 파일을 덮어쓰지 않는다.
+
+공통 `Observation`/`AuditResult`의 provenance는 원수집 시각과 재분석 시각을 구분하고 증적은 기본 PRIVATE다. 원수집 시각이 없는 예전 JSON에 현재 시각을 대입하지 않는다. 이 모듈과 테스트의 PASS는 실제 collector 실행이나 고객 환경 측정을 대신하지 않는다.

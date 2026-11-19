@@ -67,6 +67,17 @@ def identify_service(banner: str | bytes | None, hint: str = "unknown") -> dict:
             return observed(service, None, None, "http_incomplete_headers", first_line)
         # Ignore the body, X-Powered-By and duplicate Server headers.
         header = re.split(r"\r?\n\r?\n", text, maxsplit=1)[0]
+        # Product-specific response headers are advertised identity, never a
+        # port-number guess. Repeated/ambiguous identity is deliberately ignored.
+        elastic = re.findall(r"^X-Elastic-Product:[ \t]*([^\r\n]*)", header, re.I | re.M)
+        if elastic == ["Elasticsearch"]:
+            return observed(service, "elasticsearch", None, "http_product_headers", "X-Elastic-Product: Elasticsearch")
+        kibana_names = re.findall(r"^kbn-name:[ \t]*([^\r\n]*)", header, re.I | re.M)
+        kibana_signatures = re.findall(r"^kbn-license-sig:[ \t]*([^\r\n]*)", header, re.I | re.M)
+        if len(kibana_names) == len(kibana_signatures) == 1 and all((kibana_names[0], kibana_signatures[0])):
+            versions = re.findall(r"^kbn-version:[ \t]*([0-9]+\.[0-9]+\.[0-9]+)[ \t]*$", header, re.I | re.M)
+            return observed(service, "kibana", versions[0] if len(versions) == 1 else None,
+                            "http_product_headers", "Kibana product headers present")
         servers = re.findall(r"^Server:[ \t]*([^\r\n]*)", header, re.I | re.M)
         if len(servers) != 1:
             return observed(service, None, None, "http_response", first_line)

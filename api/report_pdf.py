@@ -116,14 +116,21 @@ def render_report_pdf(snapshot, output_path):
     story.append(Spacer(1, 8))
     section(1, "Report Metadata")
     fields([("generated_at_utc", snapshot.get("generated_at")), ("selection", snapshot.get("selection")),
-            ("report_basis", "Read-only V6-capable DB snapshot. This command does not scan, verify or refresh external intelligence.")])
+            ("report_basis", "Read-only stored DB snapshot. This command does not scan, verify or refresh external intelligence."),
+            ("history_capability", snapshot.get("history_capability", "LEGACY_CURRENT_STATE_ONLY")),
+            ("timestamp_policy", snapshot.get("timestamp_policy"))])
 
     section(2, "Executive Summary")
-    table(["Assets", "Open ports", "CVE findings", "AWS config", "CVE highest"],
+    table(["Assets", "Open ports", "Stored CVE records", "AWS config", "CVE highest"],
           [[summary.get("asset_count"), summary.get("open_port_count"), summary.get("finding_count"),
             summary.get("cloud_configuration_finding_count", 0), summary.get("highest_priority", "UNASSESSED")]],
           [0.14, 0.16, 0.20, 0.20, 0.30])
-    story.append(p("Status counts", subheading))
+    if 'current_finding_count' in summary:
+        fields([('currently_applicable_finding_count', summary['current_finding_count']),
+                ('historical_status_counts', summary.get('historical_status_counts')),
+                ('current_relevance_counts', summary.get('relevance_counts'))])
+        story.append(p('Stored CVE records include historical reviews. They are not the current confirmed-vulnerability count.'))
+    story.append(p("Current effective status counts", subheading))
     statuses = list(summary.get("status_counts", {}).items())
     status_rows = []
     for index in range(0, len(statuses), 2):
@@ -194,11 +201,20 @@ def render_report_pdf(snapshot, output_path):
     else:
         story.append(p("No current open port observations. This is not proof that all ports are closed or safe."))
     story.append(p("Findings on currently observed closed/filtered endpoints retain their stored review status; port closure alone does not close a finding."))
+    uncertain = [(asset, port) for asset in assets for port in asset.get('ports', []) if port.get('state') != 'open']
+    if uncertain:
+        story.append(p('Closed, uncertain, error and untested observations', subheading))
+        table(['Host', 'Port / proto', 'State', 'Reason'],
+              [[asset.get('host_ip'), f"{port.get('port')}/{port.get('protocol')}", port.get('state'),
+                port.get('reason') or port.get('error_code')] for asset, port in uncertain[:200]],
+              [.25, .20, .20, .35])
+        if len(uncertain)>200:
+            story.append(p(f'First 200 of {len(uncertain)} non-open observations shown. Full observations are preserved in the JSON snapshot.'))
 
     section(7, "CVE Findings Summary")
     if findings:
         table(["CVE / ID", "Status", "Priority", "Action", "Freshness"],
-              [[f"{f.get('cve_id')} / {f['vuln_id']}", f.get("status"), f.get("effective_priority"),
+              [[f"{f.get('cve_id')} / {f['vuln_id']}", f.get("effective_status", f.get('status')) or f.get('current_relevance'), f.get("effective_priority"),
                 f.get("effective_action"), f.get("assessment_freshness")] for f in findings],
               [0.29, 0.22, 0.16, 0.16, 0.17])
     else:
@@ -207,13 +223,15 @@ def render_report_pdf(snapshot, output_path):
     section(8, "CVE Finding Details")
     for finding in findings:
         story.append(p(f"{finding.get('cve_id')} / Finding {finding['vuln_id']}", subheading))
-        fields((key, finding.get(key)) for key in ("title", "source", "status", "severity", "effective_priority",
+        fields((key, finding.get(key)) for key in ("title", "source", "historical_status", "effective_status", "current_relevance", "verification_relevance", "relevance_reason", "status", "severity", "effective_priority",
                                                    "effective_action", "assessment_freshness", "freshness_reasons",
                                                    "first_detected_at", "last_detected_at", "verified_at", "closed_at"))
         fields([("endpoint", finding.get("endpoint"))])
         current_asset = assets_by_uid.get(finding.get("endpoint", {}).get("asset_uid"), {})
         fields([("current_asset_criticality", current_asset.get("criticality"))])
         assessment = finding.get("assessment") or {}
+        fields([('external_intel_freshness', assessment.get('intel_freshness')),
+                ('observation_links', finding.get('observation_links'))])
         fields([("stored_cvss", assessment.get("cvss_score")), ("stored_epss_score", assessment.get("epss_score")),
                 ("stored_epss_percentile", assessment.get("epss_percentile")), ("stored_kev", assessment.get("kev_status")),
                 ("assessed_asset_criticality", assessment.get("asset_criticality")),
@@ -315,7 +333,7 @@ def render_report_pdf(snapshot, output_path):
         canvas.line(42, 37, width - 42, 37)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(MUTED)
-        canvas.drawString(42, 25, "Infrastructure Security Review | Current-state snapshot")
+        canvas.drawString(42, 25, "Infrastructure Security Review | Stored observation snapshot")
         canvas.drawRightString(width - 42, 25, f"Page {doc.page}")
         canvas.restoreState()
 

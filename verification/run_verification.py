@@ -11,6 +11,7 @@ from db.db_client import get_connection
 from db.query_helpers import (get_ports_with_vuln_candidates, insert_vuln_evidence,
                               update_vuln_verification)
 from db.statuses import validate_vuln_transition
+from db.scan_history import link_finding
 from scanner.scope import ScopePolicy, ScopeValidationError
 from scanner.targets import ResolvedTarget, normalize_hostname, resolve_target_specs
 from verification.base_checker import RESULT_EVIDENCE_TYPES, RESULT_STATUSES, check_result
@@ -168,6 +169,8 @@ def save_verification(port_record: dict, vuln_candidate: dict, result: dict,
                 evidence_id = insert_vuln_evidence(connection, vuln_id, result["checker"],
                                                    result["evidence_type"], details=details, sha256=digest)
         update_vuln_verification(connection, vuln_id, new_status, reason=result["reason"][:500])
+        if result['status'] == 'CONFIRMED':
+            link_finding(connection, vuln_id, port_id=port_record['id'], relation='VERIFIED')
         connection.commit()
         return {"status": new_status, "evidence_id": evidence_id, "evidence_reused": bool(existing)}
     except VerificationConflictError:

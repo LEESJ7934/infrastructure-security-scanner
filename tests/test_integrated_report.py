@@ -30,7 +30,38 @@ def pdf_text(path):
     return "\n".join(page.extract_text() or "" for page in PdfReader(path).pages)
 
 
-@unittest.skipUnless(all((ROOT / spec[0]).is_file() for spec in INPUTS), "Local ignored Day2/3 JSON inputs unavailable")
+def missing_local_evidence(root=ROOT):
+    """Availability is not integrity; never fabricate missing private sidecars."""
+    paths = {root / spec[0] for spec in INPUTS}
+    paths.update(root/'lab/ids-waf-lab/artifacts'/name for name in
+                 ('day3.pcap','suricata-eve.json','suricata-fast.log'))
+    paths.update(root/'evidence/day4'/name for name in ('fw04-active-rules.txt','fw04-active-rules-detail.txt',
+                 'fw04-rules.tar','fw05-wan-tcp22.json','fw05-wan-tcp22-retest.json'))
+    manual = root/'evidence/day4/manual.json'
+    paths.add(manual)
+    if manual.is_file():
+        for record in json.loads(manual.read_text(encoding='utf-8-sig'))['checks']:
+            paths.update(root/'evidence/day4'/source['path'] for source in record['sources'])
+    return sorted(str(p.relative_to(root)) for p in paths if not p.is_file())
+
+
+class LocalEvidencePrerequisiteTests(unittest.TestCase):
+    def test_json_inputs_alone_do_not_imply_private_sidecars_exist(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            for spec in INPUTS:
+                path=root/spec[0];path.parent.mkdir(parents=True,exist_ok=True)
+                path.write_text(json.dumps({'checks':[]}),encoding='utf-8')
+            self.assertIn(str(Path('lab/ids-waf-lab/artifacts/day3.pcap')),missing_local_evidence(root))
+
+    def test_missing_data_stays_unavailable_instead_of_synthetic_success(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            self.assertTrue(missing_local_evidence(root))
+            self.assertFalse(any(root.rglob('*')))
+
+
+@unittest.skipUnless(not missing_local_evidence(), "Local original report evidence incomplete (JSON or referenced PCAP/log/screenshot missing)")
 class LocalFinalReportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

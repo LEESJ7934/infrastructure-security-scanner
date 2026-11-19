@@ -18,6 +18,7 @@ from ..engine import evaluate
 from ..models import AuditAsset, AuditRule, Observation
 from ..reporting import ReportResult, SourceSnapshot
 from ..statuses import AuditStatus
+from ..support import support_scope
 
 PROJECT = "scanner-p2net"
 CHECKS = {
@@ -226,6 +227,7 @@ def audit(bundle=None, *, synthetic=False, error_code=None):
             rows[-1]["recognition"] = deepcopy(captured.get("values", {}))
         rows[-1]["evidence_references"] = [{"reference": result.evidence_reference}] if result.evidence_reference else []
     return {"schema_version": 1, "mode": "synthetic_test_only" if synthetic else "LAB", "generated_at": now.isoformat(),
+        "support_scope": support_scope('network'),
         "bundle": bundle, "results": [] if synthetic else rows, "synthetic_results": rows if synthetic else [],
         "packet_verification": {"status": "NOT_TESTED", "source": None},
         "limitations": ["not_physical_router_switch_validation", "no_Cisco_features_claimed", "8021q_not_verified",

@@ -31,7 +31,7 @@
 
 최초 템플릿은 합성 테스트에서 FAIL 8개, 개선 템플릿은 PASS 8개이다. 실제 최초/재점검 결과는 사용자 실행 이후 생성되는 JSON으로만 확정한다. 기본 manager/host-manager는 처음부터 활성화하지 않으며 사용자/암호를 만들지 않는다. docs/examples 존재는 불필요한 기본 앱 점검의 재현 범위이다.
 
-Nginx는 include 없는 제공 LAB 템플릿 두 개만 인식한다. 알 수 없는 override/include/context는 NEEDS_REVIEW이며 범용 Nginx 파서로 주장하지 않는다. Tomcat도 단일 Service/Engine/Host/Connector와 지원하는 Valve 구조만 해석한다. 누락값은 안전한 기본값으로 채우지 않는다. 제품 문서의 기본값, 명시 설정값 및 실제 HTTP 관찰을 구분하며, PASS는 지원 버전의 확인값에만 허용한다. 미수행은 NOT_TESTED, 미확인/미지원 버전은 NEEDS_REVIEW, 수집 실패는 ERROR이다. 이 LAB에서는 8개 모두 적용 대상으로 설계했으며 다른 제품을 실제 검증했다고 주장하지 않는다.
+Nginx는 템플릿 전체 문자열 일치 대신 제한된 유효 설정 파서를 사용한다. 명시적인 `http`/`server`/literal prefix `location`의 `autoindex`, `server_tokens`, `access_log` 상속과 하위 재정의를 평가한다. `nginx_values(raw, includes={정확한_경로: 수집한_내용})`에 제공된 Include만 메모리에서 펼치며 임의 파일을 읽지 않는다. unresolved/cyclic Include, regex/named/dynamic location, 조건문, 미지원 지시어는 NEEDS_REVIEW이며 범용 Nginx 문법 전체 지원을 주장하지 않는다. `/files/`·`/private/` 기준 및 실제 HTTP 대조는 기존 LAB 범위다. 자동 Docker collector는 고정 LAB 파일을 수집하므로 외부 사이트의 Include inventory까지 자동 수집했다고 주장하지 않는다. Tomcat은 단일 Service/Engine/Host/Connector와 지원하는 Valve 구조만 해석한다. 누락값은 안전한 기본값으로 채우지 않으며 독립적으로 확인된 다른 항목은 유지한다. 제품 문서의 기본값, 명시 설정값 및 실제 HTTP 관찰을 구분하며, PASS는 지원 버전의 확인값에만 허용한다. 미수행은 NOT_TESTED, 미확인/미지원 버전은 NEEDS_REVIEW, 수집 실패는 ERROR이다. `support_scope`는 구현 지원 범위 설명이며 실제 측정 결과가 아니다.
 
 ## 1. 실행 전 준비 (사용자 실행)
 

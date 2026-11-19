@@ -148,3 +148,11 @@ Windows 핸들 경로 검사를 사용한다. Git에서 제외된 Day3 입력이
 관계, 채널별 비교, 수집·검증 시각 구분, 증적 상태와 진단 상태의 분리,
 누락·버전 변경·수동 범위 차이를 검증 불가로 표현하는 정책이 필요하다.
 해시 일치 자체를 조치 완료나 진단 PASS로 취급하면 안 된다.
+
+## 원수집과 재분석 및 공개 범위
+
+공통 Observation/AuditResult의 선택 provenance 필드는 원수집 `collected_at`, 분석 `checked_at`, source_kind, collection_scope, completeness, support, review_reason과 evidence_visibility다. 새 provenance가 없는 과거 입력은 기존 export 형태를 유지하며 현재 시각을 원수집 시각으로 만들지 않는다. 부분 수집·미지원·미확인 예외로 PASS를 만들지 않는다. 증적은 기본 PRIVATE이며 공개본은 비민감 결과/정의/해시만 포함하도록 별도 검토해야 한다. PRIVATE라는 라벨 자체가 OS 접근제어·암호화 저장소를 대신하지 않는다.
+
+V8 원시 스캔 JSON은 식별에 필요한 HTTP 헤더만 보존하고 세션 헤더·body를 제거한다. 수입 시에도 민감 필드·기존 접힌 헤더를 제거한다. 원래 세션 값은 DB/일반 보고서에 보존하지 않는다. 관찰 hash는 내용 동일성의 근거이며 장비 출처나 수집 완전성의 증명이 아니다.
+
+도메인별 구현 지원 범위는 `config_audit.support.support_scope()`로 내보낸다. support 선언은 현재 환경을 측정했다는 뜻이 아니다. supplemental 증적 evaluator도 오프라인 판단이며 실제 SSH 접속·SQL·로그 marker 전송·TLS handshake를 대신하지 않는다. KISA 공식 선정 adapter와 자체 LAB/supplemental 기준은 다른 항목이다.
