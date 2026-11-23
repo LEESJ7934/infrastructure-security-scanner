@@ -5,7 +5,7 @@
 
 > **검증 범위:** 모든 진단 및 개선 성과는 승인된 격리 LAB 또는 일회용 CI 환경에 한정됩니다. 실제 고객사 진단, KISA 전 항목 준수, 정식 인증심사 실적이 아닙니다.
 
-**빠른 탐색:** [대표 진단 사례](docs/recruiting-evidence-brief.md) · [KISA 선정 점검 대장](docs/kisa-2026-final-scope-result.md) · [KISA 항목별 면접 연결표](docs/recruiting-kisa-interview-map.md) · [기술면접 질문](docs/recruiting-technical-interview.md) · [Notion 상세 포트폴리오](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
+**빠른 탐색:** [KISA 선정 점검 대장](docs/kisa-2026-final-scope-result.md) · [진단 항목별 검증 근거](docs/audit-evidence-mapping.md) · [Linux/MySQL 재점검](docs/linux-mysql-retest.md) · [WEB/WAS 점검](docs/web-was-audit.md) · [Notion 상세 포트폴리오](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
 
 ## 1. 수행 범위와 본인 기여
 
@@ -89,4 +89,4 @@ python -m scripts.generate_report_sample
 
 OPNsense S-06의 남은 경로·전체 PF 규칙, AWS CA-09의 조직 운영 승인·정기 검토, 일부 Windows 도메인/GPO와 실운영 조건, Suricata 활성 시그니처 전체, 실제 고객사의 운영 영향·정책 승인 등은 검증하지 않았습니다. **검증되지 않은 조건을 PASS 또는 실제 실무 경험으로 바꾸지 않습니다.**
 
-[세부 진단 대장](docs/kisa-2026-final-scope-result.md) · [기술진단 증거 브리프](docs/recruiting-evidence-brief.md) · [Notion 설명](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
+[세부 진단 대장](docs/kisa-2026-final-scope-result.md) · [진단별 증거 기록](docs/audit-evidence-mapping.md) · [Notion 설명](https://app.notion.com/p/300fef5673598095a2a5cc5107dcb62c)
