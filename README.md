@@ -69,4 +69,4 @@ python -m scripts.generate_report_sample
 
 대표 사례는 **재현 가능한 LAB 설정 및 접근 시험**입니다. 고객사 운영환경에서 발견한 취약점이나 공식 KISA 적합 판정을 의미하지 않습니다. KISA 선정 항목의 개별 PASS/REVIEW 판정, 서로 다른 LAB의 결과와 미검증 경로는 원본 대장에 보존했습니다. 특히 OPNsense S-06은 일부 접근경로와 전체 PF 규칙이 미확인 상태이므로 대표 검증 완료 성과로 사용하지 않습니다.
 
-[선정 16개 항목의 판정·미검증 조건](docs/kisa-2026-final-scope-result.md) · [진단 항목별 원본 근거](docs/audit-evidence-mapping.md) · [그 외 점검 기록](docs/)
+[선정 16개 항목의 판정·미검증 조건](docs/kisa-2026-final-scope-result.md) · [진단 항목별 원본 근거](docs/audit-evidence-mapping.md) · [보안장비 점검 기록](docs/opnsense-audit.md)
