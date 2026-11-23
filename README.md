@@ -1,5 +1,9 @@
 # 인프라 보안 취약점 진단 스캐너
 
+> **2026 신입 기술진단 지원 자료**  
+> [근거 중심 대표 사례 3건](docs/recruiting-evidence-brief.md) · [KISA 선정 항목 × 기술면접 연결표](docs/recruiting-kisa-interview-map.md) · [기술면접 질문 16개](docs/recruiting-technical-interview.md)  
+> 실제 고객사 수행이 아닌 격리 LAB·개인 후속 작업입니다. 일부 판정·운영조건은 미검증으로 구분합니다.
+
 Python 기반 보안 진단 프로젝트입니다. 서비스·버전 식별과 CVE 후보 분석을 시작으로 인프라 설정 점검, 개선 전후 재점검, JSON/PDF 보고서 생성을 구현했습니다.
 
 초기 스캐너는 팀 프로젝트로 개발했으며, 서버·네트워크·DBMS·WEB/WAS·보안장비·AWS 진단과 DVWA 웹 취약점 실습은 개인 후속 작업으로 확장했습니다.
